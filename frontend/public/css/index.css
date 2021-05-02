@@ -45,11 +45,17 @@ a:hover {
   background-color: #dd548d;
 }
 
+#root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 #header {
   width: 100%;
   height: 5.5rem;
   background-color: #28282d;
-  box-shadow: 3px 3px 3px 3px #2c2c2c;
+  box-shadow: 3px 3px 6px 6px #313131;
   display: flex;
   justify-content: space-between;
 }
@@ -57,7 +63,7 @@ a:hover {
   font-size: 2.5rem;
   font-weight: 800;
   letter-spacing: 0.2rem;
-  color: #e9e7e7;
+  color: white;
   margin: auto 4rem;
 }
 #header .dropdown {
@@ -146,15 +152,52 @@ a:hover {
   }
 }
 
-.header-btn {
-  display: block;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  margin-top: -22px;
-  width: 24px;
-  height: 40px;
+#new-item {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  overflow: hidden;
+}
+#new-item .title {
+  margin: 4rem auto 2rem 0;
+  font-size: 2rem;
+  letter-spacing: 0.1rem;
+  color: white;
+}
+#new-item .slide {
+  display: flex;
+}
+#new-item .slide .item-card {
+  display: flex;
+  flex-direction: column;
+  margin: auto 2rem auto 0;
+}
+#new-item .slide .item-card div {
+  margin-bottom: 0.3rem;
+}
+#new-item .slide .item-card img {
+  width: 10rem;
+  height: 15rem;
   opacity: 0.8;
+  margin-bottom: 0.4rem;
+}
+#new-item .slide .item-card img:hover {
+  opacity: 1;
+}
+#new-item .slide .item-card .item-name {
+  color: white;
+  font-size: 1.3rem;
+}
+#new-item .slide .item-card .item-cat {
+  color: #df3b7f;
+}
+#new-item .slide .item-card .item-date {
+  display: flex;
+  align-items: center;
+}
+#new-item .slide .item-card .item-date span {
+  margin-left: 0.4rem;
 }
 
 /*# sourceMappingURL=index.css.map */
