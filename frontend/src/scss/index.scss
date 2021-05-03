@@ -35,8 +35,6 @@ a:hover{
     color: $hover-button-color;
 }
 
-
-
 .btn {
     background-color: $primary-button-color;
     border: none;
@@ -59,11 +57,20 @@ a:hover{
     flex-direction: column;
 }
 
-#header {
+.container {
     width: 100%;
-    height: 5.5rem;
+}
+
+.header-container {
+    @extend .container;
     background-color: $second-color;
-    box-shadow: 3px 3px 6px 6px rgb(49, 49, 49);
+    box-shadow: 3px 3px 6px 6px rgb(32, 32, 32);
+}
+
+#header {
+    width: 80%;
+    height: 5.5rem;
+    margin: 0 auto;
     display: flex;
     justify-content: space-between;
 
@@ -72,14 +79,14 @@ a:hover{
         font-weight: 800;
         letter-spacing: 0.2rem;
         color: white;
-        margin: auto 4rem;
+        margin: auto 4rem auto 0;
+
     }
 
     .dropdown {
         position: relative;
         height: 100%;
         top: 2.5rem;
-
     }
 
     .dropdown-content {
@@ -111,7 +118,7 @@ a:hover{
 
                 a {
                     position: relative;
-                    top: 2.5rem;
+                    top: 2rem;
                 }
             }
         }
@@ -127,15 +134,15 @@ a:hover{
         display: flex;
         flex-direction: row;
         align-items: center;
-        margin-right: 2rem;
         font-size: 1rem;
-
-        * {
-            margin-right: 2rem;
-        }
 
         ion-icon {
             font-size: 1.4rem;
+            margin-right: 2rem;
+        }
+
+        .dropdown {
+            margin-right: 2rem;
         }
 
         #mobile-btn {
@@ -169,8 +176,6 @@ a:hover{
               }
         }
 
-
-
         @media screen and (max-width: 1024px) {
             #mobile-btn {
                 display: flex;
@@ -179,63 +184,124 @@ a:hover{
     }
 }
 
+.continue-container {
+    @extend .container;
+    padding-bottom: 3rem;
+    border-bottom: solid 3px $primary-button-color;
+    position: relative;
+}
 
-#new-item {
+
+.continue-container::after {
+    content: '';
+    background: url('/images/deer.jpg');
+    opacity: 0.1;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+#continue-watching {
     width: 80%;
     display: flex;
     flex-direction: column;
     margin: auto;
     overflow: hidden;
-    
+    position: relative;
 
     .title {
         margin: 4rem auto 2rem 0;
         font-size: 2rem;
         letter-spacing: 0.1rem;
         color: white;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        ion-icon {
+            color: $primary-text-color;
+            margin: auto 0.8rem;
+            cursor: pointer;
+        }
     }
 
-    .slide {
-        display: flex;
+    #carousel {
+        width: 100%;
+        position: relative;
 
-        .item-card {
+        #carouselbox {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
             display: flex;
-            flex-direction: column;
-            margin: auto 2rem auto 0;
-    
-            div {
-                margin-bottom: 0.3rem;
-            }
+            align-items: center;
 
-            img {
-                width: 10rem;
-                height: 15rem;
-                opacity: 0.8;
-                margin-bottom: 0.4rem;
-            }
-
-            img:hover {
-                opacity: 1;
-            }
-
-            .item-name {
-                color: white;
-                font-size: 1.3rem;
-            }
-
-            .item-cat {
-                color: $primary-button-color;
-            }
-
-            .item-date {
+            .carousel-item {
                 display: flex;
-                align-items: center;
+                flex-direction: column;
+                margin: 1rem;
+                width: 12rem;
 
-                span {
-                    margin-left: 0.4rem;
+                .item-poster {
+                    margin-bottom: 0.3rem;
+                    position: relative;
+
+                    img {
+                        width: 12rem;
+                        height: 18rem;
+                        cursor: pointer;
+                        transition: 0.5s ease;
+                        opacity: 0.75;
+                    }
+
+                    progress {
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        opacity: 0.6;
+                    }
+
+                    img:hover {
+                        opacity: 1;
+                    }
+                }
+
+                .item-name {
+                    font-size: 1.2rem;
+                    color: white;
+                    overflow: hidden;
+                    margin-bottom: 0.2rem;
+                }
+
+                .item-cat {
+                    font-size: 0.9rem;
+                    color: $primary-button-color;
+                    overflow: hidden;
                 }
             }
         }
     }
+}
 
+#new-item {
+    width: 100%;
+
+    .title-bar {
+        width: 80%;
+        height: 5.5rem;
+        margin: auto;
+        font-size: 2rem;
+        letter-spacing: 0.1rem;
+        color: white; 
+        display: flex;       
+        align-items: center;
+    }
+
+
+    
 }

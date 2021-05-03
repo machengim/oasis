@@ -4,6 +4,7 @@ export default function Header() {
     console.log('header loaded');
 
     return (
+        <div className='header-container'>
         <div id='header'>
             <div id='logo'>
                 OASIS
@@ -47,6 +48,7 @@ export default function Header() {
                     <div className='mobile-btn-line'></div>
                 </div>
             </div>
+        </div>
         </div>
     );
 }

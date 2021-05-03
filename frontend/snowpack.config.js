@@ -2,7 +2,8 @@
 module.exports = {
   mount: {
     src: '/dist',
-    public: '/'
+    public: '/',
+    scss: '/scss'
   },
   plugins: [
     /* ... */

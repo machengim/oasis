@@ -51,11 +51,19 @@ a:hover {
   flex-direction: column;
 }
 
-#header {
+.container, .continue-container, .header-container {
   width: 100%;
-  height: 5.5rem;
+}
+
+.header-container {
   background-color: #28282d;
-  box-shadow: 3px 3px 6px 6px #313131;
+  box-shadow: 3px 3px 6px 6px #202020;
+}
+
+#header {
+  width: 80%;
+  height: 5.5rem;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
 }
@@ -64,7 +72,7 @@ a:hover {
   font-weight: 800;
   letter-spacing: 0.2rem;
   color: white;
-  margin: auto 4rem;
+  margin: auto 4rem auto 0;
 }
 #header .dropdown {
   position: relative;
@@ -97,7 +105,7 @@ a:hover {
 }
 #header #nav-items ul li a {
   position: relative;
-  top: 2.5rem;
+  top: 2rem;
 }
 @media screen and (max-width: 1024px) {
   #header #nav-items {
@@ -108,14 +116,14 @@ a:hover {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-right: 2rem;
   font-size: 1rem;
-}
-#header #header-right * {
-  margin-right: 2rem;
 }
 #header #header-right ion-icon {
   font-size: 1.4rem;
+  margin-right: 2rem;
+}
+#header #header-right .dropdown {
+  margin-right: 2rem;
 }
 #header #header-right #mobile-btn {
   display: none;
@@ -152,52 +160,109 @@ a:hover {
   }
 }
 
-#new-item {
+.continue-container {
+  padding-bottom: 3rem;
+  border-bottom: solid 3px #df3b7f;
+  position: relative;
+}
+
+.continue-container::after {
+  content: "";
+  background: url("/images/deer.jpg");
+  opacity: 0.1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+#continue-watching {
   width: 80%;
   display: flex;
   flex-direction: column;
   margin: auto;
   overflow: hidden;
+  position: relative;
 }
-#new-item .title {
+#continue-watching .title {
   margin: 4rem auto 2rem 0;
   font-size: 2rem;
   letter-spacing: 0.1rem;
   color: white;
-}
-#new-item .slide {
+  width: 100%;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-#new-item .slide .item-card {
-  display: flex;
-  flex-direction: column;
-  margin: auto 2rem auto 0;
+#continue-watching .title ion-icon {
+  color: #aaaaaa;
+  margin: auto 0.8rem;
+  cursor: pointer;
 }
-#new-item .slide .item-card div {
-  margin-bottom: 0.3rem;
+#continue-watching #carousel {
+  width: 100%;
+  position: relative;
 }
-#new-item .slide .item-card img {
-  width: 10rem;
-  height: 15rem;
-  opacity: 0.8;
-  margin-bottom: 0.4rem;
-}
-#new-item .slide .item-card img:hover {
-  opacity: 1;
-}
-#new-item .slide .item-card .item-name {
-  color: white;
-  font-size: 1.3rem;
-}
-#new-item .slide .item-card .item-cat {
-  color: #df3b7f;
-}
-#new-item .slide .item-card .item-date {
+#continue-watching #carousel #carouselbox {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
   display: flex;
   align-items: center;
 }
-#new-item .slide .item-card .item-date span {
-  margin-left: 0.4rem;
+#continue-watching #carousel #carouselbox .carousel-item {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+  width: 12rem;
+}
+#continue-watching #carousel #carouselbox .carousel-item .item-poster {
+  margin-bottom: 0.3rem;
+  position: relative;
+}
+#continue-watching #carousel #carouselbox .carousel-item .item-poster img {
+  width: 12rem;
+  height: 18rem;
+  cursor: pointer;
+  transition: 0.5s ease;
+  opacity: 0.75;
+}
+#continue-watching #carousel #carouselbox .carousel-item .item-poster progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0.6;
+}
+#continue-watching #carousel #carouselbox .carousel-item .item-poster img:hover {
+  opacity: 1;
+}
+#continue-watching #carousel #carouselbox .carousel-item .item-name {
+  font-size: 1.2rem;
+  color: white;
+  overflow: hidden;
+  margin-bottom: 0.2rem;
+}
+#continue-watching #carousel #carouselbox .carousel-item .item-cat {
+  font-size: 0.9rem;
+  color: #df3b7f;
+  overflow: hidden;
+}
+
+#new-item {
+  width: 100%;
+}
+#new-item .title-bar {
+  width: 80%;
+  height: 5.5rem;
+  margin: auto;
+  font-size: 2rem;
+  letter-spacing: 0.1rem;
+  color: white;
+  display: flex;
+  align-items: center;
 }
 
 /*# sourceMappingURL=index.css.map */
