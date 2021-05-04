@@ -1,3 +1,15 @@
-// Index page checks user authentication and determine 
-// which page to show.
-window.location.href = 'home';
+import React from 'react'
+import ReactDom from 'react-dom'
+
+ReactDom.render(
+    <App />, 
+    document.getElementById('root')
+);
+
+function App() {
+	return (
+        <div className='text-md'>
+            Snowpack with React
+        </div>
+    );
+}

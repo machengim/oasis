@@ -1,16 +1,25 @@
 {
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "snowpack dev",
-    "build": "snowpack build",
-    "test": "echo \"This template does not include a test runner by default.\" && exit 1"
+    "build": "snowpack build"
+
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "sass": "^1.32.12",
-    "snowpack": "^3.0.1"
+    "@snowpack/plugin-build-script": "^2.1.0",
+    "postcss-cli": "^8.3.1",
+    "snowpack": "^3.3.7",
+    "tailwindcss": "^2.1.2"
   },
   "dependencies": {
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "repeating": "^3.0.0"
+    "react-dom": "^17.0.2"
   }
 }
