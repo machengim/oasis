@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+a:hover{
+    @apply text-pink-600;
+}
+
+.dropdown-menu {
+    @apply absolute top-24 p-4 border-t-2 border-pink-600 bg-light-gray;
+}
+
+.nav-icon {
+    @apply text-icon hover:text-white cursor-pointer;
+}
+
+#root {
+    @apply flex flex-col;
+}

@@ -1,15 +1,4 @@
-import React from 'react'
-import ReactDom from 'react-dom'
-
-ReactDom.render(
-    <App />, 
-    document.getElementById('root')
-);
-
-function App() {
-	return (
-        <div className='text-md'>
-            Snowpack with React
-        </div>
-    );
-}
+// This file will contain redirection logic that 
+// checks whether the user has login
+// and whether the site allows guest users.
+window.location.href = '/home';
