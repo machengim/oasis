@@ -2,8 +2,8 @@ import React from 'react';
 
 export default function Header() {
     return (
-        <div className='w-full fixed shadow-lg bg-light-gray'>
-            <div className='w-full h-24 md:w-4/5 flex mx-auto items-center justify-between'>
+        <div className='w-full fixed shadow-lg bg-light-gray z-50'>
+            <div className='h-24 custom-container flex mx-auto items-center justify-between'>
                 <div className='text-4xl text-white my-auto font-bold font-sans tracking-wide'>
                     OASIS
                 </div>
@@ -17,6 +17,11 @@ export default function Header() {
                         <li className='h-full flex items-center ' >
                             <a href='#'>
                                 Movie
+                            </a>
+                        </li>
+                        <li className='h-full flex items-center ' >
+                            <a href='#'>
+                                TV Series
                             </a>
                         </li>
                         <li className='h-full flex items-center relative' >

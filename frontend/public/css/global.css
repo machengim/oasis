@@ -17,3 +17,7 @@ a:hover{
 #root {
     @apply flex flex-col;
 }
+
+.custom-container {
+    @apply w-full md:w-4/5 xl:w-3/5;
+}
