@@ -21,3 +21,15 @@ a:hover{
 .custom-container {
     @apply w-full md:w-4/5 xl:w-3/5;
 }
+
+#new-user-groups td, th {
+    @apply relative px-4 py-2 w-24 border border-gray-400 border-collapse;
+}
+
+#new-user-groups td .hidden-btn{
+    @apply absolute top-2 right-4 cursor-pointer hidden;
+}
+
+#new-user-groups td:hover .hidden-btn{
+    @apply block;
+}

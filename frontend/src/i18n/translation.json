@@ -1,0 +1,13 @@
+{
+    "en": {
+        "translation": {
+        }
+    },
+    "cn": {
+        "translation": {
+            "OASIS Setup": "OASIS 设置",
+            "Looks like you are creating a new server?": "看起来你在创建一个新服务器？",
+            "Please choose a language": "请选择语言"
+        }
+    }
+}

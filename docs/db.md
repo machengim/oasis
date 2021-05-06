@@ -5,10 +5,10 @@ Note SQLite has no built-in `bool` or `time` data type.
 ### Table `site`
 
 + id 
-+ first-run:   bool
++ firstRun:   bool
 + allow-guest: bool
 + lang: text
-+ create-time: time
++ createAt: time
 
 ### Table `user`
 
@@ -21,14 +21,14 @@ When the site starts up the first time, the user will be an admin automatically.
 
 ### Table `group`
 
-`Admin` group cannot be changed with init value {id: 1, name: 'Admin', level: 9}
+Initial group `Admin` and `User` cannot be removed
+`Admin`: {id: 1, name: 'Admin', level: 9}
 `User`: {id: 2, name: 'User', level: 2}
-`VIP`: {id: 3, name: 'VIP', level: 5}
-`Guest`: {id: 2, name: 'Guest', level: 0}
 
 + id
 + name: text
 + level: number
++ status: number    // whether the group has been removed. In case some items relate to a removed user group.
 
 ### Table `category`
 
@@ -60,7 +60,7 @@ One movie is likely to have only one file, while TV shows may contain some sub f
 + name: text
 + item: number // the id of the item it belongs to
 + storage: number // the id of the storage it lives in 
-+ location: text  // the relative path of this file on the storage
++ path: text  // the relative path of this file on the storage
 
 ### Table `cast`
 
