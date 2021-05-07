@@ -12,7 +12,7 @@ ReactDom.render(
 
 function App() {
 	return (
-        <div className='w-full h-screen bg-dark-gray text-gray-400'>
+        <div className='w-full min-h-screen text-gray-400'>
             <Header />
             <Continue />
             <NewItem />

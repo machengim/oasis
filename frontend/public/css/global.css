@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+    @apply bg-dark-gray;
+}
+
 a:hover{
     @apply text-pink-600;
 }
@@ -32,4 +36,12 @@ a:hover{
 
 #new-user-groups td:hover .hidden-btn{
     @apply block;
+}
+
+.shine-in-300 {
+    @apply opacity-80 transition-all duration-300;
+}
+
+.tag-with-border {
+    @apply border text-sm border-gray-400 rounded p-1 text-gray-300 font-semibold;
 }

@@ -25,8 +25,8 @@ export default function Continue() {
     }
 
     return (
-        <div className='w-full bg-deer pb-24 border-b-2 border-pink-600'>
-            <div className='custom-container mx-auto pt-24'>
+        <div className='w-full bg-deer pb-20 border-b-2 border-pink-600'>
+            <div className='custom-container mx-auto pt-20'>
                 <div className='w-full flex justify-between mt-16'>
                     <div className='text-white text-3xl flex justify-between'>
                         CONTINUE WATCHING
@@ -47,9 +47,9 @@ export default function Continue() {
                 </div>
                 <div className='w-full mt-8 relative'>
                     <div className='flex space-x-8 overflow-hidden' ref={carouselRef}>
-                        <div className='flex flex-col w-60'>
-                            <div className='w-full h-90 relative opacity-80 hover:opacity-100 transition-all duration-300'>
-                                <img src="/images/starwar.jpg" className='w-60 h-90' />
+                        <div className='flex flex-col w-48'>
+                            <div className='relative shine-in-300 hover:opacity-100'>
+                                <img src="/images/starwar.jpg" className='w-full h-72' />
                                 <progress value='30' max='100' className='absolute w-full bottom-0 left-0'/>
                             </div>
                             <p className='text-white text-2xl truncate mt-2'>

@@ -11,7 +11,11 @@ module.exports = {
             },
             backgroundImage: theme => ({
                 'deer': "url('/images/deer.png')",
-            })
+            }),
+            maxWidth: {
+                '4/5': '80%',
+                '9/10': '90%',
+            }
         }
     }
 };
