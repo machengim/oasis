@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS site (
 	id INTEGER PRIMARY KEY,
 	firstRun INTEGER NOT NULL DEFAULT 1,
+	port INTEGER NOT NULL DEFAULT 3000,
 	allowGuest INTEGER NOT NULL DEFAULT 0,
     defaultUserGroup INTEGER NOT NULL DEFAULT 2,
 	lang INTEGER NOT NULL DEFAULT 1,
@@ -9,6 +10,7 @@ CREATE TABLE IF NOT EXISTS site (
 
 CREATE TABLE IF NOT EXISTS lang (
 	id INTEGER PRIMARY KEY,
+	code TEXT NOT NULL,
    	langName TEXT NOT NULL
 );
 
@@ -84,8 +86,8 @@ CREATE TABLE IF NOT EXISTS itemtag (
 	tag INTEGER NOT NULL
 );
 
-INSERT INTO lang(langName) VALUES('en');
-INSERT INTO lang(langName) VALUES('cn');
+INSERT INTO lang(code, langName) VALUES('en', 'English');
+INSERT INTO lang(code, langName) VALUES('cn', '中文');
 INSERT INTO site(createAt) VALUES(datetime());
 INSERT INTO usergroup(groupName, power) VALUES('Admin', 9);
 INSERT INTO usergroup(groupName, power) VALUES('User', 3);

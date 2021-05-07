@@ -1,93 +1,40 @@
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
-import sqlite3 from 'sqlite3';
-import open from 'open';
+import getDb from './init.js';
+import express from 'express';
+import cors from 'cors';
+import { readSingleRow } from './crud.js';
 
-// Get the Platform name and return it.
-// Could be 'win32', 'darwin' or 'linux'.
-function getOS() {
-    let sys = os.platform();
+const db = getDb();
+let sql = 'SELECT firstRun FROM site;';
 
-    if (sys !== 'win32' && sys !== 'darwin' && sys !== 'linux') {
-        console.error('Error: only Windows, MacOS and Linux are supported!');
-        process.exit(1);
-    }
-
-    return sys;
-}
-
-// Get database connection.
-// Create a database if not existed.
-function getDb(sys) {
-    const dbName = 'main.db';
-
-    let dbFile = null;
-    if (sys == 'win32') {
-        dbFile = path.join(__dirname, dbName);  
-    } else {
-        dbFile = path.join(os.homedir(), '.config', 'oasis', dbName);
-    }
-
-    if (!fs.existsSync(dbFile)) {
-        return {db: createNewDb(dbFile), firstRun: true};
-    } else {
-        return {db: connectDb(dbFile), firstRun: false};
-    }
-}
-
-// Open connection with a database.
-function connectDb(filename) {
-    const db = new sqlite3.Database(filename, e => {
-        if (e) {
-            console.error('Cannot connect to the database. ' + e);
-            process.exit(1);
+readSingleRow(db, sql)
+    .then(res => {
+        if (res.firstRun == 1) {
+            console.log('first');
+            initSite(db, res.port);
+        } else {
+            console.log('not first');
         }
     });
 
-    return db;
-}
+const app = express();
 
-// Create a database according to the file path provided.
-function createNewDb(filename) {
-    const dir = path.dirname(filename);
-    console.log(dir);
-    
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, {recursive: true});
-    }
+function initSite(db, port) {
+    app.use(cors());
 
-    const db = connectDb(filename);
-    runInitSql(db);
+    app.get('/', (req, res) => {
+        res.send('Hello world');
+    });
 
-    return db;
-}
+    app.listen(port, () => console.log(`Listening on port ${port}`));
 
-// Run the initial SQL commands from the provided `init.sql` file.
-function runInitSql(db) {
-    const sqlCmdFile = fs.readFileSync('./assets/init.sql').toString();
-    const sqlCmdArray = sqlCmdFile.split(');');
-    
-    db.serialize(() => {
-        db.run('BEGIN TRANSACTION;');
-
-        sqlCmdArray.forEach((query) => {
-            if (query) {
-                query += ');';
-                db.run(query, e => {
-                    if (e) {
-                        console.log('Cannot initialize databse. ' + e);
-                        process.exit(1);
-                    }
-                });
-            }
-        });
-
-        db.run('COMMIT;');
+    app.get('/config', (req, res) => {
+        let sql = 'SELECT * FROM site;';
+        readSingleRow(db, sql)
+            .then(v => {
+                res.send(v);
+            });
     });
 }
 
-let sys = getOS();
-const {db, firstRun} = getDb(sys);
-console.log(firstRun);
-open('https://www.google.com');
+
+
