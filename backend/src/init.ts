@@ -1,15 +1,15 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import sqlite3 from 'sqlite3';
+import sqlite3, { Database } from 'sqlite3';
 
 // Get database connection.
 // Create a database if not existed.
-export default function getDb() {
+export default function getDb(): Database {
     const sys = getOS();
     const dbName = 'main.db';
 
-    let dbFile = null;
+    let dbFile = '';
     if (sys == 'win32') {
         dbFile = path.join(__dirname, dbName);  
     } else {
@@ -25,7 +25,7 @@ export default function getDb() {
 
 // Get the Platform name and return it.
 // Could be 'win32', 'darwin' or 'linux'.
-function getOS() {
+function getOS(): NodeJS.Platform {
     let sys = os.platform();
 
     if (sys !== 'win32' && sys !== 'darwin' && sys !== 'linux') {
@@ -36,10 +36,8 @@ function getOS() {
     return sys;
 }
 
-
-
 // Open connection with a database.
-function connectDb(filename) {
+function connectDb(filename: string): Database {
     const db = new sqlite3.Database(filename, e => {
         if (e) {
             console.error('Cannot connect to the database. ' + e);
@@ -51,7 +49,7 @@ function connectDb(filename) {
 }
 
 // Create a database according to the file path provided.
-function createNewDb(filename) {
+function createNewDb(filename: string): Database {
     const dir = path.dirname(filename);
     console.log(dir);
     
@@ -66,7 +64,7 @@ function createNewDb(filename) {
 }
 
 // Run the initial SQL commands from the provided `init.sql` file.
-function runInitSql(db) {
+function runInitSql(db: Database) {
     const sqlCmdFile = fs.readFileSync('./assets/init.sql').toString();
     const sqlCmdArray = sqlCmdFile.split(');');
     
