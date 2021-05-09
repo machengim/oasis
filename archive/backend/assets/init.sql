@@ -1,0 +1,103 @@
+CREATE TABLE IF NOT EXISTS site (
+	id INTEGER PRIMARY KEY,
+	firstRun INTEGER NOT NULL DEFAULT 1,
+	port INTEGER NOT NULL DEFAULT 3000,
+	allowGuest INTEGER NOT NULL DEFAULT 1,
+    defaultUserGroup INTEGER NOT NULL DEFAULT 2,
+	lang INTEGER NOT NULL DEFAULT 1,
+	createAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS lang (
+	id INTEGER PRIMARY KEY,
+	code TEXT NOT NULL,
+   	langName TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS usergroup (
+	id INTEGER PRIMARY KEY,
+   	groupName TEXT NOT NULL,
+	power INTEGER NOT NULL,
+    status INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS user (
+	id INTEGER PRIMARY KEY,
+   	userName TEXT NOT NULL,
+    password TEXT NOT NULL,
+	usergroup INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS category (
+	id INTEGER PRIMARY KEY,
+   	categoryName TEXT NOT NULL,
+	permission INTEGER NOT NULL DEFAULT 1,
+	seq INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS storage (
+	id INTEGER PRIMARY KEY,
+   	storageName TEXT NOT NULL,
+	path TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS item (
+	id INTEGER PRIMARY KEY,
+    parent INTEGER,
+   	itemName TEXT NOT NULL,
+	type INTEGER NOT NULL,
+    category INTEGER NOT NULL DEFAULT 0,
+    permission INTEGER NOT NULL,
+    descriptoin TEXT,
+	thumbnail TEXT
+);
+
+CREATE TABLE IF NOT EXISTS file (
+	id INTEGER PRIMARY KEY,
+    item INTEGER NOT NULL,
+    storage INTEGER NOT NULL,
+	path TEXT NOT NULL,
+   	fileName TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cast (
+	id INTEGER PRIMARY KEY,
+   	castName TEXT NOT NULL,
+	description TEXT,
+    permission INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS itemcast (
+	id INTEGER PRIMARY KEY,
+   	item INTEGER NOT NULL,
+	cast INTEGER NOT NULL,
+    type TEXT,
+    seq INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tag (
+	id INTEGER PRIMARY KEY,
+    tagName TEXT NOT NULL,
+    permission INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS itemtag (
+	id INTEGER PRIMARY KEY,
+   	item INTEGER NOT NULL,
+	tag INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS star (
+	id INTEGER PRIMARY KEY,
+	user INTEGER NOT NULL,
+	item INTEGER NOT NULL,
+	createAt DATE DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO lang(code, langName) VALUES('en', 'English');
+INSERT INTO lang(code, langName) VALUES('cn', '中文');
+INSERT INTO site(createAt) VALUES(datetime());
+INSERT INTO usergroup(groupName, power) VALUES('Admin', 9);
+INSERT INTO usergroup(groupName, power) VALUES('User', 3);
+INSERT INTO category(categoryName, seq) VALUES('Movie', 1);
+INSERT INTO category(categoryName, seq) VALUES('TV series', 2);
