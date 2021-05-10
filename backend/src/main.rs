@@ -1,6 +1,7 @@
 #[macro_use] extern crate rocket;
 use std::{io::Read, path::Path};
-use rocket::http::Status;
+use futures::Stream;
+use rocket::{http::Status, response::stream::TextStream};
 use rocket::{Request, Response, fairing::{AdHoc, Fairing, Info, Kind}, form::name::Name, http::{ContentType, Header}, response::NamedFile};
 mod partial;
 use partial::Media;
@@ -32,13 +33,8 @@ async fn movie() -> (Status, Media) {
 }
 
 #[get("/media")]
-fn media() -> ByteStream<&'static [u8]> {
-    let f = std::fs::File::open("/home/ma/Downloads/ep04.mp4")?;
-    let handle = f.take(8096000);
-    let mut buffer = [0; 8096000];
-    handle.read(buffer);
-
-    ByteStream::from(Vec::from(buffer))
+async fn media() -> TextStream![&'static str] {
+    ByteStream!([0; 16])
 }
 
 #[launch]
