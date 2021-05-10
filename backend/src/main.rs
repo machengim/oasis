@@ -1,16 +1,44 @@
 #[macro_use] extern crate rocket;
-use std::path::Path;
-use rocket::{Request, Response, fairing::{Fairing, Info, Kind}, http::Header, response::NamedFile};
+use std::{io::Read, path::Path};
+use rocket::http::Status;
+use rocket::{Request, Response, fairing::{AdHoc, Fairing, Info, Kind}, form::name::Name, http::{ContentType, Header}, response::NamedFile};
+mod partial;
+use partial::Media;
+use rocket::response::stream::ByteStream;
+
+#[derive(Responder)]
+#[response(status=206, content_type="video/mp4")]
+struct Video {
+    file: Option<NamedFile>
+}
 
 #[get("/<name>")]
 fn hello(name: &str) -> String {
     format!("Hello,  {}!", name)
 }
 
+/*
 #[get("/movie")]
 async fn movie() -> Option<NamedFile> {
-    let filename = "/home/ma/Dropbox/channel/ep04/ep04.mp4";
+    let filename = "/home/ma/Downloads/lust.mp4";
     NamedFile::open(Path::new(filename)).await.ok()
+} */
+
+#[get("/movie")]
+async fn movie() -> (Status, Media) {
+    let filename = "/home/ma/Downloads/ep04.mp4";
+    let media = Media{path: filename.to_string()};
+    (Status::PartialContent, media)
+}
+
+#[get("/media")]
+fn media() -> ByteStream<&'static [u8]> {
+    let f = std::fs::File::open("/home/ma/Downloads/ep04.mp4")?;
+    let handle = f.take(8096000);
+    let mut buffer = [0; 8096000];
+    handle.read(buffer);
+
+    ByteStream::from(Vec::from(buffer))
 }
 
 #[launch]
@@ -18,16 +46,22 @@ fn rocket() -> _ {
     rocket::build()
     .mount("/hello", routes![hello])
     .mount("/", routes![movie])
+    .attach(AdHoc::config::<AppConfig>())
     .attach(CORS)
 }
 
 pub struct CORS;
 
+#[derive(Debug, serde::Deserialize)]
+struct AppConfig{
+    address: String
+}
+
 #[async_trait]
 impl Fairing for CORS {
     fn info(&self) -> Info {
         Info {
-            name: "Add CORS headers to responses",
+            name: "Add CORS and ACCEPT RANGE headers to responses",
             kind: Kind::Response
         }
     }
@@ -37,6 +71,5 @@ impl Fairing for CORS {
         response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
-        response.set_header(Header::new("Accept-Ranges", "bytes"));
     }
 }
