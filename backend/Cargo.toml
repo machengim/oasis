@@ -1,5 +1,5 @@
 [package]
-name = "backend"
+name = "oasis"
 version = "0.1.0"
 authors = ["Cheng <machengiam@gmail.com>"]
 edition = "2018"
@@ -7,7 +7,11 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rocket = { git = "https://github.com/SergioBenitez/Rocket" }
-serde = "1.0.125"
-tokio = { version = "1.5.0", features = ["full"] }
-futures = "0.3"
+log = "0.4"
+env_logger = "0.8.3"
+tokio = { version = "1.5", features = ["full"] }
+warp = "0.3"
+serde = { version = "1.0", features = ["derive"]}
+sqlx = { version = "0.5", features = [ "runtime-tokio-rustls", "sqlite" ] }
+dirs = "3.0"
+anyhow = "1.0"

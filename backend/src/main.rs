@@ -1,71 +1,56 @@
-#[macro_use] extern crate rocket;
-use std::{io::Read, path::Path};
-use futures::Stream;
-use rocket::{http::Status, response::stream::TextStream};
-use rocket::{Request, Response, fairing::{AdHoc, Fairing, Info, Kind}, form::name::Name, http::{ContentType, Header}, response::NamedFile};
-mod partial;
-use partial::Media;
-use rocket::response::stream::ByteStream;
+#[macro_use] extern crate log;
+use std::path::PathBuf;
+use sqlx::sqlite::SqlitePool;
+use sqlx::ConnectOptions;
 
-#[derive(Responder)]
-#[response(status=206, content_type="video/mp4")]
-struct Video {
-    file: Option<NamedFile>
+#[tokio::main]
+async fn main() {
+    env_logger::init();
+
+    let dir = get_config_dir();
+    info!("Using directory: {:?}", &dir);
+
+    get_db_conn(&dir).await;
 }
 
-#[get("/<name>")]
-fn hello(name: &str) -> String {
-    format!("Hello,  {}!", name)
-}
-
-/*
-#[get("/movie")]
-async fn movie() -> Option<NamedFile> {
-    let filename = "/home/ma/Downloads/lust.mp4";
-    NamedFile::open(Path::new(filename)).await.ok()
-} */
-
-#[get("/movie")]
-async fn movie() -> (Status, Media) {
-    let filename = "/home/ma/Downloads/ep04.mp4";
-    let media = Media{path: filename.to_string()};
-    (Status::PartialContent, media)
-}
-
-#[get("/media")]
-async fn media() -> TextStream![&'static str] {
-    ByteStream!([0; 16])
-}
-
-#[launch]
-fn rocket() -> _ {
-    rocket::build()
-    .mount("/hello", routes![hello])
-    .mount("/", routes![movie])
-    .attach(AdHoc::config::<AppConfig>())
-    .attach(CORS)
-}
-
-pub struct CORS;
-
-#[derive(Debug, serde::Deserialize)]
-struct AppConfig{
-    address: String
-}
-
-#[async_trait]
-impl Fairing for CORS {
-    fn info(&self) -> Info {
-        Info {
-            name: "Add CORS and ACCEPT RANGE headers to responses",
-            kind: Kind::Response
-        }
+fn get_config_dir() -> PathBuf {
+    match dirs::home_dir() {    // IMPORTANT! This directory should be changed to config dir later!
+        Some(d) => d.join("oasis"),
+        None => std::env::current_dir()
+            .expect("Cannot get the config directory or the current working directory"),
     }
+}
 
-    async fn on_response<'r>(&self, _req: &'r Request<'_>, response: &mut Response<'r>) {
-        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
-        response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
-        response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
-        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+async fn get_db_conn(dir: &PathBuf) {
+    let db_file = dir.join("main.db");
+    if !db_file.as_path().exists() {
+        create_database(&db_file).await;
     }
+}
+
+async fn create_database(db_file: &PathBuf) -> anyhow::Result<SqlitePool> {
+    let prefix = db_file.parent().expect("Cannot retrieve the parent directory");
+    tokio::fs::create_dir_all(&prefix).await?;
+    /*
+    let db = sqlx::sqlite::SqliteConnectOptions::new()
+        .filename(db_file)
+        .create_if_missing(true)
+        .connect()
+        .await?;*/
+    
+    tokio::fs::File::create(db_file).await?;
+
+    let pool = get_conn_pool(db_file).await?;
+    sqlx::migrate!("assets/migration")
+    .run(&pool)
+    .await?;
+    
+    Ok(pool)
+}
+
+async fn get_conn_pool(db_file: &PathBuf) -> Result<SqlitePool, sqlx::Error> {
+    let db_file_str = db_file.to_str().expect("Cannot parse database filename");
+    let pool = SqlitePool::connect(db_file_str).await?;
+
+    Ok(pool)
 }
