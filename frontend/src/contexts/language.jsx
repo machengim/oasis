@@ -9,10 +9,9 @@ export const LangContext = React.createContext({
 export default function LangProvider(props) {
     const [language, setLanguage] = useState('en');
     const {i18n} = useTranslation();
-
     useEffect(() => {
         i18n.changeLanguage(language);
-    }, [language, i18n]);
+    }, [language]);
 
     return (
         <LangContext.Provider value={{language, setLanguage}}>

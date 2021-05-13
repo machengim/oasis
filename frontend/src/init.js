@@ -7,7 +7,7 @@ fetch(server + 'config/')
         res.json().then(
             v => {
                 console.log(v);
-                if (v.firstRun) {
+                if (v.first_run) {
                     window.location.href = '/setup';
                 }
             }

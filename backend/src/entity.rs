@@ -3,21 +3,33 @@ use sqlx::FromRow;
 
 #[derive(Serialize, FromRow, Debug, Clone)]
 pub struct Config {
-    pub version: f64,
-    #[sqlx(rename = "firstRun")]
-    pub first_run: u8,
+    version: f64,
+    first_run: u8,
     //pub port: u32,
-    #[sqlx(rename = "allowGuest")]
-    pub allow_guest: u8,
-    #[sqlx(rename = "defaultUserGroup")]
-    pub default_user_group: u32,
-    pub lang: u32
+    allow_guest: u8,
+    default_user_group: u32,
+    language: u32
 }
 
 #[derive(Serialize, FromRow, Debug)]
 pub struct Language {
     id: u32,
     code: String,
-    #[sqlx(rename = "langName")]
-    lang_name: String
+    language_name: String
+}
+
+#[derive(Serialize, FromRow, Debug)]
+pub struct Group {
+    id: u32,
+    group_name: String,
+    power: u8,
+    status: u8
+}
+
+#[derive(Serialize, FromRow, Debug)]
+pub struct Category {
+    id: u32,
+    category_name: String,
+    permission: u8,
+    seq: u8
 }

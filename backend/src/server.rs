@@ -5,8 +5,12 @@ use crate::entity::Config;
 
 pub async fn run(pool: Pool<Sqlite>) {
     let config = read_config(&pool).await;
+    debug!("Get config: {:?}", &config);
 
-    warp::serve(get_config(config.clone()))
+    let routes = get_config(config.clone())
+        .with(add_cors());
+
+    warp::serve(routes)
         .run(([127, 0, 0, 1], 3000))
         .await;
 }
@@ -22,8 +26,15 @@ async fn read_config(pool: &Pool<Sqlite>) -> Config {
 }
 
 fn get_config(config: Config) 
-    -> impl Filter<Extract = (reply::Json,)> + Clone + Send + Sync + 'static {
-
+    -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+    
     warp::path!("config")
-    .map(move|| reply::json(&config))
+        .and(warp::get())
+        .map(move|| reply::json(&config))
+}
+
+fn add_cors() -> warp::cors::Builder {
+    warp::cors()
+        .allow_any_origin()
+        .allow_methods(vec!["GET", "POST", "DELETE", "OPTION"])
 }

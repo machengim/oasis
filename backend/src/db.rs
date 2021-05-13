@@ -4,13 +4,18 @@ use sqlx::sqlite::{SqlitePool, SqliteConnectOptions, SqliteRow};
 use tokio::fs;
 use crate::utils;
 
-pub async fn get_db_conn(dir: &PathBuf) -> anyhow::Result<SqlitePool>{
+pub async fn get_db_conn(dir: &PathBuf) -> SqlitePool {
     let db_file = dir.join("main.db");
     if !db_file.as_path().exists() {
-        create_database(&db_file).await?;
+        if let Err(e) = create_database(&db_file).await {
+            panic!("Error happens when creating database\n {}", e);
+        }
     }
 
-    Ok(get_conn_pool(&db_file).await?)
+    match get_conn_pool(&db_file).await {
+        Ok(pool) => pool,
+        Err(e) => panic!("Cannot get database connection pool\n {}", e)
+    }
 }
 
 async fn create_database(db_file: &PathBuf) -> anyhow::Result<()> {
