@@ -773,6 +773,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "dirs",
+ "dotenv",
  "env_logger",
  "log",
  "serde",

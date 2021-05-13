@@ -1,16 +1,19 @@
 #[macro_use] extern crate log;
 use std::path::PathBuf;
-use sqlx::sqlite::SqlitePool;
-use sqlx::ConnectOptions;
+use sqlx::{Connection, ConnectOptions};
+use sqlx::sqlite::{SqlitePool, SqliteConnectOptions};
 
 #[tokio::main]
-async fn main() {
-    env_logger::init();
+async fn main() -> anyhow::Result<()> {
+    dotenv::dotenv().ok();
+    env_logger::Builder::from_env("LOG_LEVEL").init();
 
     let dir = get_config_dir();
-    info!("Using directory: {:?}", &dir);
+    debug!("Using directory: {:?}", &dir);
 
-    get_db_conn(&dir).await;
+    let _pool = get_db_conn(&dir).await?;
+
+    Ok(())
 }
 
 fn get_config_dir() -> PathBuf {
@@ -21,36 +24,55 @@ fn get_config_dir() -> PathBuf {
     }
 }
 
-async fn get_db_conn(dir: &PathBuf) {
+async fn get_db_conn(dir: &PathBuf) -> anyhow::Result<SqlitePool>{
     let db_file = dir.join("main.db");
     if !db_file.as_path().exists() {
-        create_database(&db_file).await;
+        create_database(&db_file).await?;
     }
+
+    Ok(get_conn_pool(&db_file).await?)
 }
 
-async fn create_database(db_file: &PathBuf) -> anyhow::Result<SqlitePool> {
+async fn create_database(db_file: &PathBuf) -> anyhow::Result<()> {
     let prefix = db_file.parent().expect("Cannot retrieve the parent directory");
     tokio::fs::create_dir_all(&prefix).await?;
-    /*
-    let db = sqlx::sqlite::SqliteConnectOptions::new()
+    
+    let mut conn = SqliteConnectOptions::new()
         .filename(db_file)
         .create_if_missing(true)
+        .log_statements(log::LevelFilter::Trace)
         .connect()
-        .await?;*/
-    
-    tokio::fs::File::create(db_file).await?;
+        .await?;
 
-    let pool = get_conn_pool(db_file).await?;
-    sqlx::migrate!("assets/migration")
-    .run(&pool)
-    .await?;
-    
+    let sql = tokio::fs::read_to_string("./assets/sql/init.sql").await?;
+    sqlx::query(&sql).execute(&mut conn).await?;
+    let version = get_version()?;
+    sqlx::query("UPDATE site SET version = ?")
+        .bind(version)
+        .execute(&mut conn)
+        .await?;
+
+    debug!("Database created at {:?}", db_file);
+    conn.close();
+
+    Ok(())
+}
+
+async fn get_conn_pool(db_file: &PathBuf) -> anyhow::Result<SqlitePool> {
+    let db_file_str = db_file.to_str().expect("Cannot parse database filename");
+    let mut option = SqliteConnectOptions::new()
+        .filename(db_file_str);
+    option.log_statements(log::LevelFilter::Trace);
+    let pool = SqlitePool::connect_with(option).await?;
+
     Ok(pool)
 }
 
-async fn get_conn_pool(db_file: &PathBuf) -> Result<SqlitePool, sqlx::Error> {
-    let db_file_str = db_file.to_str().expect("Cannot parse database filename");
-    let pool = SqlitePool::connect(db_file_str).await?;
+fn get_version() -> anyhow::Result<f64> {
+    let version: f64 = match std::env::var("VERSION")?.parse() {
+        Ok(v) => v,
+        _ => 0.1,
+    };
 
-    Ok(pool)
+    Ok(version)
 }

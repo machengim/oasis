@@ -15,3 +15,4 @@ serde = { version = "1.0", features = ["derive"]}
 sqlx = { version = "0.5", features = [ "runtime-tokio-rustls", "sqlite" ] }
 dirs = "3.0"
 anyhow = "1.0"
+dotenv = "0.15.0"
