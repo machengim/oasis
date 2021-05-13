@@ -1,12 +1,12 @@
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
 use sqlx::FromRow;
 
-#[derive(Serialize, FromRow, Debug)]
+#[derive(Serialize, FromRow, Debug, Clone)]
 pub struct Config {
     pub version: f64,
     #[sqlx(rename = "firstRun")]
     pub first_run: u8,
-    pub port: u32,
+    //pub port: u32,
     #[sqlx(rename = "allowGuest")]
     pub allow_guest: u8,
     #[sqlx(rename = "defaultUserGroup")]

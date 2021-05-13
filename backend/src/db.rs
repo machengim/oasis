@@ -1,6 +1,7 @@
 use std::path::PathBuf;
-use sqlx::{Connection, ConnectOptions};
-use sqlx::sqlite::{SqlitePool, SqliteConnectOptions};
+use sqlx::{Connection, ConnectOptions, FromRow};
+use sqlx::sqlite::{SqlitePool, SqliteConnectOptions, SqliteRow};
+use tokio::fs;
 use crate::utils;
 
 pub async fn get_db_conn(dir: &PathBuf) -> anyhow::Result<SqlitePool>{
@@ -13,8 +14,9 @@ pub async fn get_db_conn(dir: &PathBuf) -> anyhow::Result<SqlitePool>{
 }
 
 async fn create_database(db_file: &PathBuf) -> anyhow::Result<()> {
-    let prefix = db_file.parent().expect("Cannot retrieve the parent directory");
-    tokio::fs::create_dir_all(&prefix).await?;
+    let prefix = db_file.parent()
+        .expect("Cannot retrieve the parent directory");
+    fs::create_dir_all(&prefix).await?;
 
     let mut conn = SqliteConnectOptions::new()
         .filename(db_file)
@@ -23,7 +25,7 @@ async fn create_database(db_file: &PathBuf) -> anyhow::Result<()> {
         .connect()
         .await?;
 
-    let sql = tokio::fs::read_to_string("./assets/sql/init.sql").await?;
+    let sql = fs::read_to_string("./assets/sql/init.sql").await?;
     sqlx::query(&sql).execute(&mut conn).await?;
     let version = utils::get_version()?;
     sqlx::query("UPDATE site SET version = ?")
@@ -47,6 +49,30 @@ async fn get_conn_pool(db_file: &PathBuf) -> anyhow::Result<SqlitePool> {
     Ok(pool)
 }
 
-pub async fn fetch_single(sql: &str, ) {
+pub async fn fetch_single<T>(sql: &str, args: Vec<String>, pool: &SqlitePool)
+    -> anyhow::Result<T>
+    where T: Send + Unpin + for<'a> FromRow<'a, SqliteRow> {
 
+    let stmt = prepare_sql(sql, args);
+    Ok(stmt.fetch_one(pool).await?)
+}
+
+pub async fn fetch_multiple<T>(sql: &str, args: Vec<String>, pool: &SqlitePool)
+    -> anyhow::Result<Vec<T>>
+    where T: Send + Unpin + for<'a> FromRow<'a, SqliteRow> {
+
+    let stmt = prepare_sql(sql, args);
+    Ok(stmt.fetch_all(pool).await?)
+}
+
+fn prepare_sql<T>(sql: &str, args: Vec<String>) 
+    -> sqlx::query::QueryAs<'_, sqlx::Sqlite, T, sqlx::sqlite::SqliteArguments<'_>>
+    where T: Send + Unpin + for<'a> FromRow<'a, SqliteRow> {
+
+    let mut stmt = sqlx::query_as(sql);
+    for arg in args.iter() {
+        stmt = stmt.bind(arg.to_owned());
+    } 
+
+    stmt
 }

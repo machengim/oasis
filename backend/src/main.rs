@@ -1,9 +1,9 @@
 mod entity;
 mod db;
 mod utils;
+mod server;
 
 #[macro_use] extern crate log;
-use entity::{Config, Language};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -14,12 +14,8 @@ async fn main() -> anyhow::Result<()> {
     debug!("Using directory: {:?}", &dir);
 
     let pool = db::get_db_conn(&dir).await?;
-    let sql = "SELECT * FROM lang WHERE id=? AND code=?";
-    let args = "1, 'en'";
-    let row: Language = sqlx::query_as(sql)
-        .bind(args)
-        .fetch_one(&pool).await?;
-    println!("{:?}", &row);
+    server::run(pool).await;
+
     Ok(())
 }
 
