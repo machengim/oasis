@@ -49,7 +49,7 @@ export default function Continue() {
                     <div className='flex space-x-8 overflow-hidden' ref={carouselRef}>
                         <div className='flex flex-col w-48'>
                             <div className='relative shine-in-300 hover:opacity-100'>
-                                <img src="/images/starwar.jpg" className='w-full h-72' />
+                                <img src="images/starwar.jpg" className='w-full h-72' />
                                 <progress value='30' max='100' className='absolute w-full bottom-0 left-0'/>
                             </div>
                             <p className='text-white text-2xl truncate mt-2'>

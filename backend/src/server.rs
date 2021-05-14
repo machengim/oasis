@@ -7,7 +7,10 @@ pub async fn run(pool: Pool<Sqlite>) {
     let config = read_config(&pool).await;
     debug!("Get config: {:?}", &config);
 
+    let home_dir = warp::path("home").and(warp::fs::dir("../frontend/build"));
+
     let routes = get_config(config.clone())
+        .or(home_dir)
         .with(add_cors());
 
     warp::serve(routes)

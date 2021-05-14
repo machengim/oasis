@@ -13,7 +13,7 @@ export default function NewItem() {
             <div className='w-full h-auto'>
                 <div className='custom-container mx-auto py-6 grid grid-cols-none lg:grid-cols-2 gap-8'>
                     <div className='flex max-w-2xl h-60 overflow-hidden shine-in-300 hover:opacity-100'>
-                        <img src='/images/starwar.jpg' className='w-40 h-60' />
+                        <img src='images/starwar.jpg' className='w-40 h-60' />
                         <div className='ml-6'>
                             <p className='text-pink-600'>Movie</p>
                             <p className='text-2xl text-white w-5/6 truncate'>Star Wars Blablbsbsbsbxxxssdss</p>
@@ -25,7 +25,7 @@ export default function NewItem() {
                         </div>
                     </div>
                     <div className='flex max-w-2xl h-60 overflow-hidden'>
-                        <img src='/images/starwar.jpg' className='w-40 h-60' />
+                        <img src='images/starwar.jpg' className='w-40 h-60' />
                         <div className='ml-6'>
                             <p className='text-pink-600'>Movie</p>
                             <p className='text-2xl text-white truncate'>Star Wars</p>
@@ -37,7 +37,7 @@ export default function NewItem() {
                         </div>
                     </div>
                     <div className='flex max-w-2xl h-60 overflow-hidden'>
-                        <img src='/images/starwar.jpg' className='w-40 h-60' />
+                        <img src='images/starwar.jpg' className='w-40 h-60' />
                         <div className='ml-6'>
                             <p className='text-pink-600'>Movie</p>
                             <p className='text-2xl text-white truncate'>Star Wars</p>
@@ -49,7 +49,7 @@ export default function NewItem() {
                         </div>
                     </div>
                     <div className='flex max-w-2xl h-60 overflow-hidden'>
-                        <img src='/images/starwar.jpg' className='w-40 h-60' />
+                        <img src='images/starwar.jpg' className='w-40 h-60' />
                         <div className='ml-6'>
                             <p className='text-pink-600'>Movie</p>
                             <p className='text-2xl text-white truncate'>Star Wars</p>
@@ -61,7 +61,7 @@ export default function NewItem() {
                         </div>
                     </div>
                     <div className='flex max-w-2xl h-60 overflow-hidden'>
-                        <img src='/images/starwar.jpg' className='w-40 h-60' />
+                        <img src='images/starwar.jpg' className='w-40 h-60' />
                         <div className='ml-6'>
                             <p className='text-pink-600'>Movie</p>
                             <p className='text-2xl text-white truncate w-5/6'>Star Wars Blablablasbsbsbsbsb</p>

@@ -10,7 +10,7 @@ module.exports = {
                 icon: ['1.5rem', '1.5rem'],
             },
             backgroundImage: theme => ({
-                'deer': "url('/images/deer.png')",
+                'deer': "url('/home/images/deer.png')",
             }),
             maxWidth: {
                 '4/5': '80%',
