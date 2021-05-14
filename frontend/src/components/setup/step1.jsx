@@ -2,11 +2,25 @@ import React, {useContext} from 'react';
 import {LangContext} from '../../contexts/language';
 import SubTitle from './subtitle';
 
-export default function Step1() {
+export default function Step1(props) {
     const langContext = useContext(LangContext);
 
     function changeLang(e) {
-        langContext.setLanguage(e.target.value);
+        let newLang = e.target.value;
+        props.setLanguage(newLang);
+        langContext.setLanguage(newLang);
+    }
+
+    function changeUsername(e) {
+        props.setUsername(e.target.value);
+    }
+
+    function changePassword(e) {
+        props.setPassword(e.target.value);
+    }
+
+    function toggleAllowGuest() {
+        props.setAllowGuest(!props.allowGuest);
     }
 
     return (
@@ -21,7 +35,7 @@ export default function Step1() {
                 <tr>
                     <td>Language</td>
                     <td>
-                        <select defaultValue='en' onChange={changeLang}
+                        <select defaultValue={props.language} onChange={changeLang}
                             className='px-2 py-0.5'>
                             <option value='en'>English</option>
                             <option value='cn'>中文</option>
@@ -33,7 +47,8 @@ export default function Step1() {
                         Admin username
                     </td>
                     <td>
-                        <input type='text' defaultValue='admin' 
+                        <input type='text' defaultValue={props.username}
+                            onChange={changeUsername}
                             className='w-48 px-2'
                         />
                     </td>
@@ -43,7 +58,8 @@ export default function Step1() {
                         Admin password
                     </td>
                     <td>
-                        <input type='password' 
+                        <input type='password' defaultValue={props.password}
+                            onChange={changePassword}
                             className='w-48 px-2'
                             
                         />
@@ -52,7 +68,9 @@ export default function Step1() {
                 <tr>
                     <td>Allow visits without login?</td>
                     <td>
-                        <input type='checkbox' defaultChecked />
+                        <input type='checkbox' checked={props.allowGuest}
+                            onChange={toggleAllowGuest} 
+                        />
                         <span className='ml-2'>Yes</span>
                     </td>
                 </tr>

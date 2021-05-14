@@ -15,19 +15,50 @@ ReactDom.render(
 );
 
 function App() {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2);
+    const [language, setLanguage] = useState('en');
+    const [username, setUsername] = useState('admin');
+    const [password, setPassword] = useState('');
+    const [allowGuest, setAllowGuest] = useState(1);
+    const [groups, setGroups] = useState(initGroups());
+
+    function initGroups() {
+        return [{name: "Admin", power: 9, default: false, delete: false, editPower: false, editDefault: false},
+                {name: "User", power: 3, default: true, delete: false, editPower: true, editDefault: true}];
+    }
+
+    function checkStepComplete() {
+        if (step === 1) {
+            if (username.trim().length > 0 && password.trim().length > 0) {
+                return true;
+            } else {
+                alert("Username and password cannot be empty!");
+                return false;
+            }
+        }
+
+        return true;
+            
+    }
 
 	return (
         <LanguageProvider>
             <div className='w-full h-full bg-white'>
                 <div className='w-4/5 lg:w-1/2 mx-auto text-center'>
                     <Title />
-                    {step == 1 && <Step1 />}
-                    {step == 2 && <Step2 />}
+                    {step == 1 && <Step1 
+                        language={language} setLanguage={setLanguage}
+                        username={username} setUsername={setUsername}
+                        password={password} setPassword={setPassword}
+                        allowGuest={allowGuest} setAllowGuest={setAllowGuest} 
+                    />}
+                    {step == 2 && <Step2 groups={groups} setGroups={setGroups} />}
                     {step == 3 && <Step3 />}
                     {step == 4 && <Step4 />}
                     {step == 5 && <Step5 />}
-                    <FootButtons step={step} setStep={setStep} />
+                    <FootButtons step={step} setStep={setStep} 
+                        checkStepComplete={checkStepComplete}
+                    />
                 </div>
             </div>
         </LanguageProvider>
@@ -48,9 +79,12 @@ function Title() {
 function FootButtons(props) {
     const step = props.step;
     const setStep = props.setStep;
+    const checkStepComplete = props.checkStepComplete;
 
     function moveStep(i) {
-        setStep(step + i);
+        if (i < 0 || checkStepComplete()) {
+            setStep(step + i);
+        }
     }
 
     return (
