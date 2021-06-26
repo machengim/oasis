@@ -2,8 +2,10 @@ use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqliteRow};
 use sqlx::{ConnectOptions, Connection, FromRow};
 use std::path::PathBuf;
 use tokio::fs;
+use crate::utils;
 
-pub async fn get_db_conn(dir: &PathBuf) -> SqlitePool {
+pub async fn get_db_conn() -> SqlitePool {
+    let dir = utils::get_config_dir();
     let db_file = dir.join("main.db");
     if !db_file.as_path().exists() {
         if let Err(e) = create_db(&db_file).await {
@@ -26,11 +28,13 @@ async fn create_db(db_file: &PathBuf) -> anyhow::Result<()> {
     let mut conn = SqliteConnectOptions::new()
         .filename(db_file)
         .create_if_missing(true)
-        .log_statements(log::LevelFilter::Debug)
+        //.log_statements(log::LevelFilter::Debug)
         .connect()
         .await?;
 
-    let sql = fs::read_to_string("./assets/init.sql").await?;
+    let sql_init_file = std::env::var("INIT_SQLITE_FILE")
+        .expect("Cannot get init SQL file from env");
+    let sql = fs::read_to_string(sql_init_file).await?;
     sqlx::query(&sql).execute(&mut conn).await?;
     debug!("Database created at {:?}", db_file);
     conn.close();
@@ -40,8 +44,8 @@ async fn create_db(db_file: &PathBuf) -> anyhow::Result<()> {
 
 async fn get_conn_pool(db_file: &PathBuf) -> anyhow::Result<SqlitePool> {
     let db_file_str = db_file.to_str().expect("Cannot parse database filename");
-    let mut option = SqliteConnectOptions::new().filename(db_file_str);
-    option.log_statements(log::LevelFilter::Trace);
+    let option = SqliteConnectOptions::new().filename(db_file_str);
+    //option.log_statements(log::LevelFilter::Trace);
     let pool = SqlitePool::connect_with(option).await?;
 
     Ok(pool)

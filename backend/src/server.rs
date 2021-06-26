@@ -5,7 +5,7 @@ use warp::{http::Uri, reply, Filter};
 
 pub async fn run(pool: Pool<Sqlite>) {
     let site = read_site(&pool).await;
-    debug!("Get config config: {:?}", &site);
+    debug!("Get site info: {:?}", &site);
     if site.first_run == 1 {
         run_setup_server().await;
     }
@@ -22,7 +22,9 @@ async fn read_site(pool: &Pool<Sqlite>) -> Site {
 }
 
 async fn run_setup_server() {
-    let react = warp::fs::dir("../frontend/build");
+    let react_dir = std::env::var("REACT_DIR")
+        .expect("Cannot get frontend dir from env");
+    let react = warp::fs::dir(react_dir);
     let redirect = warp::path::end().map(|| warp::redirect::temporary(Uri::from_static("/setup")));
     let routes = redirect.or(react);
 
