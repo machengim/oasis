@@ -101,3 +101,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+**/build/**
+**/target/**

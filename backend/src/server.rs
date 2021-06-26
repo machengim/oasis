@@ -23,8 +23,8 @@ async fn read_site(pool: &Pool<Sqlite>) -> Site {
 
 async fn run_setup_server() {
     let react = warp::fs::dir("../frontend/build");
-    let redirect = warp::path::end().map(|| warp::redirect::see_other(Uri::from_static("/setup")));
-    let routes = react.or(redirect);
+    let redirect = warp::path::end().map(|| warp::redirect::temporary(Uri::from_static("/setup")));
+    let routes = redirect.or(react);
 
     warp::serve(routes).run(([127, 0, 0, 1], 3000)).await;
 }
