@@ -19,6 +19,7 @@ Personal file sharing and syncing system.
 + [ ] Image display
 + [ ] Video play
 + [ ] Music play
++ [ ] VS Code integration?
 
 **v0.3 Mobile browser compatibility**
 
@@ -36,8 +37,13 @@ Personal file sharing and syncing system.
 
 **Others**
 
++ [ ] Search
++ [ ] Logs
 + [ ] I18n
 + [ ] Grid view for file list
 + [ ] File starring
 + [ ] Desktop client
 + [ ] Mobile client
++ [ ] MySQL and PostgreSQL support
++ [ ] File tags
++ [ ] File editing: rename and delete
