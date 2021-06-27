@@ -1,11 +1,14 @@
-import React from "react";
-import Button from "../components/Button";
+import React, { useState } from 'react';
+import Button from '../components/Button';
+import DirBrowser from '../components/DirBrowser';
 
 export default function ServerInfoSetupPanel() {
+  const [isOpenDirBrowser, setIsOpenDirBrowser] = useState(false);
+
   return (
-    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
-      <div className="w-96 bg-gray-50 shadow rounded-lg flex flex-col items-center px-8 py-4 overflow-hidden">
-        <div className="text-lg mb-4">Server Setup</div>
+    <div className="absolute w-full">
+      <div className="w-96 mx-auto mt-40 bg-gray-50 shadow rounded-lg flex flex-col items-center px-8 py-4 overflow-hidden">
+        <div className="text-lg mb-4 text-gray-700">Server Setup</div>
         <div className="grid grid-cols-4 mb-4">
           <div className="col-span-1">username: </div>
           <div>
@@ -21,13 +24,14 @@ export default function ServerInfoSetupPanel() {
         <div className="grid grid-cols-4 mb-12">
           <div className="col-span-1">storage: </div>
           <div>
-            <input type="file" className="ml-2" />
+            <Button value={'Select'} onClick={() => setIsOpenDirBrowser(true)} />
           </div>
         </div>
         <div className="mb-2">
-          <Button value={"launch"} />
+          <Button value={'launch'} style={'important'} />
         </div>
       </div>
+      {isOpenDirBrowser && <DirBrowser onClose={() => setIsOpenDirBrowser(false)} />}
     </div>
   );
 }
