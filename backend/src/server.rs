@@ -30,14 +30,36 @@ async fn run_setup_server() {
     let redirect = warp::path::end().map(|| warp::redirect::temporary(Uri::from_static("/setup")));
     let routes = redirect.or(react).or(api_get_volumes());
 
+    let route = warp::path("api")
+    .map(|| {
+        let a = filesystem::get_system_volumes();
+        if let Ok(v) = a {
+            Ok(v)
+        } else {
+            Err("")
+        }
+    });
+
     warp::serve(routes).run(([127, 0, 0, 1], 3000)).await;
 }
 
 fn api_get_volumes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    warp::path!("api" / "fs" / "volumes")
-        .and(warp::get())
-        .map(|| match filesystem::get_system_volumes() {
-            Ok(volumes) => Ok(Box::new("hh")),
-            Err(e) => Err(e),
-        })
+    let route = warp::path("api")
+    .map(|| Response{value:filesystem::get_system_volumes() } 
+    );
+
+    return route;
+}
+
+struct Response {
+    value: anyhow::Result<Vec<String>>
+}
+
+impl warp::Reply for Response {
+    fn into_response(self) -> warp::reply::Response {
+        match self.value {
+            Ok(volumes) => warp::http::Response::new(format!("message: {:?}", volumes).into()),
+            Err(e) => warp::http::Response::new(format!("error: {:?}", e).into())
+        }
+    }
 }

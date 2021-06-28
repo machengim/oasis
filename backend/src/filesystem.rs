@@ -4,7 +4,7 @@ use std::process::Command;
 pub fn get_system_volumes() -> anyhow::Result<Vec<String>> {
     match std::env::consts::OS {
         "linux" => get_linux_volumes(),
-        // "macos" => Vec::new(),
+        "macos" => Err(anyhow::anyhow!("Not implemented")),
         // "windows" => Vec::new(),
         _ => Ok(Vec::new()),
     }
