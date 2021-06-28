@@ -1,6 +1,9 @@
-use crate::db;
 use crate::entity::Site;
+use crate::{db, filesystem};
 use sqlx::{Pool, Sqlite};
+use std::convert::TryFrom;
+use std::io::ErrorKind;
+use warp::hyper::StatusCode;
 use warp::{http::Uri, reply, Filter};
 
 pub async fn run(pool: Pool<Sqlite>) {
@@ -22,11 +25,19 @@ async fn read_site(pool: &Pool<Sqlite>) -> Site {
 }
 
 async fn run_setup_server() {
-    let react_dir = std::env::var("REACT_DIR")
-        .expect("Cannot get frontend dir from env");
+    let react_dir = std::env::var("REACT_DIR").expect("Cannot get frontend dir from env");
     let react = warp::fs::dir(react_dir);
     let redirect = warp::path::end().map(|| warp::redirect::temporary(Uri::from_static("/setup")));
-    let routes = redirect.or(react);
+    let routes = redirect.or(react).or(api_get_volumes());
 
     warp::serve(routes).run(([127, 0, 0, 1], 3000)).await;
+}
+
+fn api_get_volumes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+    warp::path!("api" / "fs" / "volumes")
+        .and(warp::get())
+        .map(|| match filesystem::get_system_volumes() {
+            Ok(volumes) => Ok(Box::new("hh")),
+            Err(e) => Err(e),
+        })
 }

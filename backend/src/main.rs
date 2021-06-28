@@ -1,5 +1,7 @@
+mod api;
 mod db;
 mod entity;
+mod filesystem;
 mod server;
 mod utils;
 
