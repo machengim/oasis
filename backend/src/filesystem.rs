@@ -6,7 +6,7 @@ pub fn get_system_volumes() -> anyhow::Result<Vec<String>> {
         "linux" => get_linux_volumes(),
         // "macos" => Vec::new(),
         // "windows" => Vec::new(),
-        _ => Ok(Vec::new()),
+        _ => Err(anyhow::anyhow!("Not supported system")),
     }
 }
 
