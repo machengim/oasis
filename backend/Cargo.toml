@@ -15,3 +15,4 @@ dotenv = "0.15.0"
 env_logger = "0.8.3"
 serde = { version = "1.0", features = ["derive"]}
 sqlx = { version = "0.5", features = [ "runtime-tokio-rustls", "sqlite" ] }
+tokio = { version = "1", features = ["full"] }
