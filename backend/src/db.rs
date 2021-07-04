@@ -1,8 +1,8 @@
+use crate::utils;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqliteRow};
 use sqlx::{ConnectOptions, Connection, FromRow};
 use std::path::PathBuf;
 use tokio::fs;
-use crate::utils;
 
 pub async fn get_db_conn() -> SqlitePool {
     let dir = utils::get_config_dir();
@@ -32,8 +32,8 @@ async fn create_db(db_file: &PathBuf) -> anyhow::Result<()> {
         .connect()
         .await?;
 
-    let sql_init_file = std::env::var("INIT_SQLITE_FILE")
-        .expect("Cannot get init SQL file from env");
+    let sql_init_file =
+        std::env::var("INIT_SQLITE_FILE").expect("Cannot get init SQL file from env");
     let sql = fs::read_to_string(sql_init_file).await?;
     sqlx::query(&sql).execute(&mut conn).await?;
     debug!("Database created at {:?}", db_file);
@@ -71,6 +71,13 @@ where
     Ok(stmt.fetch_all(pool).await?)
 }
 
+pub async fn execute(sql: &str, args: Vec<String>, pool: &SqlitePool) -> anyhow::Result<()> {
+    let stmt = prepare_exec_sql(sql, args);
+    stmt.execute(pool).await?;
+
+    Ok(())
+}
+
 fn prepare_sql<T>(
     sql: &str,
     args: Vec<String>,
@@ -79,6 +86,18 @@ where
     T: Send + Unpin + for<'a> FromRow<'a, SqliteRow>,
 {
     let mut stmt = sqlx::query_as(sql);
+    for arg in args.iter() {
+        stmt = stmt.bind(arg.to_owned());
+    }
+
+    stmt
+}
+
+fn prepare_exec_sql(
+    sql: &str,
+    args: Vec<String>,
+) -> sqlx::query::Query<'_, sqlx::Sqlite, sqlx::sqlite::SqliteArguments<'_>> {
+    let mut stmt = sqlx::query(sql);
     for arg in args.iter() {
         stmt = stmt.bind(arg.to_owned());
     }
