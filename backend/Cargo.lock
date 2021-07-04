@@ -392,7 +392,6 @@ dependencies = [
  "dirs",
  "dotenv",
  "env_logger",
- "futures",
  "log",
  "serde",
  "sqlx",
