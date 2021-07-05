@@ -1,5 +1,14 @@
 use serde::Serialize;
 use sqlx::FromRow;
+use std::sync::Mutex;
+use sqlx::sqlite:: SqlitePool;
+
+#[derive(Debug)]
+pub struct AppState {
+    pub first_run: Mutex<bool>,
+    pub pool: Mutex<SqlitePool>,
+    pub storage: Mutex<String>
+}
 
 #[derive(Serialize, FromRow, Debug)]
 pub struct Site {
