@@ -1,5 +1,5 @@
 [package]
-name = "backend"
+name = "oasis"
 version = "0.1.0"
 edition = "2018"
 
@@ -14,5 +14,5 @@ anyhow = "1.0"
 dotenv = "0.15.0"
 env_logger = "0.8.3"
 serde = { version = "1.0", features = ["derive"]}
-sqlx = { version = "0.5", features = [ "runtime-tokio-rustls", "sqlite" ] }
+sqlx = { version = "0.5", features = ["runtime-actix-rustls", "sqlite"] }
 tokio = { version = "1", features = ["full"] }

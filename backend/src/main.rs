@@ -4,7 +4,7 @@ mod entity;
 mod filesystem;
 mod utils;
 use actix_files::{Files, self};
-use actix_web::{web, App, HttpServer};
+use actix_web::{rt::System, web, App, HttpServer};
 use entity::{AppState, Site};
 use std::sync::Mutex;
 use sqlx::{Pool, Sqlite};
@@ -12,22 +12,27 @@ use sqlx::{Pool, Sqlite};
 #[macro_use]
 extern crate log;
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()>{
     dotenv::dotenv().ok();
     env_logger::Builder::from_env("LOG_LEVEL").init();
 
+    // let rt  = Runtime::new().unwrap();
+    // let state = web::Data::new(rt.block_on(init_app_state()));
     let state = web::Data::new(init_app_state().await);
     debug!("app state: {:?}", &state);
     let react_dir = std::env::var("REACT_DIR").expect("Cannot get frontend dir from env");
+    let sys = System::new("http-server");
     HttpServer::new(move || {
         App::new().app_data(state.clone())
             .service(api::index)
+            .service(api::get_volumes)
             .service(Files::new("/", react_dir.clone()).index_file("index.html"))
     })
     .bind("127.0.0.1:3000")?
-    .run()
-    .await
+    .run();
+
+    sys.run()
 }
 
 async fn init_app_state() -> AppState {
