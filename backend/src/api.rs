@@ -1,73 +1,72 @@
-use actix_files::{NamedFile, self};
-use actix_web::{get, web, HttpResponse, Result};
-use serde::Serialize;
-use crate::{entity, filesystem, utils};
+use std::path::PathBuf;
 
-#[derive(Serialize, Clone)]
-pub struct Response<T> {
-    pub data: Option<T>,
-    pub error: Option<Error>,
+use crate::{entity::AppState, error::CustomError, filesystem, utils};
+use actix_files::{self, NamedFile};
+use actix_web::{
+    dev::Path,
+    get,
+    web::{self, Data},
+    Either, HttpResponse, Result,
+};
+
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/api")
+            .service(get_system_volumes)
+            .service(get_system_dirs),
+    );
 }
 
-#[derive(Serialize, Clone)]
-pub struct Error {
-    pub code: i16,
-    pub message: String,
-}
-
-impl<T> Response<T> {
-    fn new() -> Self {
-        Response {
-            data: None,
-            error: None,
-        }
-    }
-
-    fn from_anyhow_result(input: anyhow::Result<T>) -> Self {
-        let mut response = Response::new();
-
-        match input {
-            Ok(v) => response.data = Some(v),
-            Err(e) => {
-                debug!("Get error: {}", e);
-                response.error = Some(Error {
-                    code: 500,
-                    message: "Internal server error".to_string(),
-                })
-            }
-        }
-
-        response
-    }
-
-    fn custom_err(code: i16, message: &str) -> Self {
-        let error = Error{code, message: message.to_owned()};
-        Response{data: None, error: Some(error)}
-    }
-}
-
-#[get("/")]
-pub async fn index(state: web::Data<entity::AppState>) -> Result<NamedFile> {
+pub async fn index(state: Data<AppState>) -> Either<HttpResponse, Result<NamedFile, CustomError>> {
     let first_run = state.first_run.lock().unwrap();
 
     if *first_run {
-        // Ok(HttpResponse::TemporaryRedirect().header("Location", "/setup/index.html").finish())
-        Ok(NamedFile::open(utils::build_react_path("setup/index.html"))?)
+        Either::Left(
+            HttpResponse::TemporaryRedirect()
+                .header("Location", "/setup")
+                .finish(),
+        )
     } else {
-        // HttpResponse::Found().header("Location", "/").finish()
-        Ok(NamedFile::open(utils::build_react_path("index.html"))?)
+        match NamedFile::open(utils::build_react_path("index.html")) {
+            Ok(nf) => Either::Right(Ok(nf)),
+            Err(_) => Either::Right(Err(CustomError::InternalError)),
+        }
     }
 }
 
 #[get("/fs/volumes")]
-pub async fn get_volumes(state: web::Data<entity::AppState>) -> HttpResponse {
+async fn get_system_volumes(state: Data<AppState>) -> Result<HttpResponse, CustomError> {
     let first_run = state.first_run.lock().unwrap();
     if !*first_run {
-        let response: Response<String> = Response::custom_err(400, "BAD REQUEST");
-        return HttpResponse::Ok().json(response)
+        return Err(CustomError::AuthError);
     }
 
-    let volumes = filesystem::get_system_volumes();
-    let response = Response::from_anyhow_result(volumes);
-    HttpResponse::Ok().json(response)   
+    match filesystem::get_system_volumes() {
+        Ok(volumes) => Ok(HttpResponse::Ok().json(volumes)),
+        Err(_) => Err(CustomError::SystemNotSupport),
+    }
+}
+
+#[get("fs/subdirs/{dir:.*}")]
+async fn get_system_dirs(
+    dir: web::Path<String>,
+    state: Data<AppState>,
+) -> Result<HttpResponse, CustomError> {
+    let first_run = state.first_run.lock().unwrap();
+    if !*first_run {
+        return Err(CustomError::AuthError);
+    }
+
+    let dir = dir.into_inner();
+    println!("dir: {}", &dir);
+    let path = PathBuf::from(dir);
+    println!("path got: {:?}", &path);
+    if !path.is_dir() {
+        return Err(CustomError::NotFound);
+    }
+
+    match filesystem::get_system_dirs(path).await {
+        Ok(dirs) => Ok(HttpResponse::Ok().json(dirs)),
+        Err(_) => Err(CustomError::InternalError),
+    }
 }

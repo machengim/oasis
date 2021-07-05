@@ -26,7 +26,7 @@ fn get_linux_volumes() -> anyhow::Result<Vec<String>> {
     Ok(mountpoints)
 }
 
-pub async fn get_sub_directories(dir: PathBuf) -> anyhow::Result<Vec<PathBuf>> {
+pub async fn get_system_dirs(dir: PathBuf) -> anyhow::Result<Vec<PathBuf>> {
     if !dir.is_dir() {
         return Err(anyhow::anyhow!("Not a directory!"));
     }
@@ -60,9 +60,7 @@ mod tests {
     fn test_get_sub_directories() {
         let path = std::path::Path::new("/");
         let rt = tokio::runtime::Runtime::new().unwrap();
-        let sub_directories = rt
-            .block_on(get_sub_directories(path.to_path_buf()))
-            .unwrap();
+        let sub_directories = rt.block_on(get_system_dirs(path.to_path_buf())).unwrap();
         println!("sub_directories: {:?}", &sub_directories);
         assert!(sub_directories.len() > 0);
     }
