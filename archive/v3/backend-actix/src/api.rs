@@ -1,13 +1,12 @@
-use std::path::PathBuf;
-
 use crate::{entity::AppState, error::CustomError, filesystem, utils};
 use actix_files::{self, NamedFile};
 use actix_web::{
     dev::Path,
     get,
     web::{self, Data},
-    Either, HttpResponse, Result,
+    Either, HttpResponse, Responder, Result,
 };
+use std::path::PathBuf;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -17,7 +16,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-pub async fn index(state: Data<AppState>) -> Either<HttpResponse, Result<NamedFile, CustomError>> {
+pub async fn index(state: Data<AppState>) -> impl Responder {
     let first_run = state.first_run.lock().unwrap();
 
     if *first_run {
