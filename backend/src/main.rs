@@ -50,12 +50,16 @@ fn system_volumes(_auth: Auth) -> Result<Json<Vec<String>>, Status> {
     }
 }
 
+// TODO: Should prevent reading dirs outside of the mountpoints.
 #[get("/fs/dirs/<dir..>")]
 async fn system_sub_dirs(dir: PathBuf) -> Result<Json<Vec<String>>, Status> {
     println!(" ============ Got dir {:?} ===============", &dir);
     match filesystem::get_system_dirs(dir).await {
         Ok(v) => Ok(Json(v)),
-        Err(_) => Err(Status::NotFound),
+        Err(e) => {
+            eprintln!("Got error when retrieving sub dirs: {}", e);
+            Err(Status::InternalServerError)
+        }
     }
 }
 
