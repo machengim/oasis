@@ -6,6 +6,7 @@ interface IButton {
   onClick?: () => void;
   style?: 'important' | 'normal' | 'bold';
   className?: string;
+  disabled?: boolean;
 }
 
 export default function Button(props: IButton) {
@@ -19,5 +20,5 @@ export default function Button(props: IButton) {
       : 'border bg-gray-50 hover:bg-gray-100 px-2 rounded shadow-sm';
   const style = 'cursor-pointer w-min transition duration-200 ' + optionalStyle + ' ' + props.className;
 
-  return <input type="button" value={value} onClick={props.onClick} className={style} />;
+  return <input type="button" value={value} onClick={props.onClick} className={style} disabled={props.disabled} />;
 }

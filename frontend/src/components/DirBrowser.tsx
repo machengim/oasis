@@ -1,16 +1,19 @@
 import React, { BaseSyntheticEvent, useState, useEffect } from 'react';
 import Button from './Button';
+import Spinner from './Spinner';
 import * as api from '../utils/api';
 
 interface IDirBrowserProps {
   onClose: () => void;
+  onSelect: Function;
 }
 
 export default function DirBrowser(props: IDirBrowserProps) {
+  const [currentDir, setCurrentDir] = useState('');
   const [dirs, setDirs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [level, setLevel] = useState(0);
-  const [prevSelectedDir, setPrevSelectedDir] = useState('');
+  const [back, setBack] = useState(false);
   const [selectedDir, setSelectedDir] = useState('');
   const [selectedVolume, setSelectedVolume] = useState('');
   const [volumes, setVolumes] = useState<string[]>([]);
@@ -38,7 +41,7 @@ export default function DirBrowser(props: IDirBrowserProps) {
   useEffect(() => {
     if (selectedVolume) {
       setLevel(0);
-      fetchDirs(selectedVolume);
+      setSelectedDir(selectedVolume);
     }
   }, [selectedVolume]);
 
@@ -53,10 +56,11 @@ export default function DirBrowser(props: IDirBrowserProps) {
 
     try {
       const dirs: string[] = await api.get('/api/fs/dirs/' + dir);
+      const newLevel = back ? level - 1 : level + 1;
+      setCurrentDir(selectedDir);
       setDirs(dirs);
-      const newLevel = !prevSelectedDir ? level : dir.includes(prevSelectedDir) ? level + 1 : level - 1;
       setLevel(newLevel);
-      setPrevSelectedDir(dir);
+      setBack(false);
     } catch (e) {
       console.log(e);
       alert('Cannot read the directory.');
@@ -65,12 +69,17 @@ export default function DirBrowser(props: IDirBrowserProps) {
     }
   };
 
+  const onConfirmDir = () => {
+    props.onSelect(currentDir);
+    props.onClose();
+  };
+
   // TODO: this works, but not ideal.
   const goToParentDir = (): void => {
-    const dirSplit = selectedDir.split('/').filter((e) => e.length > 0);
+    const dirSplit = currentDir.split('/').filter((e) => e.length > 0);
     dirSplit.pop();
     const parentDir = dirSplit.length > 0 && dirSplit[0] ? dirSplit.join('/') : '/';
-
+    setBack(true);
     setSelectedDir(parentDir);
   };
 
@@ -80,16 +89,15 @@ export default function DirBrowser(props: IDirBrowserProps) {
         <div className="mb-4 text-xl mx-auto text-gray-700">Directory Browser</div>
         <VolumeSelector volumes={volumes} setSelectedVolume={setSelectedVolume} />
         <hr />
+        <div className="mt-2">Selected Directory:</div>
+        <div className="text-gray-700 font-bold break-words mb-2">{currentDir}</div>
         {isLoading ? (
-          <div>Loading..</div>
+          <Spinner />
         ) : (
           <DirectoryList dirs={dirs} setSelectedDir={setSelectedDir} level={level} goToParentDir={goToParentDir} />
         )}
-        <hr />
-        <div className="mt-2">Selected Directory:</div>
-        <div className="mb-8 text-gray-700 break-words">{selectedDir}</div>
-        <div className="mx-auto flex flex-row">
-          <Button value="Confirm" className="mr-4" />
+        <div className="mx-auto my-4 flex flex-row">
+          <Button value="Confirm" className="mr-4" disabled={!currentDir} onClick={onConfirmDir} />
           <Button value="Cancel" onClick={props.onClose} />
         </div>
       </div>
@@ -135,8 +143,8 @@ function DirectoryList(props: IDirectoryListProps) {
   };
 
   return (
-    <div className="mb-2 h-60 overflow-y-auto overflow-x-hidden">
-      {props.level > 0 && (
+    <div className="mb-2 py-2 border rounded h-60 overflow-y-auto overflow-x-hidden">
+      {props.level > 1 && (
         <div className="mx-2 px-2 rounded hover:bg-gray-200 cursor-pointer break-words" onClick={props.goToParentDir}>
           ..
         </div>
