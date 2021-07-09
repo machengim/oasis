@@ -4,7 +4,7 @@ mod filesystem;
 mod utils;
 use entity::Site;
 use rocket::fairing::{Fairing, Info, Kind};
-use rocket::fs::FileServer;
+use rocket::fs::{FileServer, NamedFile};
 use rocket::http::uri::Origin;
 use rocket::http::{Method, Status};
 use rocket::request::{FromRequest, Outcome, Request};
@@ -19,43 +19,27 @@ use std::sync::Mutex;
 #[macro_use]
 extern crate rocket;
 
-#[get("/", rank = 1)]
-fn root() -> Redirect {
-    Redirect::to(uri!("/?page=home"))
+#[get("/")]
+fn index(_auth: Auth) -> Redirect {
+    Redirect::to(uri!("/setup"))
 }
 
 #[get("/setup")]
-fn setup() -> Redirect {
-    Redirect::to(uri!("/?page=setup"))
+async fn setup(_auth: Auth) -> Option<NamedFile> {
+    get_react_index().await
+}
+
+async fn get_react_index() -> Option<NamedFile> {
+    let react_dir = std::env::var("REACT_DIR").expect("Cannot get frontend dir from env");
+    let mut path = PathBuf::from(react_dir);
+    path.push("index.html");
+    NamedFile::open(path).await.ok()
 }
 
 #[get("/login")]
-fn login() -> Redirect {
-    Redirect::to(uri!("/?page=login"))
+async fn login() -> Option<NamedFile> {
+    get_react_index().await
 }
-
-#[get("/?<page>")]
-fn index(page: &str, auth: Auth) {
-    // match auth.option {
-    //     1 => Redirect::to(uri!("/setup")),
-    //     _ => Redirect::to(uri!("/404")),
-    // }
-}
-
-// fn redirect_index(auth: Auth) -> Redirect {
-//     match auth.option {
-//         1 => Redirect::to(uri!("/setup")),
-//         _ => Redirect::to(uri!("/login")),
-//     }
-// }
-
-// #[get("/setup")]
-// fn setup(_auth: Auth) {
-//     // This handler has only forward and forbidden, no real handling process needed.
-// }
-
-// #[get("/setup/index.html")]
-// fn setup_index(_auth: Auth) {}
 
 #[get("/fs/volumes")]
 fn system_volumes(_auth: Auth) -> Result<Json<Vec<String>>, Status> {
@@ -95,29 +79,17 @@ impl<'r> FromRequest<'r> for Auth {
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let state = req.rocket().state::<AppState>().unwrap();
         let first_run = state.first_run.lock().unwrap();
-        let page = req.query_value::<&str>("page").unwrap().unwrap();
-        println!("path get in auth: {}", req.uri());
+        let path = req.uri().path().to_string();
 
-        match (page, *first_run) {
-            ("home", true) => Outcome::Success(Auth { option: 1 }),
-            ("home", false) => Outcome::Forward(()),
-            ("setup", true) => Outcome::Forward(()),
-            ("setup", false) => Outcome::Failure((Status::Forbidden, Status::Forbidden)),
-            ("login", _) => Outcome::Forward(()),
+        match (&path[..], *first_run) {
+            ("/", false) | ("/index.html", false) => Outcome::Forward(()),
+            ("/", true) | ("/index.html", true) => Outcome::Success(Auth { option: 1 }),
+            ("/setup", true) => Outcome::Success(Auth { option: 1 }),
+            ("/setup", false) => Outcome::Failure((Status::Forbidden, Status::Forbidden)),
+            ("/api/fs/volumes", true) => Outcome::Success(Auth { option: 1 }),
+            ("/api/fs/volumes", false) => Outcome::Failure((Status::Forbidden, Status::Forbidden)),
             _ => Outcome::Failure((Status::Forbidden, Status::Forbidden)),
         }
-        // Could combine all failure arms to a single one.
-        // match (&url[..], *first_run) {
-        //     ("/", false) | ("/index.html", false) => Outcome::Forward(()),
-        //     ("/", true) | ("/index.html", true) => Outcome::Success(Auth { option: 1 }),
-        //     ("/setup", true) | ("/setup/index.html", true) => Outcome::Forward(()),
-        //     ("/setup", false) | ("/setup/index.html", false) => {
-        //         Outcome::Failure((Status::Forbidden, Status::Forbidden))
-        //     }
-        //     ("/api/fs/volumes", true) => Outcome::Success(Auth { option: 1 }),
-        //     ("/api/fs/volumes", false) => Outcome::Failure((Status::Forbidden, Status::Forbidden)),
-        //     _ => Outcome::Failure((Status::Forbidden, Status::Forbidden)),
-        // }
     }
 }
 
@@ -129,9 +101,9 @@ async fn main() {
 
     if let Err(e) = rocket::build()
         .manage(state)
-        .attach(ServerRoute)
+        //.attach(ServerRoute)
         //.attach(CacheContent)
-        .mount("/", routes![index])
+        .mount("/", routes![index, login, setup])
         .mount("/api", routes![system_volumes, system_sub_dirs])
         .mount("/", FileServer::from(react_dir))
         .launch()
