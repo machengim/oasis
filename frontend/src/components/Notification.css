@@ -1,0 +1,18 @@
+.notification {
+  animation: notify 5s ease-in-out infinite;
+}
+
+@keyframes notify {
+  0% {
+    transform: translateX(120%);
+  }
+  15% {
+    transform: translateX(0);
+  }
+  90% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}

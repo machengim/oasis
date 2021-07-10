@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface ISpinnerProps {
   size?: 'small' | 'normal' | 'large';
 }
@@ -12,6 +10,7 @@ export default function Spinner(props: ISpinnerProps) {
       break;
     case 'large':
       width = '2rem';
+      break;
     default:
       width = '1.5rem';
       break;

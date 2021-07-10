@@ -1,4 +1,4 @@
-import React, { BaseSyntheticEvent, useState, useEffect } from 'react';
+import { BaseSyntheticEvent, useState, useEffect } from 'react';
 import Button from './Button';
 import Spinner from './Spinner';
 import * as api from '../utils/api';

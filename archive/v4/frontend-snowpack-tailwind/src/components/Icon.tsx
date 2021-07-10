@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+
 interface IIconProps {
   type: 'success' | 'error';
   theme?: 'fill';
@@ -6,14 +8,14 @@ interface IIconProps {
 }
 
 export default function Icon(props: IIconProps) {
-  const buildStyle = () => {
-    let style = 'w-8 h-8';
-    if (props.color) {
-      style += ' fill-' + props.color;
-    }
+  const [svgClass, setSvgClass] = useState('w-8 h-8');
 
-    return style;
-  };
+  useEffect(() => {
+    if (props.color) {
+      let newStyle = svgClass + ' ' + 'svg-' + props.color;
+      setSvgClass(newStyle);
+    }
+  }, []);
 
   const getIcon = () => {
     switch (props.type) {
@@ -31,7 +33,7 @@ export default function Icon(props: IIconProps) {
   };
 
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={buildStyle()} viewBox="0 0 512 512">
+    <svg xmlns="http://www.w3.org/2000/svg" className={svgClass} viewBox="0 0 512 512">
       {getIcon()}
     </svg>
   );

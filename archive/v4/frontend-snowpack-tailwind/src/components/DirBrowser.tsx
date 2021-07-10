@@ -19,14 +19,10 @@ export default function DirBrowser(props: IDirBrowserProps) {
   const [volumes, setVolumes] = useState<string[]>([]);
 
   useEffect(() => {
-    let didCancel = false;
-
     const fetchVolumes = async () => {
       try {
-        const volumes: string[] = await api.get('/api/fs/volumes');
-        if (!didCancel) {
-          setVolumes(volumes);
-        }
+        const volumes: string[] = await api.get('/api/sys/volumes');
+        setVolumes(volumes);
       } catch (e) {
         console.log(e);
         alert('Cannot get the volume list.');
@@ -34,10 +30,6 @@ export default function DirBrowser(props: IDirBrowserProps) {
     };
 
     fetchVolumes();
-
-    return () => {
-      didCancel = true;
-    };
   }, []);
 
   useEffect(() => {
@@ -55,36 +47,33 @@ export default function DirBrowser(props: IDirBrowserProps) {
 
   useEffect(() => {
     if (selectedDir) {
-      let didCancel = false;
-
-      const fetchDirs = async (dir: string) => {
-        setIsLoading(true);
-
-        try {
-          const dirs: string[] = await api.get('/api/fs/dirs/' + dir);
-          if (!didCancel) {
-            const newLevel = back ? level - 1 : level + 1;
-            setCurrentDir(selectedDir);
-            setDirs(dirs);
-            setLevel(newLevel);
-            setBack(false);
-          }
-        } catch (e) {
-          console.log(e);
-          alert('Cannot read the directory.');
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
       fetchDirs(selectedDir);
-
-      return () => {
-        didCancel = true;
-      };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDir]);
+
+  useEffect(() => {
+    if (currentDir) {
+      console.log('current dir: ', currentDir);
+    }
+  }, [currentDir]);
+
+  const fetchDirs = async (dir: string) => {
+    setIsLoading(true);
+
+    try {
+      const dirs: string[] = await api.get('/api/sys/dirs/' + dir);
+      const newLevel = back ? level - 1 : level + 1;
+      setCurrentDir(selectedDir);
+      setDirs(dirs);
+      setLevel(newLevel);
+      setBack(false);
+    } catch (e) {
+      console.log(e);
+      alert('Cannot read the directory.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const onConfirmDir = () => {
     props.onSelect(currentDir);
@@ -94,6 +83,10 @@ export default function DirBrowser(props: IDirBrowserProps) {
   // TODO: this works, but not ideal.
   const goToParentDir = (): void => {
     const dirSplit = currentDir.split('/').filter((e) => e.length > 0);
+    if (currentDir.startsWith('/') && dirSplit.length > 0) {
+      dirSplit[0] = '/' + dirSplit[0];
+    }
+
     dirSplit.pop();
     const parentDir = dirSplit.length > 0 && dirSplit[0] ? dirSplit.join('/') : '/';
     setBack(true);

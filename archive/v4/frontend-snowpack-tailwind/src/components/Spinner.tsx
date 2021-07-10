@@ -12,14 +12,13 @@ export default function Spinner(props: ISpinnerProps) {
       break;
     case 'large':
       width = '2rem';
-      break;
     default:
       width = '1.5rem';
       break;
   }
 
   return (
-    <div className="transition ease-in-out duration-150 flex flex-row items-center">
+    <div className="transition ease-in-out duration-150 flex flex-row items-center justify-center">
       <svg
         className="animate-spin mr-3"
         width={width}

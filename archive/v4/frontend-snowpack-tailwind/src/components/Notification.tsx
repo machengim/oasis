@@ -1,5 +1,6 @@
+import React from 'react';
 import Icon from './Icon';
-import './Notification.css';
+import './notification.css';
 
 interface INotificationProps {
   type: 'success' | 'error';
@@ -8,26 +9,22 @@ interface INotificationProps {
 export default function Notification(props: INotificationProps) {
   const type = props.type;
 
-  const buildStyle = (): string => {
-    let notificationClass =
-      'flex flex-row justify-between space-x-2  bg-gray-50 shadow rounded border-l-4 items-center p-2 notification';
+  let notificationClass = 'flex flex-row justify-between space-x-2  bg-gray-50 shadow rounded items-center p-2';
 
-    switch (props.type) {
-      case 'success':
-        notificationClass += ' border-green-400';
-        break;
-      case 'error':
-        notificationClass += ' border-red-400';
-        break;
-      default:
-        break;
-    }
-    return notificationClass;
-  };
+  switch (props.type) {
+    case 'success':
+      notificationClass += ' border-green';
+      break;
+    case 'error':
+      notificationClass += ' border-red';
+      break;
+    default:
+      break;
+  }
 
   return (
-    <div className="absolute right-6 top-6 max-w-sm overflow-x-hidden">
-      <div className={buildStyle()}>
+    <div className="absolute right-6 top-6 max-w-sm">
+      <div className={notificationClass}>
         <div>
           <Icon type={type} theme="fill" color={type === 'success' ? 'green' : 'red'} />
         </div>

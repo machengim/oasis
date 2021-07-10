@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface IButton {
   value: string;
   upperCase?: boolean;

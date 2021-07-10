@@ -1,19 +1,19 @@
-import ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDom from 'react-dom';
 import { Router } from 'react-router';
-import { Switch, Route } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Setup from './pages/Setup';
 import Error404 from './pages/Error404';
-import './index.css';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 const history = createBrowserHistory();
 
-ReactDOM.render(
-  <Router history={history}>
+ReactDom.render(
+  <BrowserRouter history={history}>
     <App />
-  </Router>,
+  </BrowserRouter>,
   document.getElementById('root')
 );
 
