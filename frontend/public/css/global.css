@@ -11,3 +11,20 @@ html {
   width: 100vw;
   height: 100vh;
 }
+
+input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.svg-green {
+  @apply fill-green;
+}
+
+.svg-red {
+  @apply fill-red;
+}
+
+.svg-yellow {
+  @apply fill-yellow;
+}

@@ -18,7 +18,7 @@ export default function Spinner(props: ISpinnerProps) {
   }
 
   return (
-    <div className="transition ease-in-out duration-150 flex flex-row items-center">
+    <div className="transition ease-in-out duration-150 flex flex-row items-center justify-center">
       <svg
         className="animate-spin mr-3"
         width={width}

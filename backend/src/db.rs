@@ -1,11 +1,11 @@
-use crate::utils;
+use crate::util;
+use rocket::tokio::fs;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqliteRow};
 use sqlx::{ConnectOptions, Connection, FromRow};
 use std::path::PathBuf;
-use rocket::tokio::fs;
 
 pub async fn get_db_conn() -> SqlitePool {
-    let dir = utils::get_config_dir();
+    let dir = util::get_config_dir();
     let db_file = dir.join("main.db");
     if !db_file.as_path().exists() {
         if let Err(e) = create_db(&db_file).await {

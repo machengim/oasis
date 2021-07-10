@@ -21,7 +21,7 @@ export default function DirBrowser(props: IDirBrowserProps) {
   useEffect(() => {
     const fetchVolumes = async () => {
       try {
-        const volumes: string[] = await api.get('/api/fs/volumes');
+        const volumes: string[] = await api.get('/api/sys/volumes');
         setVolumes(volumes);
       } catch (e) {
         console.log(e);
@@ -51,11 +51,17 @@ export default function DirBrowser(props: IDirBrowserProps) {
     }
   }, [selectedDir]);
 
+  useEffect(() => {
+    if (currentDir) {
+      console.log('current dir: ', currentDir);
+    }
+  }, [currentDir]);
+
   const fetchDirs = async (dir: string) => {
     setIsLoading(true);
 
     try {
-      const dirs: string[] = await api.get('/api/fs/dirs/' + dir);
+      const dirs: string[] = await api.get('/api/sys/dirs/' + dir);
       const newLevel = back ? level - 1 : level + 1;
       setCurrentDir(selectedDir);
       setDirs(dirs);
@@ -77,6 +83,10 @@ export default function DirBrowser(props: IDirBrowserProps) {
   // TODO: this works, but not ideal.
   const goToParentDir = (): void => {
     const dirSplit = currentDir.split('/').filter((e) => e.length > 0);
+    if (currentDir.startsWith('/') && dirSplit.length > 0) {
+      dirSplit[0] = '/' + dirSplit[0];
+    }
+
     dirSplit.pop();
     const parentDir = dirSplit.length > 0 && dirSplit[0] ? dirSplit.join('/') : '/';
     setBack(true);
