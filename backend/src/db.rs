@@ -51,7 +51,7 @@ async fn get_conn_pool(db_file: &PathBuf) -> anyhow::Result<SqlitePool> {
     Ok(pool)
 }
 
-pub async fn fetch_single<T>(sql: &str, args: Vec<String>, pool: &SqlitePool) -> anyhow::Result<T>
+pub async fn fetch_single<T>(sql: &str, args: Vec<&str>, pool: &SqlitePool) -> anyhow::Result<T>
 where
     T: Send + Unpin + for<'a> FromRow<'a, SqliteRow>,
 {
@@ -61,7 +61,7 @@ where
 
 pub async fn fetch_multiple<T>(
     sql: &str,
-    args: Vec<String>,
+    args: Vec<&str>,
     pool: &SqlitePool,
 ) -> anyhow::Result<Vec<T>>
 where
@@ -71,19 +71,37 @@ where
     Ok(stmt.fetch_all(pool).await?)
 }
 
-pub async fn execute(sql: &str, args: Vec<String>, pool: &SqlitePool) -> anyhow::Result<()> {
+pub async fn tx_execute(
+    sql_list: Vec<&str>,
+    args_list: Vec<Vec<&str>>,
+    pool: &SqlitePool,
+) -> anyhow::Result<()> {
+    if sql_list.len() != args_list.len() {
+        return Err(anyhow::anyhow!("Wrong query input for transaction."));
+    }
+    let mut tx = pool.begin().await?;
+    for i in 0..sql_list.len() {
+        let stmt = prepare_exec_sql(sql_list[i], args_list[i].to_owned());
+        stmt.execute(&mut tx).await?;
+    }
+    tx.commit().await?;
+
+    Ok(())
+}
+
+pub async fn execute(sql: &str, args: Vec<&str>, pool: &SqlitePool) -> anyhow::Result<()> {
     let stmt = prepare_exec_sql(sql, args);
     stmt.execute(pool).await?;
 
     Ok(())
 }
 
-fn prepare_sql<T>(
-    sql: &str,
-    args: Vec<String>,
-) -> sqlx::query::QueryAs<'_, sqlx::Sqlite, T, sqlx::sqlite::SqliteArguments<'_>>
+fn prepare_sql<'a, T>(
+    sql: &'a str,
+    args: Vec<&'a str>,
+) -> sqlx::query::QueryAs<'a, sqlx::Sqlite, T, sqlx::sqlite::SqliteArguments<'a>>
 where
-    T: Send + Unpin + for<'a> FromRow<'a, SqliteRow>,
+    T: Send + Unpin + for<'b> FromRow<'b, SqliteRow>,
 {
     let mut stmt = sqlx::query_as(sql);
     for arg in args.iter() {
@@ -93,10 +111,10 @@ where
     stmt
 }
 
-fn prepare_exec_sql(
-    sql: &str,
-    args: Vec<String>,
-) -> sqlx::query::Query<'_, sqlx::Sqlite, sqlx::sqlite::SqliteArguments<'_>> {
+fn prepare_exec_sql<'a>(
+    sql: &'a str,
+    args: Vec<&'a str>,
+) -> sqlx::query::Query<'a, sqlx::Sqlite, sqlx::sqlite::SqliteArguments<'a>> {
     let mut stmt = sqlx::query(sql);
     for arg in args.iter() {
         stmt = stmt.bind(arg.to_owned());
