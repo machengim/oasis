@@ -1,7 +1,8 @@
 use crate::util;
 use rocket::tokio::fs;
+use sqlx::pool::PoolConnection;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqliteRow};
-use sqlx::{ConnectOptions, Connection, FromRow};
+use sqlx::{ConnectOptions, Connection, FromRow, Sqlite};
 use std::path::PathBuf;
 
 pub async fn get_db_conn() -> SqlitePool {
@@ -73,7 +74,7 @@ where
 
 pub async fn tx_execute(
     sql_list: Vec<&str>,
-    args_list: Vec<Vec<&str>>,
+    args_list: Vec<Vec<String>>,
     pool: &SqlitePool,
 ) -> anyhow::Result<()> {
     if sql_list.len() != args_list.len() {
@@ -89,7 +90,11 @@ pub async fn tx_execute(
     Ok(())
 }
 
-pub async fn execute(sql: &str, args: Vec<&str>, pool: &SqlitePool) -> anyhow::Result<()> {
+pub async fn execute(
+    sql: &str,
+    args: Vec<String>,
+    pool: &mut PoolConnection<Sqlite>,
+) -> anyhow::Result<()> {
     let stmt = prepare_exec_sql(sql, args);
     stmt.execute(pool).await?;
 
@@ -113,7 +118,7 @@ where
 
 fn prepare_exec_sql<'a>(
     sql: &'a str,
-    args: Vec<&'a str>,
+    args: Vec<String>,
 ) -> sqlx::query::Query<'a, sqlx::Sqlite, sqlx::sqlite::SqliteArguments<'a>> {
     let mut stmt = sqlx::query(sql);
     for arg in args.iter() {

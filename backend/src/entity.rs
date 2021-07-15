@@ -1,16 +1,21 @@
 use serde::{Deserialize, Serialize};
+use sqlx::pool::PoolConnection;
 use sqlx::FromRow;
 use sqlx::{Pool, Sqlite};
 use std::sync::Mutex;
 
 pub struct AppState {
     pub first_run: Mutex<bool>,
-    pub pool: Mutex<Pool<Sqlite>>,
+    pub pool: Pool<Sqlite>,
     pub storage: Mutex<String>,
 }
 
-pub struct Auth {
+pub struct AuthIndex {
     pub option: i8,
+}
+
+pub struct AuthDb {
+    pub conn: PoolConnection<Sqlite>,
 }
 
 #[derive(Serialize, FromRow, Debug)]

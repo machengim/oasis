@@ -38,7 +38,7 @@ async fn init_app_state() -> entity::AppState {
 
     entity::AppState {
         first_run: Mutex::new(first_run),
-        pool: Mutex::new(pool),
+        pool,
         storage: Mutex::new(String::new()),
     }
 }

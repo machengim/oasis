@@ -1,4 +1,4 @@
-use crate::entity::Auth;
+use crate::entity::AuthIndex;
 use crate::util;
 use rocket::fs::NamedFile;
 use rocket::response::Redirect;
@@ -10,7 +10,7 @@ pub fn serve_route() -> Vec<Route> {
 }
 
 #[get("/")]
-fn index(_auth: Auth) -> Redirect {
+fn index(_auth: AuthIndex) -> Redirect {
     Redirect::to(uri!("/setup"))
 }
 
@@ -20,7 +20,7 @@ async fn login() -> Option<NamedFile> {
 }
 
 #[get("/setup")]
-async fn setup(_auth: Auth) -> Option<NamedFile> {
+async fn setup(_auth: AuthIndex) -> Option<NamedFile> {
     get_react_index().await
 }
 
