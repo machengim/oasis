@@ -1,27 +1,45 @@
-use crate::entity::AuthIndex;
+use crate::auth::AppFirstRun;
 use crate::util;
 use rocket::fs::NamedFile;
+use rocket::http::Status;
 use rocket::response::Redirect;
 use rocket::Route;
 use std::path::PathBuf;
 
 pub fn serve_route() -> Vec<Route> {
-    routes![index, login, setup]
+    routes![
+        get_index_first_run,
+        get_index_default,
+        get_login,
+        get_setup_first_run,
+        get_setup_default
+    ]
 }
 
-#[get("/")]
-fn index(_auth: AuthIndex) -> Redirect {
+#[get("/", rank = 1)]
+fn get_index_first_run(_auth: AppFirstRun) -> Redirect {
     Redirect::to(uri!("/setup"))
 }
 
-#[get("/login")]
-async fn login() -> Option<NamedFile> {
+// TODO: check user login info
+#[get("/", rank = 2)]
+async fn get_index_default() -> Option<NamedFile> {
     get_react_index().await
 }
 
-#[get("/setup")]
-async fn setup(_auth: AuthIndex) -> Option<NamedFile> {
+#[get("/login")]
+async fn get_login() -> Option<NamedFile> {
     get_react_index().await
+}
+
+#[get("/setup", rank = 1)]
+async fn get_setup_first_run(_auth: AppFirstRun) -> Option<NamedFile> {
+    get_react_index().await
+}
+
+#[get("/setup", rank = 2)]
+async fn get_setup_default() -> Status {
+    Status::BadRequest
 }
 
 async fn get_react_index() -> Option<NamedFile> {
@@ -52,34 +70,3 @@ impl Fairing for CacheContent {
     }
 }
 */
-
-/*
-struct ServerRoute;
-
-#[rocket::async_trait]
-impl Fairing for ServerRoute {
-    fn info(&self) -> Info {
-        Info {
-            name: "GET/POST Counter",
-            kind: Kind::Request,
-        }
-    }
-
-    async fn on_request(&self, request: &mut Request<'_>, _: &mut Data<'_>) {
-        if request.method() == Method::Get {
-            let request_url = request.uri().to_string();
-            let target_uri = match &request_url[..] {
-                "/" | "/index.html" => "/?page=home",
-                "/setup" => "/?page=setup",
-                "/login" => "/?page=login",
-                _ => "",
-            };
-
-            if target_uri.len() > 0 {
-                request.set_uri(Origin::parse(target_uri).unwrap());
-                println!("New uri set: {}", request.uri());
-            }
-        }
-    }
-}
- */

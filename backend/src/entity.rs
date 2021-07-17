@@ -10,14 +10,6 @@ pub struct AppState {
     pub storage: Mutex<String>,
 }
 
-pub struct AuthIndex {
-    pub option: i8,
-}
-
-pub struct AuthDb {
-    pub conn: PoolConnection<Sqlite>,
-}
-
 #[derive(Serialize, FromRow, Debug)]
 pub struct Site {
     pub version: f64,
