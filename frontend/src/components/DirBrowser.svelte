@@ -85,15 +85,15 @@
   };
 </script>
 
-<div class="fixed z-10 left-0 top-0 w-full h-full bg-black bg-opacity-40">
+<div class="fixed z-10 left-0 top-0 w-full min-h-full bg-black bg-opacity-40">
   <div
-    class="bg-white w-96 my-40 mx-auto p-4 border rounded-lg border-gray-50 flex flex-col"
+    class="bg-white w-96 mt-20 mx-auto p-4 border rounded-lg border-gray-50 flex flex-col"
   >
     <div class="mb-4 text-xl mx-auto text-gray-700">Directory Browser</div>
     <!-- Volume selector -->
     <div class="mb-4 flex flex-row items-center">
       <span class="mr-4">Volumes:</span>
-      <select class="px-2 border bg-gray-50" on:change={selectVolume} on:blur>
+      <select class="px-2 border bg-gray-50 max-w-10" on:change={selectVolume} on:blur>
         {#each volumes as volume}
           <option value={volume}>
             {volume}
@@ -149,3 +149,9 @@
     </div>
   </div>
 </div>
+
+<style>
+  .max-w-10{
+    max-width: 10rem;
+  }
+</style>

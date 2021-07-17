@@ -5,7 +5,7 @@ use std::process::Command;
 pub fn get_system_volumes() -> anyhow::Result<Vec<String>> {
     match std::env::consts::OS {
         "linux" => get_linux_volumes(),
-        "macos" => Err(anyhow::anyhow!("Not implemented")),
+        "macos" => get_mac_volumes(),
         // "windows" => Vec::new(),
         _ => Err(anyhow::anyhow!("Not supported system")),
     }
@@ -24,6 +24,21 @@ fn get_linux_volumes() -> anyhow::Result<Vec<String>> {
         }
     }
 
+    Ok(mountpoints)
+}
+
+fn get_mac_volumes() -> anyhow::Result<Vec<String>> {
+    let df_output = Command::new("sh").arg("-c").arg("df -Hl").output()?;
+    let lines = std::str::from_utf8(&df_output.stdout)?.lines();
+    let mut mountpoints: Vec<String> = Vec::new();
+
+    for line in lines {
+        let words: Vec<&str> = line.split_whitespace().collect();
+        let last_word = words.last().unwrap_or(&"");
+        if last_word.starts_with('/') && !last_word.starts_with("/System") {
+            mountpoints.push(last_word.to_string());
+        }
+    }
     Ok(mountpoints)
 }
 

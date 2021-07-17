@@ -38,7 +38,7 @@
   {/if}
   <form on:submit={onConfirm} bind:this={form}>
     <div
-      class="w-96 mx-auto mt-40 bg-gray-50 shadow rounded-lg flex flex-col items-center p-8 overflow-hidden"
+      class="w-96 mx-auto mt-20 bg-gray-50 shadow rounded-lg flex flex-col items-center p-8"
     >
       <div class="text-xl font-bold mb-8 text-gray-700">Server Setup</div>
       <div class="w-full grid grid-cols-4 mb-4">
