@@ -1,15 +1,19 @@
-use crate::entity::AppState;
+use crate::entity::site::AppState;
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome, Request};
 use sqlx::pool::PoolConnection;
 use sqlx::Sqlite;
 
-pub struct AppFirstRun {
+pub struct FirstRun {
     pub first_run: bool,
 }
 
+pub struct Db {
+    pub conn: PoolConnection<Sqlite>,
+}
+
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for AppFirstRun {
+impl<'r> FromRequest<'r> for FirstRun {
     type Error = Status;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
@@ -26,18 +30,14 @@ impl<'r> FromRequest<'r> for AppFirstRun {
         };
 
         match first_run {
-            true => Outcome::Success(AppFirstRun { first_run: true }),
+            true => Outcome::Success(FirstRun { first_run: true }),
             false => Outcome::Forward(()),
         }
     }
 }
 
-pub struct AppDb {
-    pub conn: PoolConnection<Sqlite>,
-}
-
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for AppDb {
+impl<'r> FromRequest<'r> for Db {
     type Error = Status;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
@@ -49,7 +49,7 @@ impl<'r> FromRequest<'r> for AppDb {
         };
 
         match state.pool.acquire().await {
-            Ok(conn) => Outcome::Success(AppDb { conn }),
+            Ok(conn) => Outcome::Success(Db { conn }),
             Err(_) => error500,
         }
     }

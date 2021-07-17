@@ -1,14 +1,12 @@
 mod api;
-pub mod auth;
-mod db;
 mod entity;
-mod filesystem;
 mod route;
 mod util;
-use entity::Site;
+use entity::site::{AppState, Query, Site};
 use rocket::fs::FileServer;
 use sqlx::{Pool, Sqlite};
 use std::sync::Mutex;
+use util::db;
 
 #[macro_use]
 extern crate rocket;
@@ -21,7 +19,7 @@ async fn main() {
 
     if let Err(e) = rocket::build()
         .manage(state)
-        .mount("/", route::serve_route())
+        .mount("/", route::serve_static_route())
         .mount("/api", api::serve_api())
         .mount("/", FileServer::from(react_dir))
         .launch()
@@ -31,23 +29,27 @@ async fn main() {
     }
 }
 
-async fn init_app_state() -> entity::AppState {
+async fn init_app_state() -> AppState {
     let pool = db::get_db_conn().await;
-    let site = read_site(&pool).await;
+    let site = read_site_info(&pool).await;
     let first_run = site.first_run == 1;
 
-    entity::AppState {
+    AppState {
         first_run: Mutex::new(first_run),
         pool,
         storage: Mutex::new(String::new()),
     }
 }
 
-async fn read_site(pool: &Pool<Sqlite>) -> Site {
-    let sql = "SELECT * FROM site";
-    let args = vec![];
+async fn read_site_info(pool: &Pool<Sqlite>) -> Site {
+    let query = Query::new("SELECT * FROM site", vec![]);
 
-    match db::fetch_single::<Site>(sql, args, pool).await {
+    let mut conn = match pool.acquire().await {
+        Ok(conn) => conn,
+        Err(_) => panic!("Cannot get db connection"),
+    };
+
+    match db::fetch_single::<Site>(query, &mut conn).await {
         Ok(site) => site,
         Err(e) => panic!("Cannot read site info from db: {}", e),
     }

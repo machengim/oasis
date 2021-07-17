@@ -1,4 +1,4 @@
-use crate::auth::AppFirstRun;
+use crate::entity::auth::FirstRun;
 use crate::util;
 use rocket::fs::NamedFile;
 use rocket::http::Status;
@@ -6,7 +6,7 @@ use rocket::response::Redirect;
 use rocket::Route;
 use std::path::PathBuf;
 
-pub fn serve_route() -> Vec<Route> {
+pub fn serve_static_route() -> Vec<Route> {
     routes![
         get_index_first_run,
         get_index_default,
@@ -17,7 +17,7 @@ pub fn serve_route() -> Vec<Route> {
 }
 
 #[get("/", rank = 1)]
-fn get_index_first_run(_auth: AppFirstRun) -> Redirect {
+fn get_index_first_run(_auth: FirstRun) -> Redirect {
     Redirect::to(uri!("/setup"))
 }
 
@@ -33,7 +33,7 @@ async fn get_login() -> Option<NamedFile> {
 }
 
 #[get("/setup", rank = 1)]
-async fn get_setup_first_run(_auth: AppFirstRun) -> Option<NamedFile> {
+async fn get_setup_first_run(_auth: FirstRun) -> Option<NamedFile> {
     get_react_index().await
 }
 

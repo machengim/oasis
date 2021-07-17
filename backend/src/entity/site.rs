@@ -1,5 +1,4 @@
-use serde::{Deserialize, Serialize};
-use sqlx::pool::PoolConnection;
+use serde::Serialize;
 use sqlx::FromRow;
 use sqlx::{Pool, Sqlite};
 use std::sync::Mutex;
@@ -18,9 +17,16 @@ pub struct Site {
     pub storage: String,
 }
 
-#[derive(Deserialize)]
-pub struct SetupRequest {
-    pub username: String,
-    pub password: String,
-    pub storage: String,
+pub struct Query {
+    pub sql: String,
+    pub args: Vec<String>,
+}
+
+impl Query {
+    pub fn new(sql: &str, args: Vec<String>) -> Self {
+        Query {
+            sql: String::from(sql),
+            args,
+        }
+    }
 }

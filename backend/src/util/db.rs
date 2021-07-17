@@ -1,4 +1,4 @@
-use crate::util;
+use crate::entity::site::Query;
 use rocket::tokio::fs;
 use sqlx::pool::PoolConnection;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqliteRow};
@@ -6,7 +6,7 @@ use sqlx::{ConnectOptions, Connection, FromRow, Sqlite};
 use std::path::PathBuf;
 
 pub async fn get_db_conn() -> SqlitePool {
-    let dir = util::get_config_dir();
+    let dir = super::get_config_dir();
     let db_file = dir.join("main.db");
     if !db_file.as_path().exists() {
         if let Err(e) = create_db(&db_file).await {
@@ -52,65 +52,57 @@ async fn get_conn_pool(db_file: &PathBuf) -> anyhow::Result<SqlitePool> {
     Ok(pool)
 }
 
-pub async fn fetch_single<T>(sql: &str, args: Vec<&str>, pool: &SqlitePool) -> anyhow::Result<T>
+pub async fn fetch_single<T>(query: Query, conn: &mut PoolConnection<Sqlite>) -> anyhow::Result<T>
 where
     T: Send + Unpin + for<'a> FromRow<'a, SqliteRow>,
 {
-    let stmt = prepare_sql(sql, args);
-    Ok(stmt.fetch_one(pool).await?)
+    let stmt = prepare_sql(&query.sql, &query.args);
+    Ok(stmt.fetch_one(conn).await?)
 }
 
 pub async fn fetch_multiple<T>(
-    sql: &str,
-    args: Vec<&str>,
-    pool: &SqlitePool,
+    query: Query,
+    conn: &mut PoolConnection<Sqlite>,
 ) -> anyhow::Result<Vec<T>>
 where
     T: Send + Unpin + for<'a> FromRow<'a, SqliteRow>,
 {
-    let stmt = prepare_sql(sql, args);
-    Ok(stmt.fetch_all(pool).await?)
+    let stmt = prepare_sql(&query.sql, &query.args);
+    Ok(stmt.fetch_all(conn).await?)
 }
 
 pub async fn tx_execute(
-    sql_list: Vec<&str>,
-    args_list: Vec<Vec<String>>,
-    pool: &SqlitePool,
+    queries: Vec<Query>,
+    conn: &mut PoolConnection<Sqlite>,
 ) -> anyhow::Result<()> {
-    if sql_list.len() != args_list.len() {
-        return Err(anyhow::anyhow!("Wrong query input for transaction."));
-    }
-    let mut tx = pool.begin().await?;
-    for i in 0..sql_list.len() {
-        let stmt = prepare_exec_sql(sql_list[i], args_list[i].to_owned());
+    let mut tx = conn.begin().await?;
+
+    for query in queries.iter() {
+        let stmt = prepare_exec_sql(&query.sql, &query.args);
         stmt.execute(&mut tx).await?;
     }
-    tx.commit().await?;
 
+    tx.commit().await?;
     Ok(())
 }
 
-pub async fn execute(
-    sql: &str,
-    args: Vec<String>,
-    pool: &mut PoolConnection<Sqlite>,
-) -> anyhow::Result<()> {
-    let stmt = prepare_exec_sql(sql, args);
-    stmt.execute(pool).await?;
+pub async fn execute(query: Query, conn: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+    let stmt = prepare_exec_sql(&query.sql, &query.args);
+    stmt.execute(conn).await?;
 
     Ok(())
 }
 
 fn prepare_sql<'a, T>(
     sql: &'a str,
-    args: Vec<&'a str>,
+    args: &'a Vec<String>,
 ) -> sqlx::query::QueryAs<'a, sqlx::Sqlite, T, sqlx::sqlite::SqliteArguments<'a>>
 where
     T: Send + Unpin + for<'b> FromRow<'b, SqliteRow>,
 {
     let mut stmt = sqlx::query_as(sql);
     for arg in args.iter() {
-        stmt = stmt.bind(arg.to_owned());
+        stmt = stmt.bind(arg);
     }
 
     stmt
@@ -118,11 +110,11 @@ where
 
 fn prepare_exec_sql<'a>(
     sql: &'a str,
-    args: Vec<String>,
+    args: &'a Vec<String>,
 ) -> sqlx::query::Query<'a, sqlx::Sqlite, sqlx::sqlite::SqliteArguments<'a>> {
     let mut stmt = sqlx::query(sql);
     for arg in args.iter() {
-        stmt = stmt.bind(arg.to_owned());
+        stmt = stmt.bind(arg);
     }
 
     stmt
