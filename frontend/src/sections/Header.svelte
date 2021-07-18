@@ -2,7 +2,6 @@
   export let path: string = "/";
 
   const buildNav = () => {
-    console.log("inside: ", path);
     switch (path) {
       case "/setup":
         return "Oasis &gt; Setup";

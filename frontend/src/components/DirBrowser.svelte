@@ -5,6 +5,7 @@
   import Button from "./Button.svelte";
   import Spinner from "./Spinner.svelte";
   import * as api from "../utils/api";
+  import { setNotification } from "../utils/util";
 
   export let onClose = () => {};
   export let onSelect = (v: string) => {};
@@ -24,11 +25,7 @@
       volumes = await api.get("/api/sys/volumes");
     } catch (e) {
       console.log(e);
-      const newNotification: INotification = {
-        type: "error",
-        msg: "Cannot read volumes",
-      };
-      notificationStore.set(newNotification);
+      setNotification("error", "Cannot read volumes");
     } finally {
       isLoading = false;
     }
@@ -60,11 +57,7 @@
       back = false;
     } catch (e) {
       console.log(e);
-      const newNotification: INotification = {
-        type: "error",
-        msg: "Cannot read directory",
-      };
-      notificationStore.set(newNotification);
+      setNotification("error", "Cannot read directory");
     } finally {
       isLoading = false;
     }
@@ -97,7 +90,11 @@
     <!-- Volume selector -->
     <div class="mb-4 flex flex-row items-center">
       <span class="mr-4">Volumes:</span>
-      <select class="px-2 border bg-gray-50 max-w-10" on:change={selectVolume} on:blur>
+      <select
+        class="px-2 border bg-gray-50 max-w-10"
+        on:change={selectVolume}
+        on:blur
+      >
         {#each volumes as volume}
           <option value={volume}>
             {volume}
@@ -155,7 +152,7 @@
 </div>
 
 <style>
-  .max-w-10{
+  .max-w-10 {
     max-width: 10rem;
   }
 </style>

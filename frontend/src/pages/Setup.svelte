@@ -1,20 +1,40 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
   import DirBrowser from "../components/DirBrowser.svelte";
+  import * as api from "../utils/api";
+  import type { ISetupRequest } from "../utils/types";
+  import { setNotification } from "../utils/util";
+  import { useNavigate } from "svelte-navigator";
+  const navigate = useNavigate();
 
   let username = "";
   let password = "";
   let selectedDir = "";
   let form: HTMLFormElement;
+  let isLoading = false;
   let isNoStorageError = false;
   let isOpenDirBrowser = false;
 
-  const onConfirm = (e: Event) => {
+  const onConfirm = async (e: Event) => {
     e.preventDefault();
 
+    if (!validateForm()) {
+      return;
+    }
+
+    isLoading = true;
+    const result = await sendSetupRequest();
+    isLoading = false;
+
+    if (result) {
+      navigate("/login");
+    }
+  };
+
+  const validateForm = (): boolean => {
     if (!form.checkValidity()) {
       form.reportValidity();
-      return;
+      return false;
     }
 
     if (!selectedDir || selectedDir.trim().length === 0) {
@@ -22,7 +42,29 @@
       return false;
     }
 
-    alert("submitted!");
+    return true;
+  };
+
+  const sendSetupRequest = async (): Promise<boolean> => {
+    try {
+      const payload: ISetupRequest = {
+        username,
+        password,
+        storage: selectedDir,
+      };
+      await api.post("/api/setup", payload, false);
+      setNotification("success", "Launched successfully.");
+    } catch (e) {
+      console.log(e);
+      if (e.message === "409") {
+        setNotification("error", "Username existed.");
+      } else {
+        setNotification("error", "Launch failed");
+      }
+      return false;
+    }
+
+    return true;
   };
 </script>
 
@@ -38,7 +80,7 @@
   {/if}
   <form on:submit={onConfirm} bind:this={form}>
     <div
-      class="w-96 mx-auto mt-20 bg-gray-50 shadow rounded-lg flex flex-col items-center p-8"
+      class="w-96 mx-auto mt-28 bg-gray-50 shadow rounded-lg flex flex-col items-center p-8"
     >
       <div class="text-xl font-bold mb-8 text-gray-700">Server Setup</div>
       <div class="w-full grid grid-cols-4 mb-4">
@@ -88,8 +130,9 @@
       </div>
       <div class="mb-2">
         <Button
-          value="launch"
+          value={isLoading ? "Lauching..." : "Launch"}
           onClick={onConfirm}
+          disabled={isLoading}
           spec="important"
           type="submit"
         />

@@ -17,16 +17,14 @@ pub struct Site {
     pub storage: String,
 }
 
-pub struct Query {
-    pub sql: String,
-    pub args: Vec<String>,
+#[derive(Debug)]
+pub struct Query<'a> {
+    pub sql: &'a str,
+    pub args: Vec<&'a str>,
 }
 
-impl Query {
-    pub fn new(sql: &str, args: Vec<String>) -> Self {
-        Query {
-            sql: String::from(sql),
-            args,
-        }
+impl<'a> Query<'a> {
+    pub fn new(sql: &'a str, args: Vec<&'a str>) -> Self {
+        Query { sql, args }
     }
 }

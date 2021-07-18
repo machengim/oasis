@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Router, Route, Link } from "svelte-routing";
+  import { Router, Link, Route } from "svelte-navigator";
   import Tailwind from "./components/Tailwind.svelte";
   import Header from "./sections/Header.svelte";
   import Notification from "./components/Notification.svelte";

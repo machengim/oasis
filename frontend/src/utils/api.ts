@@ -1,31 +1,31 @@
 export async function get<T>(url: string): Promise<T> {
-  const response = await fetch(url);
+  let response: Response;
+  try {
+     response = await fetch(url);
+  } catch (e) {
+    throw e;
+  }
+
   if (!response.ok) {
-    throw custom_error(response.status);
+    throw new Error(response.status.toString());
   }
-  const data = await response.json();
-  return data;
+
+  return await response.json();
 }
 
-export async function post<T, S>(url: string, payload: T): Promise<S> {
-  const response = await fetch(url, {body: JSON.stringify(payload), method: 'POST'});
+export async function post<T, S>(url: string, payload: T, needResponse: boolean): Promise<S> {
+  let response: Response;
+  try {
+    response = await fetch(url, {body: JSON.stringify(payload), method: 'POST'});
+
+  } catch (e) {
+    throw e;
+  }
+
   if (!response.ok) {
-    throw custom_error(response.status);
-  }
-  const data = await response.json();
-  return data;
-}
-
-function custom_error(code: number): Error {
-  let msg = '';
-
-  switch (code) {
-    case 500:
-      msg = 'Internal server error';
-      break;
-    default:
-      break;
+    throw new Error(response.status.toString());
   }
 
-  return new Error(msg);
+  return needResponse ? await response.json() : null;
 }
+

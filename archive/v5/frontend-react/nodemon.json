@@ -1,5 +1,0 @@
-{
-  "watch": ["src", "public"],
-  "exec": "tsc && npm run build",
-  "ext": "js, json, ts, jsx, tsx, html"
-}
