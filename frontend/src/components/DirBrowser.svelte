@@ -24,7 +24,11 @@
       volumes = await api.get("/api/sys/volumes");
     } catch (e) {
       console.log(e);
-      alert("Cannot get the volume list.");
+      const newNotification: INotification = {
+        type: "error",
+        msg: "Cannot read volumes",
+      };
+      notificationStore.set(newNotification);
     } finally {
       isLoading = false;
     }
