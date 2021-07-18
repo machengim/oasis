@@ -1,4 +1,4 @@
-use crate::entity::site::Query;
+use crate::entity::query::Query;
 use rocket::tokio::fs;
 use sqlx::pool::PoolConnection;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqliteRow};
@@ -101,7 +101,7 @@ pub async fn execute<'a>(
 
 fn prepare_sql<'a, T>(
     sql: &'a str,
-    args: &'a Vec<&'a str>,
+    args: &'a Vec<String>,
 ) -> sqlx::query::QueryAs<'a, sqlx::Sqlite, T, sqlx::sqlite::SqliteArguments<'a>>
 where
     T: Send + Unpin + for<'b> FromRow<'b, SqliteRow>,
@@ -116,7 +116,7 @@ where
 
 fn prepare_exec_sql<'a>(
     sql: &'a str,
-    args: &'a Vec<&'a str>,
+    args: &'a Vec<String>,
 ) -> sqlx::query::Query<'a, sqlx::Sqlite, sqlx::sqlite::SqliteArguments<'a>> {
     let mut stmt = sqlx::query(sql);
     for arg in args.iter() {

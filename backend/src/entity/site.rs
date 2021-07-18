@@ -1,3 +1,4 @@
+use crate::entity::query::Query;
 use serde::Serialize;
 use sqlx::FromRow;
 use sqlx::{Pool, Sqlite};
@@ -17,14 +18,9 @@ pub struct Site {
     pub storage: String,
 }
 
-#[derive(Debug)]
-pub struct Query<'a> {
-    pub sql: &'a str,
-    pub args: Vec<&'a str>,
-}
-
-impl<'a> Query<'a> {
-    pub fn new(sql: &'a str, args: Vec<&'a str>) -> Self {
-        Query { sql, args }
-    }
+pub fn setup_site_sql(storage: &str) -> Query {
+    Query::from(
+        "update SITE set first_run = ?1, storage = ?2",
+        vec!["0", storage.into()],
+    )
 }

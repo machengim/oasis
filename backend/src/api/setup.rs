@@ -1,9 +1,8 @@
 use crate::db;
 use crate::entity::auth::{Db, FirstRun};
 use crate::entity::request::SetupRequest;
-use crate::entity::site::{AppState, Query};
-use crate::entity::user::UserId;
-use bcrypt::{hash, DEFAULT_COST};
+use crate::entity::site::{self, AppState};
+use crate::entity::user;
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::{Route, State};
@@ -20,36 +19,22 @@ async fn post_setup_first_run(
     mut db: Db,
     state: &State<AppState>,
 ) -> Result<(), Status> {
+    let error409 = Err(Status::Conflict);
     let error500 = Err(Status::InternalServerError);
 
-    let query_user_sql = Query::new(
-        "select user_id from USER where username = ?1",
-        vec![&setup_req.username],
-    );
-
-    if db::fetch_single::<UserId>(query_user_sql, &mut db.conn)
-        .await
-        .is_ok()
-    {
-        return Err(Status::Conflict);
-    }
-
-    let encrypt_password = match hash(&setup_req.password, DEFAULT_COST) {
-        Ok(v) => v,
+    match user::find_exist_username(&setup_req.username, &mut db.conn).await {
         Err(_) => return error500,
+        Ok(true) => return error409,
+        Ok(false) => (),
     };
 
-    let insert_user_sql = Query::new(
-        "insert into USER (username, password, permission) values (?1, ?2, ?3)",
-        vec![&setup_req.username, &encrypt_password, "9"],
-    );
+    let insert_user = match user::insert_user_sql(&setup_req.username, &setup_req.password, 9) {
+        Ok(query) => query,
+        Err(_) => return error500,
+    };
+    let update_site = site::setup_site_sql(&setup_req.storage);
 
-    let update_site_sql = Query::new(
-        "update SITE set first_run = ?1, storage = ?2",
-        vec!["0", &setup_req.storage],
-    );
-
-    if let Err(e) = db::tx_execute(vec![insert_user_sql, update_site_sql], &mut db.conn).await {
+    if let Err(e) = db::tx_execute(vec![insert_user, update_site], &mut db.conn).await {
         eprintln!("{}", e);
         return error500;
     }
