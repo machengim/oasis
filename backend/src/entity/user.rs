@@ -1,7 +1,7 @@
 use crate::db;
 use crate::entity::query::Query;
 use anyhow::Result;
-use bcrypt::{hash, DEFAULT_COST};
+use bcrypt::{hash, verify, DEFAULT_COST};
 use serde::Serialize;
 use sqlx::{pool::PoolConnection, FromRow, Sqlite};
 
@@ -24,10 +24,29 @@ pub async fn find_exist_username(
     conn: &mut PoolConnection<Sqlite>,
 ) -> Result<bool> {
     let query_user_sql = find_username_sql(username);
-    let users: Vec<UserId> = db::fetch_multiple(query_user_sql, conn).await?;
-    let find = users.len() > 0;
+    let user_ids: Vec<UserId> = db::fetch_multiple(query_user_sql, conn).await?;
+    let find = user_ids.len() > 0;
 
     Ok(find)
+}
+
+// TODO: how to disinguish different error types.
+pub async fn login_user(
+    username: &str,
+    password: &str,
+    conn: &mut PoolConnection<Sqlite>,
+) -> Result<User> {
+    let encrypt_password = hash(password, DEFAULT_COST)?;
+
+    // Not work. Need to select username only and verify password later.
+    let login_user_query = Query::new(
+        "select * from USER where username = ?1 and password = ?2",
+        vec![username.into(), encrypt_password],
+    );
+
+    let user: User = db::fetch_single(login_user_query, conn).await?;
+
+    Ok(user)
 }
 
 pub fn insert_user_sql<'a>(
@@ -35,10 +54,7 @@ pub fn insert_user_sql<'a>(
     password: &'a str,
     permission: u8,
 ) -> Result<Query<'a>> {
-    let encrypt_password = match hash(password, DEFAULT_COST) {
-        Ok(v) => v,
-        Err(_) => return Err(anyhow::anyhow!("Encrypt password error")),
-    };
+    let encrypt_password = hash(password, DEFAULT_COST)?;
 
     let permission_str = permission.to_string();
 

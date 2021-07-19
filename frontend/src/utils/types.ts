@@ -8,3 +8,8 @@ export interface ISetupRequest {
   password: string;
   storage: string;
 }
+
+export interface ILoginRequest {
+  username: string;
+  password: string;
+}
