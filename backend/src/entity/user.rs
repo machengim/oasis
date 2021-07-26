@@ -36,17 +36,18 @@ pub async fn login_user(
     password: &str,
     conn: &mut PoolConnection<Sqlite>,
 ) -> Result<User> {
-    let encrypt_password = hash(password, DEFAULT_COST)?;
-
-    // Not work. Need to select username only and verify password later.
     let login_user_query = Query::new(
-        "select * from USER where username = ?1 and password = ?2",
-        vec![username.into(), encrypt_password],
+        "select * from USER where username = ?1",
+        vec![username.into()],
     );
 
     let user: User = db::fetch_single(login_user_query, conn).await?;
 
-    Ok(user)
+    if verify(password, &user.password)? {
+        Ok(user)
+    } else {
+        Err(anyhow::anyhow!("Wrong password"))
+    }
 }
 
 pub fn insert_user_sql<'a>(

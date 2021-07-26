@@ -1,14 +1,6 @@
 use crate::entity::query::Query;
 use serde::Serialize;
 use sqlx::FromRow;
-use sqlx::{Pool, Sqlite};
-use std::sync::Mutex;
-
-pub struct AppState {
-    pub first_run: Mutex<bool>,
-    pub pool: Pool<Sqlite>,
-    pub storage: Mutex<String>,
-}
 
 #[derive(Serialize, FromRow, Debug)]
 pub struct Site {

@@ -2,8 +2,9 @@ mod api;
 mod entity;
 mod route;
 mod util;
+use entity::app_state::AppState;
 use entity::query::Query;
-use entity::site::{AppState, Site};
+use entity::site::Site;
 use rocket::fs::FileServer;
 use sqlx::{Pool, Sqlite};
 use std::sync::Mutex;
@@ -39,6 +40,7 @@ async fn init_app_state() -> AppState {
         first_run: Mutex::new(first_run),
         pool,
         storage: Mutex::new(String::new()),
+        secret: Mutex::new(util::generate_secret_key()),
     }
 }
 

@@ -1,7 +1,7 @@
 use crate::db;
-use crate::entity::auth::{Db, FirstRun};
+use crate::entity::app_state::{AppState, Db, FirstRun};
 use crate::entity::request::SetupRequest;
-use crate::entity::site::{self, AppState};
+use crate::entity::site;
 use crate::entity::user;
 use rocket::http::Status;
 use rocket::serde::json::Json;

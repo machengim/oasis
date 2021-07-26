@@ -1,8 +1,16 @@
-use crate::entity::site::AppState;
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome, Request};
 use sqlx::pool::PoolConnection;
+use sqlx::Pool;
 use sqlx::Sqlite;
+use std::sync::Mutex;
+
+pub struct AppState {
+    pub first_run: Mutex<bool>,
+    pub pool: Pool<Sqlite>,
+    pub storage: Mutex<String>,
+    pub secret: Mutex<String>,
+}
 
 pub struct FirstRun {
     pub first_run: bool,
@@ -10,6 +18,10 @@ pub struct FirstRun {
 
 pub struct Db {
     pub conn: PoolConnection<Sqlite>,
+}
+
+pub struct Secret {
+    pub key: String,
 }
 
 #[rocket::async_trait]
@@ -52,5 +64,27 @@ impl<'r> FromRequest<'r> for Db {
             Ok(conn) => Outcome::Success(Db { conn }),
             Err(_) => error500,
         }
+    }
+}
+
+// TODO: the secret should be stored in database?
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for Secret {
+    type Error = Status;
+
+    async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        let error500 = Outcome::Failure((Status::InternalServerError, Status::InternalServerError));
+
+        let state = match req.rocket().state::<AppState>() {
+            Some(state) => state,
+            None => return error500,
+        };
+
+        let key = match state.secret.lock() {
+            Ok(v) => (*v).clone(),
+            Err(_) => return error500,
+        };
+
+        Outcome::Success(Secret { key })
     }
 }

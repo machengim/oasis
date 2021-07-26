@@ -1,4 +1,4 @@
-use crate::entity::auth::FirstRun;
+use crate::entity::app_state::FirstRun;
 use crate::util::filesystem;
 use rocket::http::Status;
 use rocket::serde::json::Json;
