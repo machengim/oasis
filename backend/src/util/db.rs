@@ -1,4 +1,5 @@
 use crate::entity::query::Query;
+use crate::util;
 use rocket::tokio::fs;
 use sqlx::pool::PoolConnection;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqliteRow};
@@ -38,6 +39,12 @@ async fn create_db(db_file: &PathBuf) -> anyhow::Result<()> {
     let sql = fs::read_to_string(sql_init_file).await?;
     sqlx::query(&sql).execute(&mut conn).await?;
     debug!("Database created at {:?}", db_file);
+
+    // Init secret value in database.
+    let secret = util::generate_secret_key();
+    let sql = format!("update SITE set secret = '{}'", secret);
+    sqlx::query(&sql).execute(&mut conn).await?;
+
     conn.close();
 
     Ok(())

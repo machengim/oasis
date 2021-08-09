@@ -35,12 +35,13 @@ async fn init_app_state() -> AppState {
     let pool = db::get_db_conn().await;
     let site = read_site_info(&pool).await;
     let first_run = site.first_run == 1;
+    let secret = site.secret;
 
     AppState {
         first_run: Mutex::new(first_run),
         pool,
         storage: Mutex::new(String::new()),
-        secret: Mutex::new(util::generate_secret_key()),
+        secret: Mutex::new(secret),
     }
 }
 

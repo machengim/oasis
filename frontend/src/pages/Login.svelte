@@ -3,6 +3,7 @@
   import * as api from "../utils/api";
   import { setNotification } from "../utils/util";
   import type { ILoginRequest } from "../utils/types";
+  import { navigate } from "svelte-navigator";
 
   let username = "";
   let password = "";
@@ -17,7 +18,12 @@
     }
 
     isLoading = true;
+    const result = await sendLoginRequest();
     isLoading = false;
+
+    if (result) {
+      navigate("/");
+    }
   };
 
   const validateForm = (): boolean => {
@@ -35,7 +41,16 @@
       password,
     };
 
-    // TODO: login API.
+    try {
+      await api.post("/api/login", payload, false);
+      setNotification("success", "Login successfully,");
+    } catch (e) {
+      console.log(e);
+      setNotification("error", "Login failed.");
+      return false;
+    }
+
+    return  true;
   };
 </script>
 

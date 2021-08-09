@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS site (
 	site_id INTEGER PRIMARY KEY,
 	version REAL NOT NULL,
 	first_run INTEGER NOT NULL DEFAULT 1,
-  storage TEXT,
+  	storage TEXT,
+	secret TEXT,
 	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

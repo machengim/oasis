@@ -75,16 +75,26 @@ impl<'r> FromRequest<'r> for Secret {
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let error500 = Outcome::Failure((Status::InternalServerError, Status::InternalServerError));
 
-        let state = match req.rocket().state::<AppState>() {
-            Some(state) => state,
-            None => return error500,
-        };
-
-        let key = match state.secret.lock() {
-            Ok(v) => (*v).clone(),
+        let key = match get_site_secret(req) {
+            Ok(v) => v,
             Err(_) => return error500,
         };
 
         Outcome::Success(Secret { key })
     }
+}
+
+pub fn get_site_secret<'r>(req: &'r Request<'_>) -> anyhow::Result<String> {
+    let err = Err(anyhow::anyhow!("Cannot read site secret key"));
+    let state = match req.rocket().state::<AppState>() {
+        Some(state) => state,
+        None => return err,
+    };
+
+    let key = match state.secret.lock() {
+        Ok(v) => (*v).clone(),
+        Err(_) => return err,
+    };
+
+    Ok(key)
 }

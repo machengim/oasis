@@ -7,6 +7,7 @@ pub struct Site {
     pub version: f64,
     pub first_run: u8,
     pub created_at: String,
+    pub secret: String,
     pub storage: String,
 }
 

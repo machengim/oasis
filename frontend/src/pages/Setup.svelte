@@ -46,12 +46,13 @@
   };
 
   const sendSetupRequest = async (): Promise<boolean> => {
-    try {
-      const payload: ISetupRequest = {
+    const payload: ISetupRequest = {
         username,
         password,
         storage: selectedDir,
       };
+
+    try {
       await api.post("/api/setup", payload, false);
       setNotification("success", "Launched successfully.");
     } catch (e) {

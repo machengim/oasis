@@ -2,6 +2,7 @@ use crate::db;
 use crate::entity::query::Query;
 use anyhow::Result;
 use bcrypt::{hash, verify, DEFAULT_COST};
+
 use serde::Serialize;
 use sqlx::{pool::PoolConnection, FromRow, Sqlite};
 

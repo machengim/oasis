@@ -46,9 +46,10 @@ mod tests {
 
     #[test]
     fn test_token_should_work() {
+        let secret = "mySitePassword";
         let claim = Claim::new(1, 9);
-        let token = claim.to_token("secret").unwrap();
-        let validate = Claim::from(&token, "secret").unwrap();
+        let token = claim.to_token(secret).unwrap();
+        let validate = Claim::from(&token, secret).unwrap();
         assert_eq!(validate.permission, 9);
     }
 

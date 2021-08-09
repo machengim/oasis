@@ -7,7 +7,7 @@ Personal file sharing and syncing system.
 **v0.1: Basic file server**
 
 + [x] Setup
-+ [ ] Login
++ [x] Login
 + [ ] Dashboard
 + [ ] File upload
 + [ ] File list
