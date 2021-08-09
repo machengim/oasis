@@ -2,7 +2,7 @@
   export let value: string;
   export let onClick: (e) => void;
   export let type: "button" | "submit" = "button";
-  export let spec: "important" | "normal" | "bold" = "normal";
+  export let spec: "important" | "narrow" | "normal" | "bold" = "normal";
   export let className: string = "";
   export let disabled: boolean = false;
 
@@ -16,6 +16,10 @@
       case "important":
         style +=
           " bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded-lg shadow";
+        break;
+      case "narrow":
+        style +=
+          " bg-blue-400 hover:bg-blue-500 text-white px-4 rounded shadow";
         break;
       case "bold":
         style += " border bg-gray-200 hover:bg-gray-50 px-2 rounded shadow-sm";

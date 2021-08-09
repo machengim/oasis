@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Button from "../components/Button.svelte";
+  import Icon from "../components/Icon.svelte";
+
   export let path: string = "/";
 
   const buildNav = () => {
@@ -8,7 +11,7 @@
       case "/login":
         return "Oasis &gt; Login";
       default:
-        return "Oasis";
+        return "Oasis &gt; Files";
     }
   };
 </script>
@@ -16,5 +19,8 @@
 <div class="w-full h-14 bg-gray-50 shadow">
   <div class="w-4/5 h-full flex flex-row justify-between items-center mx-auto">
     <div class="text-xl">{@html buildNav()}</div>
+    <div class="flex flex-row">
+      <Icon type="profile" />
+    </div>
   </div>
 </div>

@@ -1,7 +1,7 @@
 export async function get<T>(url: string): Promise<T> {
   let response: Response;
   try {
-     response = await fetch(url);
+    response = await fetch(url);
   } catch (e) {
     throw e;
   }
@@ -16,7 +16,7 @@ export async function get<T>(url: string): Promise<T> {
 export async function post<T, S>(url: string, payload: T, needResponse: boolean): Promise<S> {
   let response: Response;
   try {
-    response = await fetch(url, {body: JSON.stringify(payload), method: 'POST'});
+    response = await fetch(url, { body: JSON.stringify(payload), method: 'POST' });
 
   } catch (e) {
     throw e;
@@ -28,4 +28,3 @@ export async function post<T, S>(url: string, payload: T, needResponse: boolean)
 
   return needResponse ? await response.json() : null;
 }
-

@@ -1,7 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { notificationStore } from "../utils/store";
-  import type { INotification } from "../utils/types";
   import Button from "./Button.svelte";
   import Spinner from "./Spinner.svelte";
   import * as api from "../utils/api";

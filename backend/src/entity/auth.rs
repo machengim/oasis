@@ -3,7 +3,9 @@ use super::token::Claim;
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome, Request};
 
-pub struct AuthUser;
+pub struct AuthUser {
+    claim: Claim,
+}
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AuthUser {
@@ -32,7 +34,7 @@ impl<'r> FromRequest<'r> for AuthUser {
         };
 
         if claim.permission > 0 {
-            return Outcome::Success(AuthUser {});
+            return Outcome::Success(AuthUser { claim });
         }
 
         Outcome::Forward(())

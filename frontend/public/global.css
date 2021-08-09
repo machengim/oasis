@@ -15,3 +15,7 @@ body {
 input:disabled {
   cursor: not-allowed;
 }
+
+.border-circle {
+  border-radius: 50%;
+}
