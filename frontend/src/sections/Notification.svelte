@@ -3,7 +3,7 @@
   import { notificationStore } from "../utils/store";
   import type { INotification } from "../utils/types";
   import { upperFirstChar } from "../utils/util";
-  import Icon from "./Icon.svelte";
+  import Icon from "../components/Icon.svelte";
 
   let notifications: INotification[] = [];
   let isShowNotification = false;

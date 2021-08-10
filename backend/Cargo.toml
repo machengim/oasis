@@ -17,6 +17,7 @@ jsonwebtoken = "7"
 rand = "0.8"
 serde = { version = "1.0", features = ["derive"]}
 sqlx = { version = "0.5", features = [ "runtime-tokio-rustls", "sqlite" ] }
+time = "0.2.11"
 
 [dependencies.rocket]
 version = "0.5.0-rc.1"

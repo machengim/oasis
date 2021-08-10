@@ -104,3 +104,5 @@ dist
 
 **/build/**
 **/target/**
+**/oasis.exe
+**/a.txt

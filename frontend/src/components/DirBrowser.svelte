@@ -3,7 +3,7 @@
   import Button from "./Button.svelte";
   import Spinner from "./Spinner.svelte";
   import * as api from "../utils/api";
-  import { setNotification } from "../utils/util";
+  import { setNotification } from "../utils/store";
 
   export let onClose = () => {};
   export let onSelect = (v: string) => {};

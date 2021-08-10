@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification } from "../utils/util";
+  import { setNotification } from "../utils/store";
   import type { ILoginRequest } from "../utils/types";
   import { navigate } from "svelte-navigator";
 
@@ -50,7 +50,7 @@
       return false;
     }
 
-    return  true;
+    return true;
   };
 </script>
 

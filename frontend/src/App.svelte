@@ -2,7 +2,8 @@
   import { Router, Link, Route } from "svelte-navigator";
   import Tailwind from "./components/Tailwind.svelte";
   import Header from "./sections/Header.svelte";
-  import Notification from "./components/Notification.svelte";
+  import Notification from "./sections/Notification.svelte";
+  import UploadTasks from "./sections/UploadTasks.svelte";
   import Home from "./pages/Home.svelte";
   import Login from "./pages/Login.svelte";
   import Setup from "./pages/Setup.svelte";
@@ -24,11 +25,12 @@
   };
 </script>
 
-<main class="relative">
+<main class="relative min-h-screen">
   <Router url={path}>
     <Header {path} />
 
     <Notification />
+    <UploadTasks />
 
     {@html renderPage(path)}
 

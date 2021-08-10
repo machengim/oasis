@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Button from "../components/Button.svelte";
   import Icon from "../components/Icon.svelte";
 
   export let path: string = "/";
@@ -20,7 +19,7 @@
   <div class="w-4/5 h-full flex flex-row justify-between items-center mx-auto">
     <div class="text-xl">{@html buildNav()}</div>
     <div class="flex flex-row">
-      <Icon type="profile" />
+      <Icon type="profile" color="gray" />
     </div>
   </div>
 </div>

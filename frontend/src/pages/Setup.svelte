@@ -3,7 +3,7 @@
   import DirBrowser from "../components/DirBrowser.svelte";
   import * as api from "../utils/api";
   import type { ISetupRequest } from "../utils/types";
-  import { setNotification } from "../utils/util";
+  import { setNotification } from "../utils/store";
   import { useNavigate } from "svelte-navigator";
   const navigate = useNavigate();
 
@@ -47,10 +47,10 @@
 
   const sendSetupRequest = async (): Promise<boolean> => {
     const payload: ISetupRequest = {
-        username,
-        password,
-        storage: selectedDir,
-      };
+      username,
+      password,
+      storage: selectedDir,
+    };
 
     try {
       await api.post("/api/setup", payload, false);

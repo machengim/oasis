@@ -13,7 +13,12 @@ pub fn route() -> Vec<Route> {
 
 // TODO: set token to cookie.
 #[post("/login", data = "<login_req>")]
-async fn login(login_req: Json<LoginRequest>, mut db: Db, secret: Secret, jar: &CookieJar<'_>) -> Result<(), Status> {
+async fn login(
+    login_req: Json<LoginRequest>,
+    mut db: Db,
+    secret: Secret,
+    jar: &CookieJar<'_>,
+) -> Result<(), Status> {
     let user = match user::login_user(&login_req.username, &login_req.password, &mut db.conn).await
     {
         Ok(u) => u,
@@ -26,10 +31,13 @@ async fn login(login_req: Json<LoginRequest>, mut db: Db, secret: Secret, jar: &
     let claim = Claim::new(user.user_id, user.permission);
     let token = match claim.to_token(&secret.key) {
         Ok(v) => v,
-        Err(_) => return Err(Status::InternalServerError)
+        Err(_) => return Err(Status::InternalServerError),
     };
 
-    let cookie = Cookie::build("token", token).path("/");
+    let cookie = Cookie::build("token", token)
+        .path("/")
+        .http_only(true)
+        .max_age(time::Duration::days(7));
     jar.add(cookie.finish());
 
     Ok(())

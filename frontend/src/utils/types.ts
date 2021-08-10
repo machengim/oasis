@@ -13,3 +13,10 @@ export interface ILoginRequest {
   username: string;
   password: string;
 }
+
+export interface IUploadTask {
+  filename: string;
+  size: number;
+  progress: number;
+  complete: boolean;
+}
