@@ -1,19 +1,14 @@
-use crate::entity::auth::AuthUser;
-use rocket::data::{Data, ToByteUnit};
-use rocket::fs::TempFile;
+use crate::entity::upload::PreUploadRequest;
+use rocket::serde::json::Json;
 use rocket::Route;
 
 pub fn route() -> Vec<Route> {
-    routes![upload]
+    routes![post_pre_upload]
 }
 
 // TODO: auth user
-#[post("/upload", data = "<paste>")]
-async fn upload(paste: Data<'_>) -> Result<(), std::io::Error> {
-    // let filename = paste.name().unwrap_or("a.txt").to_owned();
-    // println!("filename is {}", filename);
-
-    // paste.persist_to(filename).await?;
-    paste.open(2.gibibytes()).into_file("a.txt").await?;
+#[post("/pre_upload", data = "<request>")]
+async fn post_pre_upload(request: Json<PreUploadRequest>) -> Result<(), std::io::Error> {
+    println!("{:?}", request);
     Ok(())
 }

@@ -76,6 +76,16 @@ pub async fn get_system_dirs(dir: PathBuf) -> anyhow::Result<Vec<String>> {
     Ok(sub_dirs)
 }
 
+pub async fn create_site_folders(path: &str) -> anyhow::Result<()> {
+    let path = Path::new(path);
+    let storage_folder = path.join("storage");
+    let tmp_folder = path.join("tmp");
+    tokio::fs::create_dir(storage_folder).await?;
+    tokio::fs::create_dir(tmp_folder).await?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

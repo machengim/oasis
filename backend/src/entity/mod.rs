@@ -5,4 +5,5 @@ pub mod range;
 pub mod request;
 pub mod site;
 pub mod token;
+pub mod upload;
 pub mod user;

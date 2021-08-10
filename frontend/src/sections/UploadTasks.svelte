@@ -46,6 +46,7 @@
   };
 </script>
 
+{#if tasks.length > 0}
 <div
   class="absolute bg-white right-4 bottom-4 w-80 overflow-x-hidden z-50 flex flex-col border rounded-lg shadow-lg"
 >
@@ -84,3 +85,4 @@
     </div>
   {/if}
 </div>
+{/if}

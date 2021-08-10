@@ -40,12 +40,14 @@ export async function upload(task: IUploadTask) {
   const length = 10;
 
   const payload = {
-    name: file.name,
+    filename: file.name,
     size: filesize,
-    lastModified: file.lastModified
   };
 
+  let response: Response = await post("/api/pre_upload", payload, false);
+
   // TODO: send pre uploading request.
+  return;
 
   let start = 0;
   let end = Math.min(start + length, filesize);

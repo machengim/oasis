@@ -3,6 +3,7 @@ use crate::entity::app_state::{AppState, Db, FirstRun};
 use crate::entity::request::SetupRequest;
 use crate::entity::site;
 use crate::entity::user;
+use crate::util::filesystem;
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::{Route, State};
@@ -27,6 +28,11 @@ async fn post_setup_first_run(
         Ok(true) => return error409,
         Ok(false) => (),
     };
+
+    if let Err(e) = filesystem::create_site_folders(&setup_req.storage).await {
+        eprintln!("{}", e);
+        return error500;
+    }
 
     let insert_user = match user::insert_user_sql(&setup_req.username, &setup_req.password, 9) {
         Ok(query) => query,
