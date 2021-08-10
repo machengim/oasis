@@ -15,8 +15,7 @@ export function addUploadTasks(files: FileList) {
 
     for (const file of files) {
         const task: IUploadTask = {
-            filename: file.name,
-            size: file.size,
+            file,
             progress: 0,
             complete: false,
         };

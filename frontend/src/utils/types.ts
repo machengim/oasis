@@ -15,8 +15,7 @@ export interface ILoginRequest {
 }
 
 export interface IUploadTask {
-  filename: string;
-  size: number;
+  file: File;
   progress: number;
   complete: boolean;
 }

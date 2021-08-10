@@ -1,3 +1,5 @@
+import type { IUploadTask } from './types';
+
 export async function get<T>(url: string): Promise<T> {
   let response: Response;
   try {
@@ -27,4 +29,14 @@ export async function post<T, S>(url: string, payload: T, needResponse: boolean)
   }
 
   return needResponse ? await response.json() : null;
+}
+
+// TODO: process uploading.
+export async function upload(task: IUploadTask) {
+  const file = task.file;
+
+  const buffer = await file.arrayBuffer();
+  const slice = buffer.slice(0, 3);
+
+  console.log('buffer slice: ', slice);
 }

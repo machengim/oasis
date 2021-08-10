@@ -3,6 +3,7 @@
   import { uploadTaskStore } from "../utils/store";
   import type { IUploadTask } from "../utils/types";
   import Icon from "../components/Icon.svelte";
+  import * as api from "../utils/api";
 
   let showFiles = true;
   let tasks: IUploadTask[] = [];
@@ -26,7 +27,12 @@
 
   // TODO: upload file.
   $: if (currentTask) {
+    processTask(currentTask);
   }
+
+  const processTask = async (task: IUploadTask) => {
+    await api.upload(task);
+  };
 
   const toggleShowFiles = () => {
     showFiles = !showFiles;
@@ -53,11 +59,11 @@
   </div>
   {#if showFiles}
     <div>
-      {#each tasks as file}
+      {#each tasks as task}
         <div class="flex flex-row justify-between px-4 py-2">
-          <div>{file.filename}</div>
+          <div>{task.file.name}</div>
           <div class="flex flex-row items-center">
-            <span>{file.progress}</span>
+            <span>{task.progress}</span>
             <Icon
               type="close"
               color="red"
