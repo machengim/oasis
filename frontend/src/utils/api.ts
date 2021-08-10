@@ -34,9 +34,37 @@ export async function post<T, S>(url: string, payload: T, needResponse: boolean)
 // TODO: process uploading.
 export async function upload(task: IUploadTask) {
   const file = task.file;
-
+  const filesize = file.size;
   const buffer = await file.arrayBuffer();
-  const slice = buffer.slice(0, 3);
+  const worker = new Worker('upload.js');
+  const length = 10;
 
-  console.log('buffer slice: ', slice);
+  const payload = {
+    name: file.name,
+    size: filesize,
+    lastModified: file.lastModified
+  };
+
+  // TODO: send pre uploading request.
+
+  let start = 0;
+  let end = Math.min(start + length, filesize);
+  let slice = buffer.slice(start, end);
+  worker.postMessage({ type: "uploadId", data: "123456-abcdef" });
+  worker.postMessage({ type: "data", data: slice });
+
+  worker.onmessage = (e) => {
+    if (e.data === "done") {
+      start = end;
+      if (end < filesize) {
+        console.log("finished ", end);
+        end = Math.min(start + length, filesize);
+        slice = buffer.slice(start, end);
+        worker.postMessage({ type: "data", data: slice });
+      } else {
+        console.log("terminate");
+        worker.terminate();
+      }
+    }
+  };
 }

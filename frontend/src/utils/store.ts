@@ -10,17 +10,21 @@ export function setNotification(type: 'success' | 'error', msg: string) {
 
 export const uploadTaskStore: Writable<IUploadTask[]> = writable([]);
 
+let nextId = 1;
+
 export function addUploadTasks(files: FileList) {
     const tasks: IUploadTask[] = [];
 
     for (const file of files) {
         const task: IUploadTask = {
+            id: nextId,
             file,
             progress: 0,
-            complete: false,
+            status: "pending"
         };
 
         tasks.push(task);
+        nextId++;
     }
 
     uploadTaskStore.set(tasks);

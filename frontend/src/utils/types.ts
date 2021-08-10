@@ -15,7 +15,8 @@ export interface ILoginRequest {
 }
 
 export interface IUploadTask {
+  id: number;
   file: File;
   progress: number;
-  complete: boolean;
+  status: "pending" | "uploading" | "finished";
 }

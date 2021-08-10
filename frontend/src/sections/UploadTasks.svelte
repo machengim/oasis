@@ -25,13 +25,20 @@
     currentTask = tasks[0];
   }
 
-  // TODO: upload file.
   $: if (currentTask) {
     processTask(currentTask);
   }
 
   const processTask = async (task: IUploadTask) => {
+    task.status = "uploading";
     await api.upload(task);
+
+    tasks = tasks.filter((task) => task.id !== currentTask.id);
+    if (tasks.length > 0) {
+      currentTask = tasks[0];
+    } else {
+      currentTask = null;
+    }
   };
 
   const toggleShowFiles = () => {
