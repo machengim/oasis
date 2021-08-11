@@ -48,6 +48,9 @@ async fn post_setup_first_run(
     let mut first_run = state.first_run.lock().unwrap();
     *first_run = false;
 
+    let mut storage = state.storage.lock().unwrap();
+    *storage = setup_req.storage.clone();
+
     Ok(())
 }
 

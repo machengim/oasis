@@ -86,6 +86,15 @@ pub async fn create_site_folders(path: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
+// TODO: check path existed.
+pub async fn create_upload_folder(path: &str, upload_id: &str) -> anyhow::Result<()> {
+    let path = Path::new(path);
+    let upload_folder = path.join("tmp").join(upload_id);
+    tokio::fs::create_dir(upload_folder).await?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

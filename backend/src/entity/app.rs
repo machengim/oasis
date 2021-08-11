@@ -24,6 +24,10 @@ pub struct Secret {
     pub key: String,
 }
 
+pub struct Storage {
+    pub path: String,
+}
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for FirstRun {
     type Error = Status;
@@ -67,7 +71,6 @@ impl<'r> FromRequest<'r> for Db {
     }
 }
 
-// TODO: the secret should be stored in database?
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for Secret {
     type Error = Status;
@@ -81,6 +84,27 @@ impl<'r> FromRequest<'r> for Secret {
         };
 
         Outcome::Success(Secret { key })
+    }
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for Storage {
+    type Error = Status;
+
+    async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        let error500 = Outcome::Failure((Status::InternalServerError, Status::InternalServerError));
+
+        let state = match req.rocket().state::<AppState>() {
+            Some(state) => state,
+            None => return error500,
+        };
+
+        let path = match state.storage.lock() {
+            Ok(v) => (*v).clone(),
+            Err(_) => return error500,
+        };
+
+        Outcome::Success(Storage { path })
     }
 }
 

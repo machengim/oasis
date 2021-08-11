@@ -39,11 +39,12 @@ async fn init_app_state() -> AppState {
     let site = read_site_info(&pool).await;
     let first_run = site.first_run == 1;
     let secret = site.secret;
+    let storage = site.storage;
 
     AppState {
         first_run: Mutex::new(first_run),
         pool,
-        storage: Mutex::new(String::new()),
+        storage: Mutex::new(storage),
         secret: Mutex::new(secret),
     }
 }

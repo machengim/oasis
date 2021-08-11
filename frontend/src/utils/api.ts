@@ -37,28 +37,30 @@ export async function upload(task: IUploadTask) {
   const filesize = file.size;
   const buffer = await file.arrayBuffer();
   const worker = new Worker('upload.js');
-  const length = 10;
+  const length = 2 * 1024 * 1024;
 
   const payload = {
     filename: file.name,
     size: filesize,
   };
 
-  let upload_id: string = await post("/api/pre_upload", payload, false);
-  console.log("Get response: ", upload_id);
+  let uploadId: string = await post("/api/pre_upload", payload, false);
+  console.log("Get response: ", uploadId);
 
   // TODO: send pre uploading request.
-  return;
+  // return;
 
   let start = 0;
+  let sliceCount = 0;
   let end = Math.min(start + length, filesize);
   let slice = buffer.slice(start, end);
-  worker.postMessage({ type: "uploadId", data: "123456-abcdef" });
+  worker.postMessage({ type: "uploadId", data: uploadId });
   worker.postMessage({ type: "data", data: slice });
 
-  worker.onmessage = (e) => {
+  worker.onmessage = async (e) => {
     if (e.data === "done") {
       start = end;
+      sliceCount++;
       if (end < filesize) {
         console.log("finished ", end);
         end = Math.min(start + length, filesize);
@@ -67,6 +69,12 @@ export async function upload(task: IUploadTask) {
       } else {
         console.log("terminate");
         worker.terminate();
+        const payload = {
+          filename: file.name,
+          slices: sliceCount,
+          upload_id: uploadId,
+        };
+        await post(`/api/finish-upload/${uploadId}`, payload, false);
       }
     }
   };
