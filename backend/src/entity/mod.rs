@@ -1,4 +1,4 @@
-pub mod app_state;
+pub mod app;
 pub mod auth;
 pub mod query;
 pub mod range;

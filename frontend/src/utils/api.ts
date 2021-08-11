@@ -15,7 +15,7 @@ export async function get<T>(url: string): Promise<T> {
   return await response.json();
 }
 
-export async function post<T, S>(url: string, payload: T, needResponse: boolean): Promise<S> {
+export async function post<T, S>(url: string, payload: T, jsonResponse: boolean): Promise<S> {
   let response: Response;
   try {
     response = await fetch(url, { body: JSON.stringify(payload), method: 'POST' });
@@ -28,7 +28,7 @@ export async function post<T, S>(url: string, payload: T, needResponse: boolean)
     throw new Error(response.status.toString());
   }
 
-  return needResponse ? await response.json() : null;
+  return jsonResponse ? await response.json() : await response.text();
 }
 
 // TODO: process uploading.
@@ -44,7 +44,8 @@ export async function upload(task: IUploadTask) {
     size: filesize,
   };
 
-  let response: Response = await post("/api/pre_upload", payload, false);
+  let upload_id: string = await post("/api/pre_upload", payload, false);
+  console.log("Get response: ", upload_id);
 
   // TODO: send pre uploading request.
   return;

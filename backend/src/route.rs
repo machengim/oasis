@@ -1,4 +1,4 @@
-use crate::entity::app_state::FirstRun;
+use crate::entity::app::FirstRun;
 use crate::entity::auth;
 use crate::util;
 use rocket::fs::NamedFile;

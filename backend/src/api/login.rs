@@ -1,4 +1,4 @@
-use crate::entity::app_state::{Db, Secret};
+use crate::entity::app::{Db, Secret};
 use crate::entity::request::LoginRequest;
 use crate::entity::token::Claim;
 use crate::entity::user;

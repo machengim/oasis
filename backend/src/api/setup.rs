@@ -1,5 +1,5 @@
 use crate::db;
-use crate::entity::app_state::{AppState, Db, FirstRun};
+use crate::entity::app::{AppState, Db, FirstRun};
 use crate::entity::request::SetupRequest;
 use crate::entity::site;
 use crate::entity::user;

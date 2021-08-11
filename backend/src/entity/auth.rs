@@ -1,10 +1,10 @@
-use super::app_state;
+use super::app;
 use super::token::Claim;
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome, Request};
 
 pub struct AuthUser {
-    claim: Claim,
+    pub claim: Claim,
 }
 
 #[rocket::async_trait]
@@ -19,7 +19,7 @@ impl<'r> FromRequest<'r> for AuthUser {
             None => return Outcome::Forward(()),
         };
 
-        let secret = match app_state::get_site_secret(req) {
+        let secret = match app::get_site_secret(req) {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("{}", e);
