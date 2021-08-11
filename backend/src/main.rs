@@ -1,64 +1,58 @@
-mod api;
 mod entity;
-mod route;
 mod util;
-use entity::app::AppState;
-use entity::query::Query;
-use entity::site::Site;
-use entity::upload::UploadState;
-use rocket::fs::FileServer;
-use sqlx::{Pool, Sqlite};
-use std::sync::Mutex;
-use util::db;
+use entity::state::State;
+use tide::{Body, Redirect, Request, Response, Result};
 
-#[macro_use]
-extern crate rocket;
-
-#[rocket::main]
-async fn main() {
+#[async_std::main]
+async fn main() -> tide::Result<()> {
+    tide::log::start();
     dotenv::dotenv().ok();
-    let app_state = init_app_state().await;
-    let upload_state = UploadState::new();
-    let react_dir = util::get_react_dir();
-
-    if let Err(e) = rocket::build()
-        .manage(app_state)
-        .manage(upload_state)
-        .mount("/", route::serve_static_route())
-        .mount("/api", api::serve_api())
-        .mount("/", FileServer::from(react_dir))
-        .launch()
-        .await
-    {
-        println!("Starting server error: {:?}", e);
+    if !util::check_installed() {
+        if let Err(e) = util::create_db_file().await {
+            eprintln!("Cannot create database: {}", e);
+            std::process::exit(1);
+        }
     }
-}
 
-async fn init_app_state() -> AppState {
-    let pool = db::get_db_conn().await;
-    let site = read_site_info(&pool).await;
-    let first_run = site.first_run == 1;
-    let secret = site.secret;
-    let storage = site.storage;
-
-    AppState {
-        first_run: Mutex::new(first_run),
-        pool,
-        storage: Mutex::new(storage),
-        secret: Mutex::new(secret),
-    }
-}
-
-async fn read_site_info(pool: &Pool<Sqlite>) -> Site {
-    let query = Query::new("SELECT * FROM site", vec![]);
-
-    let mut conn = match pool.acquire().await {
-        Ok(conn) => conn,
-        Err(_) => panic!("Cannot get db connection"),
+    let pool = match util::get_conn_pool().await {
+        Ok(pool) => pool,
+        Err(e) => {
+            eprintln!("Cannot get connection pool: {}", e);
+            std::process::exit(1);
+        }
     };
 
-    match db::fetch_single::<Site>(query, &mut conn).await {
-        Ok(site) => site,
-        Err(e) => panic!("Cannot read site info from db: {}", e),
+    let state = State::init(pool).await;
+    let mut app = tide::with_state(state);
+
+    let front_dir = util::get_front_dir()?;
+    app.at("/").get(get_index);
+    app.at("/login").get(get_login);
+    // TODO: handler for get /setup
+    app.at("/").serve_dir(front_dir)?;
+
+    let address = util::get_listen_address();
+    app.listen(address).await?;
+    Ok(())
+}
+
+// TODO: auth user or redirect to /login.
+async fn get_index(req: Request<State>) -> Result {
+    let state = req.state();
+    let first_run = state.get_first_run()?;
+    if first_run {
+        Ok(Redirect::temporary("/setup").into())
+    } else {
+        let mut res = Response::new(200);
+        res.set_body(Body::from_file(util::get_front_index()?).await?);
+
+        Ok(res)
     }
+}
+
+async fn get_login(_: Request<State>) -> Result {
+    let mut res = Response::new(200);
+    res.set_body(Body::from_file(util::get_front_index()?).await?);
+
+    Ok(res)
 }

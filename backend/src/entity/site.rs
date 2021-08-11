@@ -1,6 +1,8 @@
-use crate::entity::query::Query;
+use super::query::Query;
+use crate::util::db;
 use serde::Serialize;
 use sqlx::FromRow;
+use sqlx::{Pool, Sqlite};
 
 #[derive(Serialize, FromRow, Debug)]
 pub struct Site {
@@ -11,9 +13,16 @@ pub struct Site {
     pub storage: String,
 }
 
-pub fn setup_site_sql(storage: &str) -> Query {
-    Query::from(
-        "update SITE set first_run = ?1, storage = ?2",
-        vec!["0", storage.into()],
-    )
+impl Site {
+    pub async fn read(pool: &Pool<Sqlite>) -> Self {
+        let query = Query::new("SELECT * FROM site", vec![]);
+        let mut conn = match pool.acquire().await {
+            Ok(conn) => conn,
+            Err(_) => panic!("Cannot get db connection"),
+        };
+        match db::fetch_single::<Site>(query, &mut conn).await {
+            Ok(site) => site,
+            Err(e) => panic!("Cannot read site info from db: {}", e),
+        }
+    }
 }
