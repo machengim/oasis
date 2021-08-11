@@ -14,7 +14,9 @@ pub struct Site {
 }
 
 impl Site {
-    pub async fn read(pool: &Pool<Sqlite>) -> Self {
+    // The pool value is only passed at the initialization of app.
+    // Later on the pool connection has to be acquired from app state.
+    pub async fn init_read(pool: &Pool<Sqlite>) -> Self {
         let query = Query::new("SELECT * FROM site", vec![]);
         let mut conn = match pool.acquire().await {
             Ok(conn) => conn,

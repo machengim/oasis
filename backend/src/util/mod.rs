@@ -16,7 +16,7 @@ pub async fn create_db_file() -> anyhow::Result<()> {
         fs::create_dir(&db_dir).await?
     }
 
-    let db_file = db_dir.join("main.db");
+    let db_file = get_db_file();
     let init_db_file =
         std::env::var("INIT_SQLITE_FILE").expect("Cannot get init SQL file from env");
     let init_sql = fs::read_to_string(init_db_file).await?;
@@ -70,7 +70,8 @@ fn get_db_dir() -> PathBuf {
 }
 
 fn get_db_file() -> PathBuf {
-    get_db_dir().join("main.db")
+    let main_db_name = std::env::var("MAIN_DB").unwrap_or("main.db".to_owned());
+    get_db_dir().join(&main_db_name)
 }
 
 async fn init_db_tables(db_file: &PathBuf, init_sql: &str) -> anyhow::Result<()> {
