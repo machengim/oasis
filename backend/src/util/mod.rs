@@ -1,9 +1,12 @@
+pub mod custom_error;
 pub mod db;
+pub mod file_system;
 use async_std::fs;
+use rand::{distributions::Alphanumeric, Rng};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
 use sqlx::{ConnectOptions, Connection};
-
 use std::path::{Path, PathBuf};
+const SECRET_LENGTH: usize = 32;
 
 pub fn check_installed() -> bool {
     let db_file = get_db_file();
@@ -58,6 +61,14 @@ pub fn get_listen_address() -> String {
     };
 
     format!("{}:{}", address, port)
+}
+
+pub fn generate_secret_key() -> String {
+    rand::thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(SECRET_LENGTH)
+        .map(char::from)
+        .collect()
 }
 
 fn get_db_dir() -> PathBuf {

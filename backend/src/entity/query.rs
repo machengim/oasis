@@ -9,8 +9,8 @@ impl<'a> Query<'a> {
         Query { sql, args }
     }
 
-    pub fn from(sql: &'a str, args: Vec<&'a str>) -> Self {
-        let args: Vec<String> = args.into_iter().map(|x| String::from(x)).collect();
+    pub fn from<T: Into<String>>(sql: &'a str, args: Vec<T>) -> Self {
+        let args: Vec<String> = args.into_iter().map(|x| x.into()).collect();
         Query { sql, args }
     }
 }

@@ -1,6 +1,8 @@
 use super::query::Query;
-use crate::util::db;
-use serde::Serialize;
+use super::user::User;
+use crate::util::{self, db};
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use sqlx::{Pool, Sqlite};
 
@@ -10,6 +12,13 @@ pub struct Site {
     pub first_run: u8,
     pub created_at: String,
     pub secret: String,
+    pub storage: String,
+}
+
+#[derive(Deserialize)]
+pub struct SetupRequest {
+    pub username: String,
+    pub password: String,
     pub storage: String,
 }
 
@@ -23,8 +32,28 @@ impl Site {
             Err(_) => panic!("Cannot get db connection"),
         };
         match db::fetch_single::<Site>(query, &mut conn).await {
-            Ok(site) => site,
+            Ok(Some(site)) => site,
+            Ok(None) => panic!("No site record in db"),
             Err(e) => panic!("Cannot read site info from db: {}", e),
         }
+    }
+}
+
+impl SetupRequest {
+    pub fn update_site_query(&self) -> Query {
+        let secret = util::generate_secret_key();
+        Query::from(
+            "update SITE set first_run = ?1, storage = ?2, secret = ?3",
+            vec!["0", &self.storage, &secret],
+        )
+    }
+
+    pub fn init_admin_query<'a>(&self) -> Result<Query<'a>> {
+        let mut user = User::default();
+        user.username = self.username.clone();
+        user.password = self.password.clone();
+        user.permission = 9;
+
+        Ok(user.insert_user_query()?)
     }
 }

@@ -6,12 +6,12 @@ use sqlx::{Connection, FromRow, Sqlite};
 pub async fn fetch_single<'r, T>(
     query: Query<'r>,
     conn: &mut PoolConnection<Sqlite>,
-) -> anyhow::Result<T>
+) -> anyhow::Result<Option<T>>
 where
     T: Send + Unpin + for<'a> FromRow<'a, SqliteRow>,
 {
     let stmt = prepare_sql(query.sql, &query.args);
-    Ok(stmt.fetch_one(conn).await?)
+    Ok(stmt.fetch_optional(conn).await?)
 }
 
 pub async fn fetch_multiple<'r, T>(
