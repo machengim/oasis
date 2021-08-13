@@ -48,7 +48,8 @@ fn get_mac_volumes() -> anyhow::Result<Vec<String>> {
 // the conversion between OsString and String should be double checked.
 // Besides, the automatic PathBuf conversion from the request uri
 // should be tested on different OSs as well.
-pub async fn get_system_dirs(dir: PathBuf) -> anyhow::Result<Vec<String>> {
+pub async fn get_system_dirs(dir: &str) -> anyhow::Result<Vec<String>> {
+    let dir = PathBuf::from(dir);
     let dir_absolute = match dir.is_absolute() {
         true => dir,
         false => Path::new("/").join(dir),
@@ -78,25 +79,6 @@ pub async fn get_system_dirs(dir: PathBuf) -> anyhow::Result<Vec<String>> {
     Ok(sub_dirs)
 }
 
-pub async fn create_site_folders(path: &str) -> anyhow::Result<()> {
-    let path = Path::new(path);
-    let storage_folder = path.join("storage");
-    let tmp_folder = path.join("tmp");
-    fs::create_dir(storage_folder).await?;
-    fs::create_dir(tmp_folder).await?;
-
-    Ok(())
-}
-
-// TODO: check path existed.
-pub async fn create_upload_folder(path: &str, upload_id: &str) -> anyhow::Result<()> {
-    let path = Path::new(path);
-    let upload_folder = path.join("tmp").join(upload_id);
-    fs::create_dir(upload_folder).await?;
-
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -114,9 +96,9 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn test_get_sub_directories() {
-        let path = Path::new("/home");
+        let path = "/home";
         // let rt = tokio::runtime::Runtime::new().unwrap();
-        let sub_directories = block_on(get_system_dirs(path.to_path_buf())).unwrap();
+        let sub_directories = block_on(get_system_dirs(path)).unwrap();
 
         println!("sub_directories: {:?}", &sub_directories);
         assert!(sub_directories.len() > 0);

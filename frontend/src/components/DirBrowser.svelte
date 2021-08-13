@@ -49,7 +49,7 @@
   const fetchDirs = async (dir: string) => {
     try {
       isLoading = true;
-      dirs = await api.get("/api/sys/dirs/" + dir);
+      dirs = await api.get("/api/sys/dirs/" + encodeURIComponent(dir));
       currentDir = selectedDir;
       level = back ? level - 1 : level + 1;
       back = false;

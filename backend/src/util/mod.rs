@@ -1,6 +1,6 @@
-pub mod custom_error;
 pub mod db;
 pub mod file_system;
+use anyhow::Result;
 use async_std::fs;
 use rand::{distributions::Alphanumeric, Rng};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
@@ -51,6 +51,26 @@ pub fn get_front_index() -> anyhow::Result<PathBuf> {
     Ok(path.to_path_buf())
 }
 
+pub async fn create_site_dirs(folder: &str) -> Result<PathBuf> {
+    let root_dir_name = std::env::var("APP_NAME").unwrap_or("oasis".into());
+    let root = PathBuf::from(folder).join(root_dir_name);
+    if root.exists() {
+        return Err(anyhow::anyhow!("Directory already existed"));
+    }
+
+    let files_path = root.join("files");
+    if !files_path.exists() {
+        fs::create_dir_all(files_path).await?
+    }
+
+    let tmp_path = root.join("tmp");
+    if !tmp_path.exists() {
+        fs::create_dir_all(tmp_path).await?
+    }
+
+    Ok(root)
+}
+
 pub fn get_listen_address() -> String {
     let port = std::env::var("PORT").unwrap_or("8000".to_owned());
     let stage = std::env::var("STAGE").unwrap_or("dev".to_owned());
@@ -71,12 +91,12 @@ pub fn generate_secret_key() -> String {
         .collect()
 }
 
+// TODO: check folder's availability in different OSes.
 fn get_db_dir() -> PathBuf {
     let sub_dir_name = std::env::var("APP_NAME").unwrap_or("oasis".to_owned());
-    match (dirs::config_dir(), dirs::home_dir()) {
-        (Some(dir), _) => dir.join(sub_dir_name),
-        (_, Some(dir)) => dir.join(sub_dir_name),
-        (None, None) => panic!("Cannot get config dir or home dir"),
+    match dirs::home_dir() {
+        Some(dir) => dir.join(sub_dir_name),
+        None => panic!("Cannot get config dir or home dir"),
     }
 }
 
