@@ -1,14 +1,12 @@
 use super::site::Site;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use sqlx::{pool::PoolConnection, Pool, Sqlite};
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Debug)]
 pub struct State {
-    pub first_run: Arc<Mutex<bool>>,
+    pub site: Arc<Mutex<Site>>,
     pub pool: Pool<Sqlite>,
-    pub storage: Arc<Mutex<String>>,
-    pub secret: Arc<Mutex<String>>,
     // pub tasks: Arc<Vec<String>>
 }
 
@@ -17,28 +15,65 @@ impl State {
         let site = Site::init_read(&pool).await;
 
         Self {
-            first_run: Arc::new(Mutex::new(site.first_run == 1)),
+            site: Arc::new(Mutex::new(site)),
             pool,
-            storage: Arc::new(Mutex::new(site.storage)),
-            secret: Arc::new(Mutex::new(site.secret)),
         }
     }
 
-    pub fn get_first_run(&self) -> Result<bool> {
-        let first_run = match self.first_run.lock() {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(anyhow::anyhow!(
-                    "Cannot retrieve first_run from state: {}",
-                    e
-                ))
-            }
-        };
+    fn get_site(&self) -> Result<std::sync::MutexGuard<Site>> {
+        match self.site.lock() {
+            Ok(v) => Ok(v),
+            Err(e) => return Err(anyhow!("Cannot retrieve site from state: {}", e)),
+        }
+    }
 
-        Ok(*first_run)
+    pub fn get_site_value(&self) -> Result<Site> {
+        let site = self.get_site()?;
+
+        Ok((*site).clone())
+    }
+
+    pub fn set_site(&self, new_site: Site) -> Result<()> {
+        let mut site = self.get_site()?;
+        *site = new_site;
+
+        Ok(())
+    }
+
+    pub fn get_first_run(&self) -> Result<bool> {
+        let site = self.get_site()?;
+
+        Ok(site.first_run == 1)
+    }
+
+    pub fn get_secret(&self) -> Result<String> {
+        let site = self.get_site()?;
+
+        Ok(site.secret.clone())
+    }
+
+    pub fn set_first_run(&self, new_first_run: bool) -> Result<()> {
+        let mut site = self.get_site()?;
+        site.first_run = if new_first_run { 1 } else { 0 };
+
+        Ok(())
+    }
+
+    pub fn set_storage(&self, new_storage: String) -> Result<()> {
+        let mut site = self.get_site()?;
+        site.storage = new_storage;
+
+        Ok(())
     }
 
     pub async fn get_pool_conn(&self) -> Result<PoolConnection<Sqlite>> {
         Ok(self.pool.acquire().await?)
+    }
+
+    pub fn set_secret(&self, new_secret: String) -> Result<()> {
+        let mut site = self.get_site()?;
+        site.secret = new_secret;
+
+        Ok(())
     }
 }

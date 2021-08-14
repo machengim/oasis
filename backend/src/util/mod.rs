@@ -1,12 +1,32 @@
 pub mod db;
 pub mod file_system;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_std::fs;
 use rand::{distributions::Alphanumeric, Rng};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
 use sqlx::{ConnectOptions, Connection};
 use std::path::{Path, PathBuf};
 const SECRET_LENGTH: usize = 32;
+
+pub fn must_get_env_value<T: std::str::FromStr>(name: &str, default: T) -> T {
+    if let Ok(s) = std::env::var(name) {
+        if let Ok(v) = s.parse::<T>() {
+            return v;
+        }
+    }
+
+    default
+}
+
+pub fn try_get_env_value<T: std::str::FromStr>(name: &str) -> Result<T> {
+    if let Ok(s) = std::env::var(name) {
+        if let Ok(v) = s.parse::<T>() {
+            return Ok(v);
+        }
+    }
+
+    Err(anyhow!("Cannot retrieve {} value from .env", name))
+}
 
 pub fn check_installed() -> bool {
     let db_file = get_db_file();
@@ -20,8 +40,7 @@ pub async fn create_db_file() -> anyhow::Result<()> {
     }
 
     let db_file = get_db_file();
-    let init_db_file =
-        std::env::var("INIT_SQLITE_FILE").expect("Cannot get init SQL file from env");
+    let init_db_file: String = try_get_env_value("INIT_SQLITE_FILE")?;
     let init_sql = fs::read_to_string(init_db_file).await?;
     init_db_tables(&db_file, &init_sql).await?;
 
@@ -38,7 +57,7 @@ pub async fn get_conn_pool() -> anyhow::Result<SqlitePool> {
 }
 
 pub fn get_front_dir() -> anyhow::Result<PathBuf> {
-    let path_env = std::env::var("FRONT_DIR")?;
+    let path_env: String = try_get_env_value("FRONT_DIR")?;
     let path = Path::new(&path_env);
 
     Ok(path.to_path_buf())
@@ -52,7 +71,7 @@ pub fn get_front_index() -> anyhow::Result<PathBuf> {
 }
 
 pub async fn create_site_dirs(folder: &str) -> Result<PathBuf> {
-    let root_dir_name = std::env::var("APP_NAME").unwrap_or("oasis".into());
+    let root_dir_name = must_get_env_value("APP_NAME", "oasis".to_string());
     let root = PathBuf::from(folder).join(root_dir_name);
     if root.exists() {
         return Err(anyhow::anyhow!("Directory already existed"));
@@ -72,8 +91,8 @@ pub async fn create_site_dirs(folder: &str) -> Result<PathBuf> {
 }
 
 pub fn get_listen_address() -> String {
-    let port = std::env::var("PORT").unwrap_or("8000".to_owned());
-    let stage = std::env::var("STAGE").unwrap_or("dev".to_owned());
+    let port = must_get_env_value("PORT", 8000);
+    let stage = must_get_env_value("STAGE", "dev".to_string());
 
     let address = match &stage[..] {
         "prod" => "0.0.0.0",
@@ -93,7 +112,7 @@ pub fn generate_secret_key() -> String {
 
 // TODO: check folder's availability in different OSes.
 fn get_db_dir() -> PathBuf {
-    let sub_dir_name = std::env::var("APP_NAME").unwrap_or("oasis".to_owned());
+    let sub_dir_name = must_get_env_value("APP_NAME", "oasis".to_string());
     match dirs::home_dir() {
         Some(dir) => dir.join(sub_dir_name),
         None => panic!("Cannot get config dir or home dir"),
@@ -101,7 +120,7 @@ fn get_db_dir() -> PathBuf {
 }
 
 fn get_db_file() -> PathBuf {
-    let main_db_name = std::env::var("MAIN_DB").unwrap_or("main.db".to_owned());
+    let main_db_name = must_get_env_value("MAIN_DB", "main.db".to_string());
     get_db_dir().join(&main_db_name)
 }
 

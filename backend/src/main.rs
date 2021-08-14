@@ -1,7 +1,7 @@
 mod api;
 mod entity;
 mod util;
-use entity::state::State;
+use entity::{state::State, token::Token};
 use tide::{Body, Redirect, Request, Response, Result, StatusCode};
 
 #[async_std::main]
@@ -29,22 +29,25 @@ async fn main() -> tide::Result<()> {
     // Mount API route
     // Bug of Tide: nested route not working well with serve_dir().
     // app.at("/api").nest(api::api_route(state.clone()));
-
     app.at("/api/setup").post(api::setup::post_setup);
+    app.at("/api/login").post(api::setup::login);
     app.at("/api/sys/volumes").get(api::sys::get_system_volumes);
     app.at("api/sys/dirs/:dir").get(api::sys::get_system_dirs);
 
     // Mount static html page route
-    let front_dir = util::get_front_dir()?;
     app.at("/").get(get_index);
     app.at("/index.html").get(get_index);
     app.at("/login").get(get_login);
     app.at("/setup").get(get_setup);
 
+    // Mount static folder
+    let front_dir = util::get_front_dir()?;
     app.at("/").serve_dir(front_dir)?;
 
+    // Launch app
     let address = util::get_listen_address();
     app.listen(address).await?;
+
     Ok(())
 }
 
@@ -54,6 +57,8 @@ async fn get_index(req: Request<State>) -> Result {
     let first_run = state.get_first_run()?;
     if first_run {
         Ok(Redirect::temporary("/setup").into())
+    } else if Token::auth_user_permission(&req) <= 0 {
+        Ok(Redirect::temporary("/login").into())
     } else {
         let mut res = Response::new(200);
         res.set_body(Body::from_file(util::get_front_index()?).await?);

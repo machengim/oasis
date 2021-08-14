@@ -1,7 +1,9 @@
-use crate::{entity::query::Query, util::db};
-use anyhow::Result;
-use bcrypt::{hash, DEFAULT_COST};
-use serde::Serialize;
+use super::token::Token;
+use crate::entity::query::Query;
+use crate::util::db;
+use anyhow::{anyhow, Result};
+use bcrypt::{hash, verify, DEFAULT_COST};
+use serde::{Deserialize, Serialize};
 use sqlx::{pool::PoolConnection, FromRow, Sqlite};
 
 #[derive(Serialize, FromRow, Debug, Default)]
@@ -9,8 +11,14 @@ pub struct User {
     pub user_id: i64,
     pub username: String,
     pub password: String,
-    pub permission: u8,
+    pub permission: i16,
     pub created_at: String,
+}
+
+#[derive(Deserialize)]
+pub struct LoginRequest {
+    pub username: String,
+    pub password: String,
 }
 
 impl User {
@@ -33,5 +41,29 @@ impl User {
             "insert into USER (username, password, permission, created_at) values (?1, ?2, ?3, ?4)",
             vec![&self.username, &encrypt_password, &permission_str, &utc],
         ))
+    }
+
+    pub fn generate_token(&self) -> Token {
+        Token::new(self.user_id, self.permission)
+    }
+}
+
+impl LoginRequest {
+    pub async fn login(&self, conn: &mut PoolConnection<Sqlite>) -> Result<User> {
+        let query = Query::from(
+            "select * from USER where username = ?1",
+            vec![&self.username],
+        );
+        let user_option: Option<User> = db::fetch_single(query, conn).await?;
+        match user_option {
+            Some(user) => {
+                if verify(&self.password, &user.password)? {
+                    Ok(user)
+                } else {
+                    Err(anyhow!("Password not match"))
+                }
+            }
+            None => Err(anyhow!("No such user in database")),
+        }
     }
 }

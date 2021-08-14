@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use sqlx::{Pool, Sqlite};
 
-#[derive(Serialize, FromRow, Debug)]
+#[derive(Serialize, FromRow, Debug, Clone)]
 pub struct Site {
     pub version: f64,
     pub first_run: u8,
@@ -37,14 +37,26 @@ impl Site {
             Err(e) => panic!("Cannot read site info from db: {}", e),
         }
     }
+
+    pub fn default() -> Self {
+        let version = util::must_get_env_value("VERSION", 0.1);
+        let created_at = chrono::Utc::now().timestamp().to_string();
+
+        Self {
+            version,
+            first_run: 1,
+            created_at,
+            secret: String::new(),
+            storage: String::new(),
+        }
+    }
 }
 
 impl SetupRequest {
-    pub fn update_site_query(&self) -> Query {
-        let secret = util::generate_secret_key();
+    pub fn update_site_query(&self, secret: &str) -> Query {
         Query::from(
             "update SITE set first_run = ?1, storage = ?2, secret = ?3",
-            vec!["0", &self.storage, &secret],
+            vec!["0", &self.storage, secret],
         )
     }
 
