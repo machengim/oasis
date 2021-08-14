@@ -24,7 +24,10 @@ async fn main() -> tide::Result<()> {
     };
 
     let state = State::init(pool).await;
-    let mut app = tide::with_state(state.clone());
+    let mut app = tide::with_state(state);
+
+    // Attach middlewares
+    app.with(util::middleware::load_token);
 
     // Mount API route
     // Bug of Tide: nested route not working well with serve_dir().
@@ -33,6 +36,8 @@ async fn main() -> tide::Result<()> {
     app.at("/api/login").post(api::setup::login);
     app.at("/api/sys/volumes").get(api::sys::get_system_volumes);
     app.at("api/sys/dirs/:dir").get(api::sys::get_system_dirs);
+    app.at("/api/file/before_upload")
+        .post(api::file::post_before_upload);
 
     // Mount static html page route
     app.at("/").get(get_index);
@@ -55,6 +60,7 @@ async fn main() -> tide::Result<()> {
 async fn get_index(req: Request<State>) -> Result {
     let state = req.state();
     let first_run = state.get_first_run()?;
+
     if first_run {
         Ok(Redirect::temporary("/setup").into())
     } else if Token::auth_user_permission(&req) <= 0 {

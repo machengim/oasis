@@ -1,11 +1,15 @@
 pub mod db;
 pub mod file_system;
+pub mod middleware;
 use anyhow::{anyhow, Result};
 use async_std::fs;
 use rand::{distributions::Alphanumeric, Rng};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
 use sqlx::{ConnectOptions, Connection};
 use std::path::{Path, PathBuf};
+use tide::Request;
+
+use crate::entity::state::State;
 const SECRET_LENGTH: usize = 32;
 
 pub fn must_get_env_value<T: std::str::FromStr>(name: &str, default: T) -> T {
@@ -88,6 +92,13 @@ pub async fn create_site_dirs(folder: &str) -> Result<PathBuf> {
     }
 
     Ok(root)
+}
+
+pub fn get_tmp_dir(req: &Request<State>) -> Result<PathBuf> {
+    let root_dir = req.state().get_site_value()?;
+    let path = PathBuf::from(root_dir.storage).join("tmp");
+
+    Ok(path)
 }
 
 pub fn get_listen_address() -> String {

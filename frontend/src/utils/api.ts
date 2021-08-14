@@ -44,7 +44,7 @@ export async function upload(task: IUploadTask) {
     size: filesize,
   };
 
-  let uploadId: string = await post("/api/pre_upload", payload, false);
+  let uploadId: string = await post("/api/file/before_upload", payload, false);
   console.log("Get response: ", uploadId);
 
   // TODO: send pre uploading request.

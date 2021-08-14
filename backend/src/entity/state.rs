@@ -1,4 +1,4 @@
-use super::site::Site;
+use super::{site::Site, upload::UploadTask};
 use anyhow::{anyhow, Result};
 use sqlx::{pool::PoolConnection, Pool, Sqlite};
 use std::sync::{Arc, Mutex};
@@ -7,16 +7,18 @@ use std::sync::{Arc, Mutex};
 pub struct State {
     pub site: Arc<Mutex<Site>>,
     pub pool: Pool<Sqlite>,
-    // pub tasks: Arc<Vec<String>>
+    pub tasks: Arc<Mutex<Vec<UploadTask>>>,
 }
 
 impl State {
     pub async fn init(pool: Pool<Sqlite>) -> Self {
         let site = Site::init_read(&pool).await;
+        let tasks: Vec<UploadTask> = vec![];
 
         Self {
-            site: Arc::new(Mutex::new(site)),
             pool,
+            site: Arc::new(Mutex::new(site)),
+            tasks: Arc::new(Mutex::new(tasks)),
         }
     }
 
@@ -73,6 +75,37 @@ impl State {
     pub fn set_secret(&self, new_secret: String) -> Result<()> {
         let mut site = self.get_site()?;
         site.secret = new_secret;
+
+        Ok(())
+    }
+
+    fn get_tasks(&self) -> Result<std::sync::MutexGuard<Vec<UploadTask>>> {
+        match self.tasks.lock() {
+            Ok(v) => Ok(v),
+            Err(e) => return Err(anyhow!("Cannot retrieve tasks from state: {}", e)),
+        }
+    }
+
+    pub fn find_task_by_uuid(&self, uuid: String) -> Result<UploadTask> {
+        let tasks = self.get_tasks()?;
+        let tasks_found: Vec<&UploadTask> = tasks.iter().filter(|t| t.uuid == uuid).collect();
+
+        match tasks_found.len() {
+            0 => Err(anyhow!("Task uuid not found")),
+            _ => Ok(tasks[0].clone()),
+        }
+    }
+
+    pub fn add_task(&self, task: UploadTask) -> Result<()> {
+        let mut tasks = self.get_tasks()?;
+        tasks.push(task);
+
+        Ok(())
+    }
+
+    pub fn remove_task(&self, task: UploadTask) -> Result<()> {
+        let mut tasks = self.get_tasks()?;
+        tasks.retain(|t| t.uuid != task.uuid);
 
         Ok(())
     }

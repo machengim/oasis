@@ -1,11 +1,11 @@
-use crate::util;
-
 use super::state::State;
+use crate::util;
 use anyhow::{anyhow, Result};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
+use tide::Request;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct Token {
     pub exp: usize,
     pub uid: i64,
@@ -22,6 +22,10 @@ impl Token {
             uid,
             permission,
         }
+    }
+
+    pub fn default() -> Self {
+        Token::new(-1, -1)
     }
 
     pub fn encode(&self, secret: &str) -> Result<String> {
@@ -44,7 +48,7 @@ impl Token {
         Ok(token.claims)
     }
 
-    fn from_cookie(req: &tide::Request<State>) -> Result<Token> {
+    pub fn from_cookie(req: &Request<State>) -> Result<Token> {
         let token_in_cookie = match req.cookie("token") {
             Some(v) => v.value().to_owned(),
             None => return Err(anyhow!("No token found in cookie")),
@@ -53,18 +57,20 @@ impl Token {
         let secret = req.state().get_secret()?;
         let token = Self::decode(&token_in_cookie, &secret)?;
 
-        println!("get token: {:?}", &token);
         Ok(token)
     }
 
-    pub fn auth_user_permission(req: &tide::Request<State>) -> i16 {
-        println!("authing user permission");
-        match Self::from_cookie(req) {
-            Ok(token) => token.permission,
-            Err(e) => {
-                eprintln!("Error when retrieving token: {}", e);
-                return -1;
-            }
+    pub fn from_ext(req: &Request<State>) -> Result<Self> {
+        match req.ext::<Self>() {
+            Some(&token) => Ok(token.into()),
+            None => Err(anyhow!("No token found")),
+        }
+    }
+
+    pub fn auth_user_permission(req: &Request<State>) -> i16 {
+        match req.ext::<Self>() {
+            Some(v) => v.permission,
+            _ => -1,
         }
     }
 }
