@@ -37,18 +37,14 @@ export async function upload(task: IUploadTask) {
   const filesize = file.size;
   const buffer = await file.arrayBuffer();
   const worker = new Worker('upload.js');
-  const length = 2 * 1024 * 1024;
+  const length = 10 * 1024 * 1024;
 
   const payload = {
     filename: file.name,
     size: filesize,
   };
 
-  let uploadId: string = await post("/api/file/before_upload", payload, false);
-  console.log("Get response: ", uploadId);
-
-  // TODO: send pre uploading request.
-  // return;
+  let uploadId: string = await post("/api/file/before-upload", payload, false);
 
   let start = 0;
   let sliceCount = 0;
@@ -70,11 +66,9 @@ export async function upload(task: IUploadTask) {
         console.log("terminate");
         worker.terminate();
         const payload = {
-          filename: file.name,
-          slices: sliceCount,
           upload_id: uploadId,
         };
-        await post(`/api/finish-upload/${uploadId}`, payload, false);
+        await post(`/api/file/finish-upload`, payload, false);
       }
     }
   };

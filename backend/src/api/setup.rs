@@ -21,10 +21,6 @@ pub async fn post_setup(mut req: Request<State>) -> Result {
     let setup_site_sql = setup_req.update_site_query(&secret);
     db::tx_execute(vec![insert_user_sql, setup_site_sql], &mut conn).await?;
 
-    // req.state().set_first_run(false)?;
-    // req.state().set_storage(setup_req.storage.clone())?;
-    // req.state().set_secret(secret)?;
-
     let mut site = req.state().get_site_value()?;
     site.first_run = 0;
     site.storage = setup_req.storage.clone();

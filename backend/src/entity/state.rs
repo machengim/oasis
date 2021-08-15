@@ -22,6 +22,10 @@ impl State {
         }
     }
 
+    pub async fn get_pool_conn(&self) -> Result<PoolConnection<Sqlite>> {
+        Ok(self.pool.acquire().await?)
+    }
+
     fn get_site(&self) -> Result<std::sync::MutexGuard<Site>> {
         match self.site.lock() {
             Ok(v) => Ok(v),
@@ -61,15 +65,17 @@ impl State {
         Ok(())
     }
 
+    pub fn get_storage(&self) -> Result<String> {
+        let site = self.get_site()?;
+
+        Ok(site.storage.clone())
+    }
+
     pub fn set_storage(&self, new_storage: String) -> Result<()> {
         let mut site = self.get_site()?;
         site.storage = new_storage;
 
         Ok(())
-    }
-
-    pub async fn get_pool_conn(&self) -> Result<PoolConnection<Sqlite>> {
-        Ok(self.pool.acquire().await?)
     }
 
     pub fn set_secret(&self, new_secret: String) -> Result<()> {
@@ -86,26 +92,36 @@ impl State {
         }
     }
 
-    pub fn find_task_by_uuid(&self, uuid: String) -> Result<UploadTask> {
+    pub fn find_upload_task_id(&self, upload_id: &str) -> Result<UploadTask> {
         let tasks = self.get_tasks()?;
-        let tasks_found: Vec<&UploadTask> = tasks.iter().filter(|t| t.uuid == uuid).collect();
+        let task_found = tasks.iter().find(|&t| t.upload_id == upload_id).unwrap();
 
-        match tasks_found.len() {
-            0 => Err(anyhow!("Task uuid not found")),
-            _ => Ok(tasks[0].clone()),
-        }
+        Ok(task_found.clone())
     }
 
     pub fn add_task(&self, task: UploadTask) -> Result<()> {
         let mut tasks = self.get_tasks()?;
+        if let Some(_) = tasks.iter().find(|&t| t.upload_id == task.upload_id) {
+            return Err(anyhow!("Task upload_id already existed in state"));
+        }
+
         tasks.push(task);
 
         Ok(())
     }
 
+    // TODO: remove unused task from state after a specific time, eg.1 hour.
     pub fn remove_task(&self, task: UploadTask) -> Result<()> {
         let mut tasks = self.get_tasks()?;
-        tasks.retain(|t| t.uuid != task.uuid);
+        tasks.retain(|t| t.upload_id != task.upload_id);
+
+        Ok(())
+    }
+
+    pub fn update_task_index(&self, upload_id: &str) -> Result<()> {
+        let mut tasks = self.get_tasks()?;
+        let task = tasks.iter_mut().find(|t| t.upload_id == upload_id).unwrap();
+        task.current_index += 1;
 
         Ok(())
     }

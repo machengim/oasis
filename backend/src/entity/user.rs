@@ -35,11 +35,10 @@ impl User {
     pub fn insert_user_query<'a>(&self) -> Result<Query<'a>> {
         let encrypt_password = hash(&self.password, DEFAULT_COST)?;
         let permission_str = self.permission.to_string();
-        let utc = chrono::Utc::now().to_string();
 
         Ok(Query::from(
-            "insert into USER (username, password, permission, created_at) values (?1, ?2, ?3, ?4)",
-            vec![&self.username, &encrypt_password, &permission_str, &utc],
+            "insert into USER (username, password, permission) values (?1, ?2, ?3)",
+            vec![&self.username, &encrypt_password, &permission_str],
         ))
     }
 

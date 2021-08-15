@@ -50,6 +50,16 @@ pub async fn execute<'a>(
     Ok(())
 }
 
+pub async fn insert_single<'a>(
+    query: Query<'a>,
+    conn: &mut PoolConnection<Sqlite>,
+) -> anyhow::Result<i64> {
+    let stmt = prepare_exec_sql(query.sql, &query.args);
+    let id = stmt.execute(conn).await?.last_insert_rowid();
+
+    Ok(id)
+}
+
 fn prepare_sql<'a, T>(
     sql: &'a str,
     args: &'a Vec<String>,

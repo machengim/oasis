@@ -7,10 +7,6 @@ use rand::{distributions::Alphanumeric, Rng};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
 use sqlx::{ConnectOptions, Connection};
 use std::path::{Path, PathBuf};
-use tide::Request;
-
-use crate::entity::state::State;
-const SECRET_LENGTH: usize = 32;
 
 pub fn must_get_env_value<T: std::str::FromStr>(name: &str, default: T) -> T {
     if let Ok(s) = std::env::var(name) {
@@ -94,11 +90,12 @@ pub async fn create_site_dirs(folder: &str) -> Result<PathBuf> {
     Ok(root)
 }
 
-pub fn get_tmp_dir(req: &Request<State>) -> Result<PathBuf> {
-    let root_dir = req.state().get_site_value()?;
-    let path = PathBuf::from(root_dir.storage).join("tmp");
+pub fn get_files_dir(storage: &str) -> PathBuf {
+    PathBuf::from(storage).join("files")
+}
 
-    Ok(path)
+pub fn get_tmp_dir(storage: &str) -> PathBuf {
+    PathBuf::from(storage).join("tmp")
 }
 
 pub fn get_listen_address() -> String {
@@ -114,9 +111,11 @@ pub fn get_listen_address() -> String {
 }
 
 pub fn generate_secret_key() -> String {
+    let secret_length = must_get_env_value("SECRET_LENGTH", 32);
+
     rand::thread_rng()
         .sample_iter(&Alphanumeric)
-        .take(SECRET_LENGTH)
+        .take(secret_length)
         .map(char::from)
         .collect()
 }

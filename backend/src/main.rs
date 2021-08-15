@@ -36,8 +36,12 @@ async fn main() -> tide::Result<()> {
     app.at("/api/login").post(api::setup::login);
     app.at("/api/sys/volumes").get(api::sys::get_system_volumes);
     app.at("api/sys/dirs/:dir").get(api::sys::get_system_dirs);
-    app.at("/api/file/before_upload")
+    app.at("/api/file/before-upload")
         .post(api::file::post_before_upload);
+    app.at("/api/file/upload/:upload_id")
+        .post(api::file::post_upload);
+    app.at("/api/file/finish-upload")
+        .post(api::file::post_finish_upload);
 
     // Mount static html page route
     app.at("/").get(get_index);

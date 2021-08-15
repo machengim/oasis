@@ -1,4 +1,4 @@
-importScripts("md5.min.js");
+importScripts("md5.js");
 let index = 0;
 let uploadId = null;
 
@@ -6,30 +6,34 @@ self.onmessage = async (e) => {
   const message = e.data;
   if (message.type === "uploadId") {
     uploadId = message.data;
-    console.log("current upload id: ", uploadId);
   } else if (message.type === "data") {
-    console.log("message data is ", message.data);
-    const hash = md5(message.data);
     const dataArray = new Uint8Array(message.data);
-    const payload = {
-      index,
-      data: [...dataArray],
-      hash
-    };
-
-    // console.log("payload: ", payload);
+    const data = [...dataArray];
+    const hash = md5(data);
 
     let xhr = new XMLHttpRequest();
-    let endpoint = `/api/upload/${uploadId}`;
+    let endpoint = `/api/file/upload/${uploadId}?index=${index}&hash=${hash}`;
+
     xhr.open('POST', endpoint);
-    xhr.send(JSON.stringify(payload));
-    xhr.addEventListener("load", (e) => {
-      console.log("task complete, ", e);
+
+    xhr.upload.onprogress = (e) => {
+      console.log(`${e.loaded} bytes transferred\n`);
+    }
+
+    xhr.onload = (e) => {
+      console.log("task complete: ", e);
       index++;
       self.postMessage("done");
-    });
-  }
-  else {
+    }
+
+    xhr.onerror = (e) => {
+      console.log("error happened: ", e);
+    }
+
+    // xhr.send(JSON.stringify(payload));
+    xhr.send(dataArray);
+
+  } else {
     console.log("Unkown instructions");
   }
 }
