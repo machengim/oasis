@@ -18,5 +18,10 @@ export interface IUploadTask {
   id: number;
   file: File;
   progress: number;
-  status: "pending" | "uploading" | "finished";
+  status: "pending" | "uploading" | "complete";
+}
+
+export interface IProgress {
+  id: number;
+  progress: number;
 }

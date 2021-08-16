@@ -8,10 +8,10 @@ Personal file sharing and syncing system.
 
 + [x] Setup
 + [x] Login
-+ [ ] Dashboard
-+ [ ] File upload
++ [x] File upload
 + [ ] File list
-+ [ ] File download
++ [ ] Create folder
++ [ ] File delete/rename
 
 **v0.2 File preview**
 
@@ -19,31 +19,34 @@ Personal file sharing and syncing system.
 + [ ] Image display
 + [ ] Video play
 + [ ] Music play
-+ [ ] VS Code integration?
++ [ ] File detail info
 
 **v0.3 Mobile browser compatibility**
 
 + [ ] Responsive UI
-+ [ ] Mobile upload
++ [ ] Mobile Actions
 
-**v0.4 Vault**
+**v0.4 Advance Support**
 
-+ [ ] E2E encryption
++ [ ] File download
++ [ ] Folder download
++ [ ] File starring
++ [ ] Dashboard
++ [ ] Search
++ [ ] Auto update
 
 **v0.5 Multiple-user system**
 
 + [ ] Sign up
++ [ ] I18n
++ [ ] Logs
 + [ ] File sharing
++ [ ] File tags
 
 **Others**
 
-+ [ ] Search
-+ [ ] Logs
-+ [ ] I18n
 + [ ] Grid view for file list
-+ [ ] File starring
 + [ ] Desktop client
 + [ ] Mobile client
 + [ ] MySQL and PostgreSQL support
-+ [ ] File tags
-+ [ ] File editing: rename and delete
++ [ ] E2E encryption?

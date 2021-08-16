@@ -1,4 +1,5 @@
 import type { IUploadTask } from './types';
+import { setProgress } from '../utils/store';
 
 export async function get<T>(url: string): Promise<T> {
   let response: Response;
@@ -47,29 +48,36 @@ export async function upload(task: IUploadTask) {
   let uploadId: string = await post("/api/file/before-upload", payload, false);
 
   let start = 0;
-  let sliceCount = 0;
+  let transferredBytes = 0;
   let end = Math.min(start + length, filesize);
   let slice = buffer.slice(start, end);
   worker.postMessage({ type: "uploadId", data: uploadId });
   worker.postMessage({ type: "data", data: slice });
 
   worker.onmessage = async (e) => {
-    if (e.data === "done") {
-      start = end;
-      sliceCount++;
+    const message = e.data;
+    if (message.type === "progress") {
+      transferredBytes += message.data;
+    } else if (message.type === "done") {
+      transferredBytes = end;
+
       if (end < filesize) {
-        console.log("finished ", end);
+        start = end;
         end = Math.min(start + length, filesize);
         slice = buffer.slice(start, end);
         worker.postMessage({ type: "data", data: slice });
       } else {
-        console.log("terminate");
         worker.terminate();
         const payload = {
           upload_id: uploadId,
         };
         await post(`/api/file/finish-upload`, payload, false);
       }
+    } else if (message.type === "error") {
+      // TODO: retry several times.
     }
+
+    task.progress = transferredBytes / filesize;
+    setProgress(task.id, task.progress);
   };
 }

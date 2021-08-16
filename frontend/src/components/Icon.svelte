@@ -11,6 +11,7 @@
     "black";
   export let size: "small" | "tiny" | "default" = "default";
   export let className: string = "";
+  export let onClick: () => void = null;
 
   const buildStyle = () => {
     let style: string;
@@ -54,7 +55,7 @@
   };
 </script>
 
-<span class={className}>
+<span class={className} on:click={onClick}>
   <svg
     xmlns="http://www.w3.org/2000/svg"
     class={buildStyle()}

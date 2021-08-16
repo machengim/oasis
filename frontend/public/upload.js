@@ -17,20 +17,19 @@ self.onmessage = async (e) => {
     xhr.open('POST', endpoint);
 
     xhr.upload.onprogress = (e) => {
-      console.log(`${e.loaded} bytes transferred\n`);
+      self.postMessage({ type: "progress", data: e.loaded });
     }
 
     xhr.onload = (e) => {
-      console.log("task complete: ", e);
       index++;
-      self.postMessage("done");
+      self.postMessage({ type: "done", data: null });
     }
 
     xhr.onerror = (e) => {
-      console.log("error happened: ", e);
+      console.error("Get error: ", e);
+      self.postMessage({ type: "error", data: null });
     }
 
-    // xhr.send(JSON.stringify(payload));
     xhr.send(dataArray);
 
   } else {
