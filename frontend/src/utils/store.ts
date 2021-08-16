@@ -1,6 +1,10 @@
-import { get, Writable, writable } from 'svelte/store';
+import { Writable, writable } from 'svelte/store';
 import type { IProgress, INotification, IUploadTask } from './types';
 
+// Current dir store
+export const pwdStore: Writable<number> = writable(0);
+
+// Notification store
 export const notificationStore: Writable<INotification> = writable(null);
 
 export function setNotification(type: 'success' | 'error', msg: string) {
@@ -8,6 +12,7 @@ export function setNotification(type: 'success' | 'error', msg: string) {
     notificationStore.set(newNotification);
 }
 
+// Upload progress store
 export const progressStore: Writable<IProgress> = writable(null);
 
 export function setProgress(id: number, progress: number) {
@@ -15,6 +20,7 @@ export function setProgress(id: number, progress: number) {
     progressStore.set(newProgress);
 }
 
+// Upload task store
 export const uploadTaskStore: Writable<IUploadTask[]> = writable([]);
 
 let nextId = 1;

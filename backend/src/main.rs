@@ -42,6 +42,8 @@ async fn main() -> tide::Result<()> {
         .post(api::file::post_upload);
     app.at("/api/file/finish-upload")
         .post(api::file::post_finish_upload);
+    app.at("/api/file/dir/:dir_id")
+        .get(api::file::get_file_list);
 
     // Mount static html page route
     app.at("/").get(get_index);

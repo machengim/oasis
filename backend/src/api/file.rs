@@ -1,12 +1,13 @@
 use crate::{
     entity::{
+        file::File,
         state::State,
         token::Token,
         upload::{BeforeUploadRequest, FinishUploadRequest, SliceUploadQuery},
     },
     util::db,
 };
-use tide::{Request, Response, Result, StatusCode};
+use tide::{convert::json, Request, Response, Result, StatusCode};
 
 // Post "/api/file/before-upload"
 pub async fn post_before_upload(mut req: Request<State>) -> Result {
@@ -72,6 +73,20 @@ pub async fn post_finish_upload(mut req: Request<State>) -> Result {
     req.state().remove_task(task)?;
 
     Ok(id.to_string().into())
+}
+
+// Get "/api/file/dir/:dir_id".
+pub async fn get_file_list(req: Request<State>) -> Result {
+    let token = Token::from_ext(&req)?;
+    if token.permission <= 0 {
+        return Ok(Response::new(StatusCode::Unauthorized));
+    }
+
+    let dir_id: i64 = req.param("dir_id")?.parse()?;
+    let mut conn = req.state().get_pool_conn().await?;
+    let files = File::get_files_in_dir(dir_id, token.uid, &mut conn).await?;
+
+    Ok(json!(files).into())
 }
 
 fn validate_upload(req: &Request<State>, upload_id: &str) -> anyhow::Result<bool> {

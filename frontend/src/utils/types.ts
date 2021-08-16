@@ -25,3 +25,20 @@ export interface IProgress {
   id: number;
   progress: number;
 }
+
+export interface IFile {
+  file_id: number,
+  filename: string,
+  path: string,
+  size: number,
+  is_dir: number,
+  owner_id: number,
+  parent_id: number,
+  created_at: string,
+  updated_at: string,
+}
+
+export interface IFileOrder {
+  key: "name" | "type" | "size" | "lastModify",
+  asc: boolean,
+}

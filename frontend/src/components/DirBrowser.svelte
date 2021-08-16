@@ -22,11 +22,10 @@
       isLoading = true;
       volumes = await api.get("/api/sys/volumes");
     } catch (e) {
-      console.log(e);
+      console.error(e);
       setNotification("error", "Cannot read volumes");
-    } finally {
-      isLoading = false;
     }
+    isLoading = false;
   });
 
   $: if (volumes.length > 0) {

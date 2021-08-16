@@ -4,6 +4,7 @@ pub mod middleware;
 use anyhow::{anyhow, Result};
 use async_std::fs;
 use rand::{distributions::Alphanumeric, Rng};
+use sqlx::migrate::Migrator;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
 use sqlx::{ConnectOptions, Connection};
 use std::path::{Path, PathBuf};
@@ -40,9 +41,7 @@ pub async fn create_db_file() -> anyhow::Result<()> {
     }
 
     let db_file = get_db_file();
-    let init_db_file: String = try_get_env_value("INIT_SQLITE_FILE")?;
-    let init_sql = fs::read_to_string(init_db_file).await?;
-    init_db_tables(&db_file, &init_sql).await?;
+    run_migrations(&db_file).await?;
 
     Ok(())
 }
@@ -134,14 +133,16 @@ fn get_db_file() -> PathBuf {
     get_db_dir().join(&main_db_name)
 }
 
-async fn init_db_tables(db_file: &PathBuf, init_sql: &str) -> anyhow::Result<()> {
+async fn run_migrations(db_file: &PathBuf) -> anyhow::Result<()> {
     let mut conn = SqliteConnectOptions::new()
         .filename(db_file)
         .create_if_missing(true)
         .connect()
         .await?;
 
-    sqlx::query(&init_sql).execute(&mut conn).await?;
+    let migration_dir: String = try_get_env_value("MIGRATION_DIR")?;
+    let migrator = Migrator::new(Path::new(&migration_dir)).await?;
+    migrator.run(&mut conn).await?;
     conn.close();
 
     Ok(())
