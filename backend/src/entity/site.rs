@@ -68,4 +68,10 @@ impl SetupRequest {
 
         Ok(user.insert_user_query()?)
     }
+
+    pub fn prepare_root_in_db_query(&self) -> Query {
+        let sql = "insert into FILE(filename, size, file_type, owner_id, parent_id) values(?1, ?2, ?3, (select user_id from USER where username = ?4), ?5)";
+        let zero = 0.to_string();
+        Query::from(sql, vec!["root", &zero, "root", &self.username, &zero])
+    }
 }

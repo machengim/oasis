@@ -9,6 +9,7 @@ use std::path::PathBuf;
 #[derive(Deserialize)]
 pub struct BeforeUploadRequest {
     pub filename: String,
+    pub parent_id: i64,
     pub size: u64,
 }
 
@@ -34,7 +35,9 @@ pub struct FinishUploadRequest {
 pub struct UploadTask {
     pub filename: String,
     pub path: String,
+    pub file_type: String,
     pub upload_id: String,
+    pub parent_id: i64,
     pub size: u64,
     pub current_index: u64,
     pub owner_id: i64,
@@ -47,8 +50,10 @@ impl BeforeUploadRequest {
             size: self.size,
             upload_id: String::from(upload_id),
             current_index: 0,
+            parent_id: self.parent_id,
             owner_id,
             path: String::new(),
+            file_type: util::infer_file_type(&self.filename),
         }
     }
 
@@ -132,17 +137,17 @@ impl UploadTask {
         Ok(())
     }
 
-    // TODO: not complete
-    pub fn insert_file_query(&self, parent_id: i64) -> Result<Query<'_>> {
-        let sql = "insert into FILE (filename, path, size, owner_id, parent_id) values (?1, ?2, ?3, ?4, ?5)";
+    pub fn insert_file_query(&self) -> Result<Query<'_>> {
+        let sql = "insert into FILE (filename, file_type, path, size, owner_id, parent_id) values (?1, ?2, ?3, ?4, ?5, ?6)";
         let query = Query::from(
             sql,
             vec![
                 &self.filename,
+                &self.file_type,
                 &self.path,
                 &self.size.to_string(),
                 &self.owner_id.to_string(),
-                &parent_id.to_string(),
+                &self.parent_id.to_string(),
             ],
         );
 

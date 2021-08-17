@@ -17,6 +17,12 @@ pub async fn post_before_upload(mut req: Request<State>) -> Result {
     }
 
     let upload_req: BeforeUploadRequest = req.body_json().await?;
+    let mut conn = req.state().get_pool_conn().await?;
+    let folder_owner_id = File::find_file_owner(upload_req.parent_id, &mut conn).await?;
+    if folder_owner_id != token.uid {
+        return Ok(Response::new(StatusCode::Unauthorized));
+    }
+
     let storage = req.state().get_storage()?;
     let upload_id = BeforeUploadRequest::prepare_tmp_dir(&storage).await?;
     let task = upload_req.create_task(&upload_id, token.uid);
@@ -66,13 +72,14 @@ pub async fn post_finish_upload(mut req: Request<State>) -> Result {
     let storage = req.state().get_storage()?;
     task.combine_slices(&storage).await?;
 
-    let insert_file_query = task.insert_file_query(0)?;
+    let insert_file_query = task.insert_file_query()?;
     let mut conn = req.state().get_pool_conn().await?;
     // db::execute(insert_file_query, &mut conn).await?;
     let id = db::insert_single(insert_file_query, &mut conn).await?;
     req.state().remove_task(task)?;
+    let file = File::get_file_by_id(id, &mut conn).await?;
 
-    Ok(id.to_string().into())
+    Ok(json!(file).into())
 }
 
 // Get "/api/file/dir/:dir_id".

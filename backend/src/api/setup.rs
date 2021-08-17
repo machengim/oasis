@@ -1,3 +1,4 @@
+use crate::entity::file::File;
 use crate::entity::state::State;
 use crate::entity::user::{LoginRequest, User};
 use crate::util::db;
@@ -18,8 +19,13 @@ pub async fn post_setup(mut req: Request<State>) -> Result {
 
     setup_req.storage = storage_path.to_string_lossy().to_string();
     let insert_user_sql = setup_req.init_admin_query()?;
+    let prepare_root_sql = setup_req.prepare_root_in_db_query();
     let setup_site_sql = setup_req.update_site_query(&secret);
-    db::tx_execute(vec![insert_user_sql, setup_site_sql], &mut conn).await?;
+    db::tx_execute(
+        vec![insert_user_sql, prepare_root_sql, setup_site_sql],
+        &mut conn,
+    )
+    .await?;
 
     let mut site = req.state().get_site_value()?;
     site.first_run = 0;
@@ -30,6 +36,7 @@ pub async fn post_setup(mut req: Request<State>) -> Result {
     Ok(Response::new(StatusCode::Ok))
 }
 
+// Post "/api/login".
 pub async fn login(mut req: Request<State>) -> Result {
     let login_req: LoginRequest = req.body_json().await?;
     let mut conn = req.state().get_pool_conn().await?;
@@ -44,8 +51,10 @@ pub async fn login(mut req: Request<State>) -> Result {
         .max_age(time::Duration::days(token_expire_days))
         .finish();
 
+    let root_id = File::find_root_dir(user.user_id, &mut conn).await?;
     let mut res = Response::new(200);
     res.insert_cookie(cookie);
+    res.set_body(root_id.to_string());
 
     Ok(res)
 }

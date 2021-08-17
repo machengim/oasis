@@ -18,13 +18,13 @@ CREATE TABLE IF NOT EXISTS user (
 CREATE TABLE IF NOT EXISTS file (
 	file_id INTEGER PRIMARY KEY,
 	filename TEXT NOT NULL,
-	path TEXT NOT NULL,
+	path TEXT,
 	size INTEGER NOT NULL,
-  	is_dir INTEGER NOT NULL DEFAULT 0,
+  	file_type TEXT,
   	owner_id INTEGER NOT NULL,
   	parent_id INTEGER,
 	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  	updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  	last_modified_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO site(version, created_at) VALUES(0.1, datetime());

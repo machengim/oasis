@@ -6,8 +6,8 @@ self.onmessage = async (e) => {
   const message = e.data;
   if (message.type === "uploadId") {
     uploadId = message.data;
-  } else if (message.type === "data") {
-    const dataArray = new Uint8Array(message.data);
+  } else {
+    const dataArray = new Uint8Array(message);
     const data = [...dataArray];
     const hash = md5(data);
 
@@ -32,8 +32,6 @@ self.onmessage = async (e) => {
 
     xhr.send(dataArray);
 
-  } else {
-    console.log("Unkown instructions");
   }
 }
 

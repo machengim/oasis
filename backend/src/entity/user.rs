@@ -1,3 +1,4 @@
+use super::file::File;
 use super::token::Token;
 use crate::entity::query::Query;
 use crate::util::db;

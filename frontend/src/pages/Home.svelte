@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { pwdStore, setNotification } from "../utils/store";
+  import { pwdStore, setNotification, completeFileStore } from "../utils/store";
   import FloatButton from "../components/FloatButton.svelte";
   import Icon from "../components/Icon.svelte";
   import type { IFile, IFileOrder } from "../utils/types";
@@ -8,28 +8,40 @@
   import { formatSize } from "../utils/util";
 
   let files: IFile[] = [];
+  let newCompleteFile: IFile;
   let isLoading = false;
-  let pwd = 0;
+  let root = +localStorage.getItem("root_dir");
+  let pwd = root;
   let order: IFileOrder = { key: "name", asc: true };
 
-  const unsubscribe = pwdStore.subscribe((value) => {
-    if (value >= 0 && pwd !== value) {
+  const unsubscribePwd = pwdStore.subscribe((value) => {
+    if (value > 0 && pwd !== value) {
       pwd = value;
     }
+  });
 
-    pwdStore.set(-1);
+  const unsubscribeCompleteFile = completeFileStore.subscribe((value) => {
+    if (value) {
+      newCompleteFile = value;
+      completeFileStore.set(null);
+    }
   });
 
   onDestroy(() => {
-    unsubscribe();
+    unsubscribePwd();
+    unsubscribeCompleteFile();
   });
 
-  $: if (pwd >= 0) {
+  $: if (pwd > 0) {
     fetchFiles();
   }
 
   $: if (files.length > 0 && order) {
     orderFiles();
+  }
+
+  $: if (newCompleteFile && newCompleteFile.parent_id === pwd) {
+    files = [...files, newCompleteFile];
   }
 
   const fetchFiles = async () => {
@@ -56,8 +68,8 @@
   };
 
   const orderFiles = () => {
-    let dirs = files.filter((f) => f.is_dir === 1);
-    let others = files.filter((f) => f.is_dir === 0);
+    let dirs = files.filter((f) => f.file_type.toUpperCase() === "DIR");
+    let others = files.filter((f) => f.file_type.toUpperCase() !== "DIR");
 
     dirs.sort(compareFile);
     others.sort(compareFile);
@@ -79,11 +91,13 @@
         result = a.size - b.size;
         break;
       case "lastModify":
-        const aTime = Date.parse(a.updated_at);
-        const bTime = Date.parse(b.updated_at);
+        const aTime = Date.parse(a.last_modified_at);
+        const bTime = Date.parse(b.last_modified_at);
         result = aTime > bTime ? 1 : aTime < bTime ? -1 : 0;
         break;
       case "type":
+        result =
+          a.file_type > b.file_type ? 1 : a.file_type < b.file_type ? -1 : 0;
         break;
       default:
         break;
@@ -109,7 +123,15 @@
         {/if}
       </div>
       <div class="px-2  flex flex-row items-center">
-        <span class="cursor-pointer hover:text-gray-400">Type</span>
+        <span
+          class="cursor-pointer hover:text-gray-400"
+          on:click={() => changeOrder("type")}>Type</span
+        >
+        {#if order.key === "type" && order.asc}
+          <Icon type="up" size="tiny" color="gray" className="ml-2" />
+        {:else if order.key === "type"}
+          <Icon type="down" size="tiny" color="gray" className="ml-2" />
+        {/if}
       </div>
       <div class="px-2  flex flex-row items-center">
         <span
@@ -135,7 +157,7 @@
         {/if}
       </div>
     </div>
-    {#if pwd > 0}
+    {#if pwd !== root}
       <div class="grid grid-cols-5 border-b border-gray-200 py-2">
         <div class="col-span-2 px-2">..</div>
         <div class="px-2" />
@@ -146,8 +168,8 @@
     {#each files as file}
       <div class="grid grid-cols-5 border-b border-gray-200 py-2">
         <div class="col-span-2 px-2">{file.filename}</div>
-        <div class="px-2">Text</div>
-        <div class="px-2">{file.updated_at}</div>
+        <div class="px-2">{file.file_type}</div>
+        <div class="px-2">{file.last_modified_at}</div>
         <div class="px-2">{formatSize(file.size)}</div>
       </div>
     {/each}

@@ -1,13 +1,25 @@
 <script lang="ts">
-  import { addUploadTasks } from "../utils/store";
+  import { onDestroy } from "svelte";
+  import { addUploadTasks, pwdStore } from "../utils/store";
 
   let is_checked = false;
+  let pwd = +localStorage.getItem("root_dir");
+
+  const unsubscribe = pwdStore.subscribe((value) => {
+    if (value > 0 && pwd !== value) {
+      pwd = value;
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribe();
+  });
 
   const selectFile = async (event: Event) => {
     let target = <HTMLInputElement>event.target;
 
     if (target.files.length > 0) {
-      addUploadTasks(target.files);
+      addUploadTasks(target.files, pwd);
       toggleCheck();
     }
   };

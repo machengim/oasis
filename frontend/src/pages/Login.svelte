@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification } from "../utils/store";
+  import { setNotification, pwdStore } from "../utils/store";
   import type { ILoginRequest } from "../utils/types";
   import { navigate } from "svelte-navigator";
 
@@ -22,6 +22,8 @@
     isLoading = false;
 
     if (result) {
+      localStorage.setItem("root_dir", result);
+      pwdStore.set(+result);
       navigate("/");
     }
   };
@@ -42,15 +44,14 @@
     };
 
     try {
-      await api.post("/api/login", payload, false);
+      const result: string = await api.post("/api/login", payload, false);
       setNotification("success", "Login successfully,");
+      return result;
     } catch (e) {
       console.log(e);
       setNotification("error", "Login failed.");
-      return false;
+      return null;
     }
-
-    return true;
   };
 </script>
 

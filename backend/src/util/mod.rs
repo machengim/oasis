@@ -119,6 +119,26 @@ pub fn generate_secret_key() -> String {
         .collect()
 }
 
+pub fn infer_file_type(filename: &str) -> String {
+    let splits: Vec<&str> = filename.rsplitn(2, ".").collect();
+
+    if splits.len() <= 1 {
+        return "Unknown".to_string();
+    }
+
+    let result = match &splits[0].to_lowercase()[..] {
+        "c" | "cpp" | "js" | "ts" | "rs" | "py" | "java" | "html" | "css" => "Code",
+        "jpg" | "jpeg" | "gif" | "png" => "Image",
+        "mp3" | "flac" | "aac" | "ogg" => "Music",
+        "pdf" => "Pdf",
+        "mp4" | "mov" | "avi" | "mkv" => "Video",
+        "txt" => "Text",
+        _ => "Unkown",
+    };
+
+    result.to_string()
+}
+
 // TODO: check folder's availability in different OSes.
 fn get_db_dir() -> PathBuf {
     let sub_dir_name = must_get_env_value("APP_NAME", "oasis".to_string());

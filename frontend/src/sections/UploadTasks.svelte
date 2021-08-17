@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { uploadTaskStore, progressStore } from "../utils/store";
+  import { uploadTaskStore, progressStore, workerStore } from "../utils/store";
   import type { IProgress, IUploadTask } from "../utils/types";
   import Icon from "../components/Icon.svelte";
   import * as api from "../utils/api";
@@ -8,6 +8,7 @@
   let showFiles = true;
   let tasks: IUploadTask[] = [];
   let currentTask: IUploadTask = null;
+  let worker: Worker = null;
 
   const unsubscribeTask = uploadTaskStore.subscribe((value) => {
     if (value.length > 0) {
@@ -24,9 +25,14 @@
     }
   });
 
+  const unsubscribeWorker = workerStore.subscribe((value) => {
+    worker = value;
+  });
+
   onDestroy(() => {
     unsubscribeTask();
     unsubscribeProgress();
+    unsubscribeWorker();
   });
 
   $: if (!currentTask && tasks.length > 0) {
@@ -47,7 +53,7 @@
     let newTask = Object.assign({}, tasks[index]);
     newTask.progress = progress.progress;
 
-    if (newTask.progress === 1) {
+    if (newTask.progress >= 1) {
       newTask.status = "complete";
       currentTask = null;
     }
@@ -67,7 +73,9 @@
       if (!confirm) return;
     }
 
+    removeWorker();
     tasks = [];
+    currentTask = null;
   };
 
   const removeTask = (id: number, complete: boolean) => {
@@ -77,11 +85,33 @@
       );
       if (!confirm) return;
     }
+
+    removeWorker();
     const newTasks = tasks.filter((t) => t.id !== id);
     tasks = newTasks;
 
     if (currentTask && currentTask.id === id) {
       currentTask = null;
+    }
+  };
+
+  const removeWorker = () => {
+    if (worker) {
+      worker.terminate();
+      workerStore.set(null);
+    }
+  };
+
+  const formatProgress = (task: IUploadTask) => {
+    if (task.status === "pending") {
+      return "Pending";
+    } else if (task.status === "uploading" && task.progress <= 0) {
+      return "Initializing";
+    } else {
+      let progressPercent = task.progress * 100;
+      let progressFormat = +progressPercent.toFixed(2);
+
+      return `${progressFormat}%`;
     }
   };
 </script>
@@ -108,10 +138,10 @@
     {#if showFiles}
       <div>
         {#each tasks as task}
-          <div class="flex flex-row justify-between px-4 py-2">
+          <div class="flex flex-row justify-between px-4 py-2 items-center">
             <div>{task.file.name}</div>
             <div class="flex flex-row items-center">
-              <span>{task.progress * 100}%</span>
+              <span>{formatProgress(task)}</span>
               {#if task.status === "complete"}
                 <Icon
                   type="success"
@@ -121,15 +151,13 @@
                   onClick={() => removeTask(task.id, true)}
                 />
               {:else}
-                <span>
-                  <Icon
-                    type="close"
-                    color="red"
-                    size="tiny"
-                    className="ml-1 cursor-pointer"
-                    onClick={() => removeTask(task.id, false)}
-                  />
-                </span>
+                <Icon
+                  type="close"
+                  color="red"
+                  size="tiny"
+                  className="ml-1 cursor-pointer"
+                  onClick={() => removeTask(task.id, false)}
+                />
               {/if}
             </div>
           </div>

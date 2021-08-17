@@ -9,39 +9,40 @@ Personal file sharing and syncing system.
 + [x] Setup
 + [x] Login
 + [x] File upload
-+ [ ] File list
-+ [ ] Create folder
++ [x] File list
 + [ ] File delete/rename
++ [ ] Create folder
 
 **v0.2 File preview**
 
-+ [ ] Text file preview
-+ [ ] Image display
++ [ ] Text file view
++ [ ] Image view
 + [ ] Video play
 + [ ] Music play
-+ [ ] File detail info
 
-**v0.3 Mobile browser compatibility**
+
+**v0.3 Mobile Compatibility**
 
 + [ ] Responsive UI
 + [ ] Mobile Actions
 
-**v0.4 Advance Support**
+**v0.4 Advance File Operation**
 
++ [ ] File detail info
 + [ ] File download
 + [ ] Folder download
 + [ ] File starring
-+ [ ] Dashboard
-+ [ ] Search
-+ [ ] Auto update
++ [ ] File thumbnail
 
 **v0.5 Multiple-user system**
 
 + [ ] Sign up
 + [ ] I18n
 + [ ] Logs
-+ [ ] File sharing
-+ [ ] File tags
++ [ ] Dashboard
++ [ ] Search
++ [ ] Sharing
++ [ ] Auto update
 
 **Others**
 

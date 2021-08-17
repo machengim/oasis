@@ -1,5 +1,5 @@
-import type { IUploadTask } from './types';
-import { setProgress } from '../utils/store';
+import type { IFile, IUploadTask } from './types';
+import { completeFileStore, setProgress, workerStore } from '../utils/store';
 
 export async function get<T>(url: string): Promise<T> {
   let response: Response;
@@ -36,48 +36,52 @@ export async function post<T, S>(url: string, payload: T, jsonResponse: boolean)
 export async function upload(task: IUploadTask) {
   const file = task.file;
   const filesize = file.size;
-  const buffer = await file.arrayBuffer();
-  const worker = new Worker('upload.js');
-  const length = 10 * 1024 * 1024;
+  const length = 20 * 1024 * 1024;
 
   const payload = {
     filename: file.name,
+    parent_id: task.parent_id,
     size: filesize,
   };
 
   let uploadId: string = await post("/api/file/before-upload", payload, false);
 
-  let start = 0;
   let transferredBytes = 0;
+  let start = 0;
   let end = Math.min(start + length, filesize);
-  let slice = buffer.slice(start, end);
+  let slice = file.slice(start, end);
+  let buffer = await slice.arrayBuffer();
+
+  const worker = new Worker('upload.js');
+  workerStore.set(worker);
   worker.postMessage({ type: "uploadId", data: uploadId });
-  worker.postMessage({ type: "data", data: slice });
+  worker.postMessage(buffer, [buffer]);
 
   worker.onmessage = async (e) => {
     const message = e.data;
     if (message.type === "progress") {
       transferredBytes += message.data;
+      task.progress = transferredBytes / filesize;
+      setProgress(task.id, task.progress);
     } else if (message.type === "done") {
-      transferredBytes = end;
-
       if (end < filesize) {
         start = end;
         end = Math.min(start + length, filesize);
-        slice = buffer.slice(start, end);
-        worker.postMessage({ type: "data", data: slice });
+        slice = file.slice(start, end);
+        buffer = await slice.arrayBuffer();
+
+        worker.postMessage(buffer, [buffer]);
       } else {
         worker.terminate();
         const payload = {
           upload_id: uploadId,
         };
-        await post(`/api/file/finish-upload`, payload, false);
+
+        const completeFile: IFile = await post(`/api/file/finish-upload`, payload, true);
+        completeFileStore.set(completeFile);
       }
     } else if (message.type === "error") {
       // TODO: retry several times.
     }
-
-    task.progress = transferredBytes / filesize;
-    setProgress(task.id, task.progress);
   };
 }

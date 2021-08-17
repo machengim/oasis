@@ -17,6 +17,7 @@ export interface ILoginRequest {
 export interface IUploadTask {
   id: number;
   file: File;
+  parent_id: number;
   progress: number;
   status: "pending" | "uploading" | "complete";
 }
@@ -31,11 +32,11 @@ export interface IFile {
   filename: string,
   path: string,
   size: number,
-  is_dir: number,
+  file_type: string,
   owner_id: number,
   parent_id: number,
   created_at: string,
-  updated_at: string,
+  last_modified_at: string,
 }
 
 export interface IFileOrder {
