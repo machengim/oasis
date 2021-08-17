@@ -8,7 +8,7 @@ use tide::{Request, Response, Result, StatusCode};
 
 // post "api/setup"
 pub async fn post_setup(mut req: Request<State>) -> Result {
-    let mut setup_req: SetupRequest = req.body_json().await?;
+    let mut setup_req = SetupRequest::new(&mut req).await?;
     let mut conn = req.state().get_pool_conn().await?;
     if let Some(_) = User::find_exist_username(&setup_req.username, &mut conn).await? {
         return Ok(Response::new(StatusCode::Conflict));

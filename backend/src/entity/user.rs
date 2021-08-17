@@ -1,5 +1,5 @@
-use super::file::File;
 use super::token::Token;
+use crate::args;
 use crate::entity::query::Query;
 use crate::util::db;
 use anyhow::{anyhow, Result};
@@ -27,7 +27,7 @@ impl User {
         username: &str,
         conn: &mut PoolConnection<Sqlite>,
     ) -> Result<Option<User>> {
-        let query = Query::from("select * from USER where username = ?1", vec![username]);
+        let query = Query::new("select * from USER where username = ?1", args![username]);
         let user: Option<User> = db::fetch_single(query, conn).await?;
 
         Ok(user)
@@ -35,11 +35,10 @@ impl User {
 
     pub fn insert_user_query<'a>(&self) -> Result<Query<'a>> {
         let encrypt_password = hash(&self.password, DEFAULT_COST)?;
-        let permission_str = self.permission.to_string();
 
-        Ok(Query::from(
+        Ok(Query::new(
             "insert into USER (username, password, permission) values (?1, ?2, ?3)",
-            vec![&self.username, &encrypt_password, &permission_str],
+            args![&self.username, encrypt_password, self.permission],
         ))
     }
 
@@ -50,9 +49,9 @@ impl User {
 
 impl LoginRequest {
     pub async fn login(&self, conn: &mut PoolConnection<Sqlite>) -> Result<User> {
-        let query = Query::from(
+        let query = Query::new(
             "select * from USER where username = ?1",
-            vec![&self.username],
+            args![&self.username],
         );
         let user_option: Option<User> = db::fetch_single(query, conn).await?;
         match user_option {

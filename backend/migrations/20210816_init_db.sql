@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS file (
 	size INTEGER NOT NULL,
   	file_type TEXT,
   	owner_id INTEGER NOT NULL,
-  	parent_id INTEGER,
+  	parent_id INTEGER NOT NULL,
 	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   	last_modified_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

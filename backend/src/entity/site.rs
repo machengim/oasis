@@ -1,10 +1,16 @@
-use super::query::Query;
+use std::path::Path;
+
 use super::user::User;
-use crate::util::{self, db};
-use anyhow::Result;
+use super::{query::Query, state::State};
+use crate::{
+    args,
+    util::{self, db},
+};
+use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use sqlx::{Pool, Sqlite};
+use tide::Request;
 
 #[derive(Serialize, FromRow, Debug, Clone)]
 pub struct Site {
@@ -15,7 +21,7 @@ pub struct Site {
     pub storage: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct SetupRequest {
     pub username: String,
     pub password: String,
@@ -53,10 +59,26 @@ impl Site {
 }
 
 impl SetupRequest {
+    pub async fn new(req: &mut Request<State>) -> Result<Self> {
+        let setup_req: Self = match req.body_json().await {
+            Ok(v) => v,
+            Err(e) => return Err(anyhow!("Cannot retrieve setup request: {:?}", e)),
+        };
+
+        if setup_req.username.len() < 1
+            || setup_req.password.len() < 6
+            || !Path::new(&setup_req.storage).exists()
+        {
+            return Err(anyhow!("Invalid request data: {:?}", &setup_req));
+        }
+
+        Ok(setup_req)
+    }
+
     pub fn update_site_query(&self, secret: &str) -> Query {
-        Query::from(
+        Query::new(
             "update SITE set first_run = ?1, storage = ?2, secret = ?3",
-            vec!["0", &self.storage, secret],
+            args![0, &self.storage, secret],
         )
     }
 
@@ -71,7 +93,6 @@ impl SetupRequest {
 
     pub fn prepare_root_in_db_query(&self) -> Query {
         let sql = "insert into FILE(filename, size, file_type, owner_id, parent_id) values(?1, ?2, ?3, (select user_id from USER where username = ?4), ?5)";
-        let zero = 0.to_string();
-        Query::from(sql, vec!["root", &zero, "root", &self.username, &zero])
+        Query::new(sql, args!["root", 0, "root", &self.username, 0])
     }
 }

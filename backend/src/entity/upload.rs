@@ -1,5 +1,5 @@
-use crate::entity::query::Query;
 use crate::util;
+use crate::{args, entity::query::Query};
 use anyhow::{anyhow, Result};
 use async_std::fs::{self, OpenOptions};
 use async_std::io::prelude::WriteExt;
@@ -139,15 +139,15 @@ impl UploadTask {
 
     pub fn insert_file_query(&self) -> Result<Query<'_>> {
         let sql = "insert into FILE (filename, file_type, path, size, owner_id, parent_id) values (?1, ?2, ?3, ?4, ?5, ?6)";
-        let query = Query::from(
+        let query = Query::new(
             sql,
-            vec![
+            args![
                 &self.filename,
                 &self.file_type,
                 &self.path,
-                &self.size.to_string(),
-                &self.owner_id.to_string(),
-                &self.parent_id.to_string(),
+                self.size,
+                self.owner_id,
+                self.parent_id
             ],
         );
 

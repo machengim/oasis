@@ -1,5 +1,5 @@
-use crate::entity::query::Query;
 use crate::util::db;
+use crate::{args, entity::query::Query};
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::pool::PoolConnection;
@@ -26,7 +26,7 @@ impl File {
     ) -> Result<Vec<File>> {
         println!("dir_id is {} and owner_id is {}", dir, owner);
         let sql = "select * from FILE where parent_id=?1 and owner_id=?2";
-        let query = Query::from(sql, vec![dir.to_string(), owner.to_string()]);
+        let query = Query::new(sql, args![dir, owner]);
 
         let files: Vec<File> = db::fetch_multiple(query, conn).await?;
 
