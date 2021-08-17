@@ -6,7 +6,7 @@ use async_std::io::prelude::WriteExt;
 use serde::Deserialize;
 use std::path::PathBuf;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct BeforeUploadRequest {
     pub filename: String,
     pub parent_id: i64,

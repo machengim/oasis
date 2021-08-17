@@ -13,6 +13,7 @@
   let root = +localStorage.getItem("root_dir");
   let pwd = root;
   let order: IFileOrder = { key: "name", asc: true };
+  let selectedFile: IFile = null;
 
   const unsubscribePwd = pwdStore.subscribe((value) => {
     if (value > 0 && pwd !== value) {
@@ -105,6 +106,33 @@
 
     return result * ascFactor;
   };
+
+  const getFileStyle = (file: IFile) => {
+    if (file === selectedFile) {
+      return "grid grid-cols-5 border-b border-gray-200 py-2 bg-blue-400 text-white";
+    } else {
+      return "grid grid-cols-5 border-b border-gray-200 py-2";
+    }
+  };
+
+  const clickFile = (file: IFile) => {
+    if (file === selectedFile) {
+      selectedFile = null;
+    } else {
+      selectedFile = file;
+    }
+
+    files = files;
+  };
+
+  const rightClickFile = (e: Event, file: IFile) => {
+    e.preventDefault();
+
+    if (file !== selectedFile) {
+      selectedFile = file;
+      files = files;
+    }
+  };
 </script>
 
 <div class="relative w-full h-full">
@@ -166,7 +194,11 @@
       </div>
     {/if}
     {#each files as file}
-      <div class="grid grid-cols-5 border-b border-gray-200 py-2">
+      <div
+        class={getFileStyle(file)}
+        on:contextmenu={(e) => rightClickFile(e, file)}
+        on:click={() => clickFile(file)}
+      >
         <div class="col-span-2 px-2">{file.filename}</div>
         <div class="px-2">{file.file_type}</div>
         <div class="px-2">{file.last_modified_at}</div>

@@ -17,6 +17,10 @@ pub async fn post_before_upload(mut req: Request<State>) -> Result {
     }
 
     let upload_req: BeforeUploadRequest = req.body_json().await?;
+    if upload_req.filename.len() == 0 || upload_req.size <= 0 {
+        return Ok(Response::new(StatusCode::BadRequest));
+    }
+
     let mut conn = req.state().get_pool_conn().await?;
     let folder_owner_id = File::find_file_owner(upload_req.parent_id, &mut conn).await?;
     if folder_owner_id != token.uid {

@@ -1,5 +1,5 @@
 import type { IFile, IUploadTask } from './types';
-import { completeFileStore, setProgress, workerStore } from '../utils/store';
+import { completeFileStore, setNotification, setProgress, workerStore } from '../utils/store';
 
 export async function get<T>(url: string): Promise<T> {
   let response: Response;
@@ -44,7 +44,14 @@ export async function upload(task: IUploadTask) {
     size: filesize,
   };
 
-  let uploadId: string = await post("/api/file/before-upload", payload, false);
+  let uploadId: string;
+  try {
+    uploadId = await post("/api/file/before-upload", payload, false);
+  } catch (e) {
+    console.error(e);
+    setNotification("error", "File " + file.name + " upload failed");
+    return;
+  }
 
   let transferredBytes = 0;
   let start = 0;
@@ -77,8 +84,15 @@ export async function upload(task: IUploadTask) {
           upload_id: uploadId,
         };
 
-        const completeFile: IFile = await post(`/api/file/finish-upload`, payload, true);
-        completeFileStore.set(completeFile);
+        try {
+          const completeFile: IFile = await post(`/api/file/finish-upload`, payload, true);
+          completeFileStore.set(completeFile);
+        } catch (e) {
+          console.error(e);
+          setNotification("error", "File " + file.name + " upload failed");
+          return;
+        }
+
       }
     } else if (message.type === "error") {
       // TODO: retry several times.
