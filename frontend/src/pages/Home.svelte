@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { pwdStore, setNotification, completeFileStore } from "../utils/store";
-  import FloatButton from "../components/FloatButton.svelte";
+  import FloatButton from "../sections/FloatButton.svelte";
   import Icon from "../components/Icon.svelte";
   import type { IFile, IFileOrder } from "../utils/types";
   import * as api from "../utils/api";
@@ -116,22 +116,16 @@
   };
 
   const clickFile = (file: IFile) => {
-    if (file === selectedFile) {
-      selectedFile = null;
-    } else {
+    if (file !== selectedFile) {
       selectedFile = file;
+      files = files;
     }
-
-    files = files;
   };
 
   const rightClickFile = (e: Event, file: IFile) => {
     e.preventDefault();
 
-    if (file !== selectedFile) {
-      selectedFile = file;
-      files = files;
-    }
+    clickFile(file);
   };
 </script>
 

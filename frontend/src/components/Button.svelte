@@ -2,7 +2,8 @@
   export let value: string;
   export let onClick: (e) => void;
   export let type: "button" | "submit" = "button";
-  export let spec: "important" | "narrow" | "normal" | "bold" = "normal";
+  export let size: "big" | "normal" | "small" = "normal";
+  export let color: "blue" | "white" | "gray" = "white";
   export let className: string = "";
   export let disabled: boolean = false;
 
@@ -12,19 +13,32 @@
       style += " " + className;
     }
 
-    switch (spec) {
-      case "important":
-        style +=
-          " bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded-lg shadow";
+    switch (size) {
+      case "big":
+        style += " px-4 py-2 rounded-lg shadow text-lg";
         break;
-      case "narrow":
-        style +=
-          " bg-blue-400 hover:bg-blue-500 text-white px-4 rounded shadow";
+      case "small":
+        style += " px-2 rounded shadow";
         break;
-      case "bold":
-        style += " border bg-gray-200 hover:bg-gray-50 px-2 rounded shadow-sm";
       default:
-        style += " border bg-gray-50 hover:bg-gray-100 px-2 rounded shadow-sm";
+        style += " px-2 py-1 rounded shadow";
+        break;
+    }
+
+    switch (color) {
+      case "blue":
+        style += " bg-blue-400 hover:bg-blue-500 text-white";
+        break;
+      case "white":
+        style += " bg-white hover:bg-gray-100 text-black";
+        break;
+      case "gray":
+        style += " bg-gray-100 hover:bg-blue-200";
+        break;
+      case "white":
+        style += " border-gray-500";
+        break;
+      default:
         break;
     }
 

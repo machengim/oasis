@@ -1,4 +1,4 @@
-use super::{site::Site, upload::UploadTask};
+use crate::entity::{site::Site, upload::UploadTask};
 use anyhow::{anyhow, Result};
 use sqlx::{pool::PoolConnection, Pool, Sqlite};
 use std::sync::{Arc, Mutex};
@@ -58,17 +58,17 @@ impl State {
         Ok(site.secret.clone())
     }
 
+    pub fn get_storage(&self) -> Result<String> {
+        let site = self.get_site()?;
+
+        Ok(site.storage.clone())
+    }
+
     pub fn set_first_run(&self, new_first_run: bool) -> Result<()> {
         let mut site = self.get_site()?;
         site.first_run = if new_first_run { 1 } else { 0 };
 
         Ok(())
-    }
-
-    pub fn get_storage(&self) -> Result<String> {
-        let site = self.get_site()?;
-
-        Ok(site.storage.clone())
     }
 
     pub fn set_storage(&self, new_storage: String) -> Result<()> {

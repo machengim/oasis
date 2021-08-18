@@ -1,7 +1,7 @@
-use super::token::Token;
 use crate::args;
-use crate::entity::query::Query;
+use crate::service::token::Token;
 use crate::util::db;
+use crate::util::query::Query;
 use anyhow::{anyhow, Result};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use serde::{Deserialize, Serialize};

@@ -1,9 +1,12 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { addUploadTasks, pwdStore } from "../utils/store";
+  import Modal from "../components/Modal.svelte";
+  import CreateDirModal from "../modals/CreateDirModal.svelte";
 
   let is_checked = false;
   let pwd = +localStorage.getItem("root_dir");
+  let isShowMkdirModal = false;
 
   const unsubscribe = pwdStore.subscribe((value) => {
     if (value > 0 && pwd !== value) {
@@ -27,15 +30,35 @@
   const toggleCheck = () => {
     is_checked = !is_checked;
   };
+
+  const openMkdirModal = () => {
+    isShowMkdirModal = true;
+    is_checked = false;
+  };
+
+  const closeMkdirModal = () => {
+    isShowMkdirModal = false;
+  };
+
+  const mkdirModalContent = () => {
+    return `<div>You're creating a folder inside <b>root</b> folder <br /> 
+      Please enter the folder name:  </div>`;
+  };
 </script>
 
 <div
   class="flex justify-center align-middle fixed bottom-36 right-36 z-10 text-lg"
 >
+  {#if isShowMkdirModal}
+    <CreateDirModal onClose={closeMkdirModal} />
+  {/if}
   <input type="checkbox" id="toggle" checked={is_checked} />
   <div class="button bg-blue-400" on:click={toggleCheck} />
   <div class="menu">
-    <div class="mb-2 hover:bg-gray-200 cursor-pointer px-4 rounded">
+    <div
+      class="mb-2 hover:bg-gray-200 cursor-pointer px-4 rounded"
+      on:click={openMkdirModal}
+    >
       Create folder
     </div>
     <div class="hover:bg-gray-200 px-4 rounded">

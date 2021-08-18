@@ -1,0 +1,45 @@
+<script lang="ts">
+  import Icon from "./Icon.svelte";
+
+  export let size: "small" | "normal" | "big" = "normal";
+  export let clickOutToClose = false;
+  export let title = "Title";
+  export let onClose: () => void;
+  const clickInside = (e: Event) => {
+    e.stopPropagation();
+  };
+</script>
+
+<div
+  class="fixed top-0 left-0 z-40 w-screen h-screen flex flex-col bg-gray-400 bg-opacity-40"
+  on:click={clickOutToClose ? onClose : () => {}}
+>
+  <div
+    class="modal-{size} mx-auto my-60 bg-white border-gray-400 shadow"
+    on:click={clickInside}
+  >
+    <div class="border-b border-gray-200 p-4 flex flex-row justify-between">
+      <div class="text-lg text-black">{title}</div>
+      <Icon
+        type="close"
+        color="gray"
+        size="small"
+        className="cursor-pointer"
+        onClick={onClose}
+      />
+    </div>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .modal-small {
+    min-width: 20rem;
+  }
+  .modal-normal {
+    min-width: 30rem;
+  }
+  .modal-large {
+    min-width: 40rem;
+  }
+</style>

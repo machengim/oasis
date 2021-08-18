@@ -4,6 +4,7 @@
   import { setNotification, pwdStore } from "../utils/store";
   import type { ILoginRequest } from "../utils/types";
   import { navigate } from "svelte-navigator";
+  import { validateForm } from "../utils/util";
 
   let username = "";
   let password = "";
@@ -13,7 +14,7 @@
   const onConfirm = async (e: Event) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (!validateForm(form)) {
       return;
     }
 
@@ -26,15 +27,6 @@
       pwdStore.set(+result);
       navigate("/");
     }
-  };
-
-  const validateForm = (): boolean => {
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return false;
-    }
-
-    return true;
   };
 
   const sendLoginRequest = async () => {
@@ -92,7 +84,8 @@
           value={isLoading ? "Logging in..." : "Login"}
           onClick={onConfirm}
           disabled={isLoading}
-          spec="important"
+          size="big"
+          color="blue"
           type="submit"
         />
       </div>

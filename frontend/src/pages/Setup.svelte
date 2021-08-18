@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
-  import DirBrowser from "../components/DirBrowser.svelte";
+  import DirBrowser from "../sections/DirBrowser.svelte";
   import * as api from "../utils/api";
   import type { ISetupRequest } from "../utils/types";
   import { setNotification } from "../utils/store";
@@ -114,13 +114,15 @@
         <div class="col-span-3 pl-2">
           {#if selectedDir}
             <Button
-              value={"Change"}
+              value="Change"
+              size="small"
               onClick={() => (isOpenDirBrowser = true)}
             />
             <div class="mt-2 break-words">{selectedDir}</div>
           {:else}
             <Button
-              value={"Select"}
+              value="Select"
+              size="small"
               onClick={() => (isOpenDirBrowser = true)}
             />
           {/if}
@@ -134,7 +136,8 @@
           value={isLoading ? "Lauching..." : "Launch"}
           onClick={onConfirm}
           disabled={isLoading}
-          spec="important"
+          size="big"
+          color="blue"
           type="submit"
         />
       </div>

@@ -1,5 +1,5 @@
-use crate::util::db;
-use crate::{args, entity::query::Query};
+use crate::args;
+use crate::util::{db, query::Query};
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::pool::PoolConnection;

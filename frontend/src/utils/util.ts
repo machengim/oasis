@@ -27,3 +27,12 @@ export function formatSize(size: number) {
 
   return size.toFixed(dp) + " " + units[u];
 };
+
+export function validateForm(form: HTMLFormElement) {
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return false;
+  }
+
+  return true;
+};

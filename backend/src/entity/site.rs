@@ -1,16 +1,13 @@
-use std::path::Path;
-
 use super::user::User;
-use super::{query::Query, state::State};
 use crate::{
     args,
-    util::{self, db},
+    util::{db, query::Query},
 };
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use sqlx::{Pool, Sqlite};
-use tide::Request;
+use std::path::Path;
 
 #[derive(Serialize, FromRow, Debug, Clone)]
 pub struct Site {
@@ -43,36 +40,17 @@ impl Site {
             Err(e) => panic!("Cannot read site info from db: {}", e),
         }
     }
-
-    pub fn default() -> Self {
-        let version = util::must_get_env_value("VERSION", 0.1);
-        let created_at = chrono::Utc::now().timestamp().to_string();
-
-        Self {
-            version,
-            first_run: 1,
-            created_at,
-            secret: String::new(),
-            storage: String::new(),
-        }
-    }
 }
 
 impl SetupRequest {
-    pub async fn new(req: &mut Request<State>) -> Result<Self> {
-        let setup_req: Self = match req.body_json().await {
-            Ok(v) => v,
-            Err(e) => return Err(anyhow!("Cannot retrieve setup request: {:?}", e)),
-        };
-
-        if setup_req.username.len() < 1
-            || setup_req.password.len() < 6
-            || !Path::new(&setup_req.storage).exists()
+    pub fn validate(&self) -> Result<bool> {
+        if self.username.len() < 1 || self.password.len() < 6 || !Path::new(&self.storage).exists()
         {
-            return Err(anyhow!("Invalid request data: {:?}", &setup_req));
+            eprintln!("Invalid request data: {:?}", self);
+            return Ok(false);
         }
 
-        Ok(setup_req)
+        Ok(true)
     }
 
     pub fn update_site_query(&self, secret: &str) -> Query {

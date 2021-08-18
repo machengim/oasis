@@ -1,4 +1,4 @@
-use crate::entity::{state::State, token::Token};
+use super::{state::State, token::Token};
 use std::{future::Future, pin::Pin};
 use tide::{Next, Request, Result};
 

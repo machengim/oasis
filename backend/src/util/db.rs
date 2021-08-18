@@ -1,4 +1,4 @@
-use crate::entity::query::Query;
+use super::query::Query;
 use sqlx::pool::PoolConnection;
 use sqlx::sqlite::SqliteRow;
 use sqlx::{Connection, FromRow, Sqlite};

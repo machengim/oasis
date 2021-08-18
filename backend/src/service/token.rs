@@ -14,7 +14,7 @@ pub struct Token {
 
 impl Token {
     pub fn new(uid: i64, permission: i16) -> Self {
-        let token_expire_days: i64 = util::must_get_env_value("TOKEN_EXPIRE_DAYS", 7);
+        let token_expire_days: i64 = util::env::must_get_env_value("TOKEN_EXPIRE_DAYS", 7);
         let expire_time = chrono::Utc::now().timestamp() + token_expire_days * 24 * 60 * 60;
 
         Token {
