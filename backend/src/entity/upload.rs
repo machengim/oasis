@@ -18,13 +18,6 @@ pub struct BeforeUploadRequest {
     pub size: u64,
 }
 
-#[derive(Deserialize)]
-pub struct SliceUploadRequest {
-    pub index: u64,
-    pub hash: String,
-    pub data: Vec<u8>,
-}
-
 #[derive(Deserialize, Default, Debug)]
 pub struct SliceUploadQuery {
     pub index: u64,

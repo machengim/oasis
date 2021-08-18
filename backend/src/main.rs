@@ -33,24 +33,10 @@ async fn main() -> tide::Result<()> {
     // Mount API route
     // Bug of Tide: nested route not working well with serve_dir().
     // app.at("/api").nest(api::api_route(state.clone()));
-    app.at("/api/setup").post(api::site::post_setup);
-    app.at("/api/login").post(api::user::login);
-    app.at("/api/sys/volumes").get(api::sys::get_system_volumes);
-    app.at("api/sys/dirs/:dir").get(api::sys::get_system_dirs);
-    app.at("/api/file/before-upload")
-        .post(api::upload::post_before_upload);
-    app.at("/api/file/upload/:upload_id")
-        .post(api::upload::post_upload);
-    app.at("/api/file/finish-upload")
-        .post(api::upload::post_finish_upload);
-    app.at("/api/file/dir/:dir_id")
-        .get(api::file::get_file_list);
+    app = api::mount_api(app);
 
     // Mount static html page route
-    app.at("/").get(route::get_index);
-    app.at("/index.html").get(route::get_index);
-    app.at("/login").get(route::get_login);
-    app.at("/setup").get(route::get_setup);
+    app = route::mount_static(app);
 
     // Mount static folder
     let front_dir = env::get_front_dir()?;

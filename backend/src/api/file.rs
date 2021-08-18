@@ -11,6 +11,11 @@ pub async fn get_file_list(req: Request<State>) -> Result {
 
     let dir_id: i64 = req.param("dir_id")?.parse()?;
     let mut conn = req.state().get_pool_conn().await?;
+    let request_dir = File::get_file_by_id(dir_id, &mut conn).await?;
+    if request_dir.owner_id != token.uid {
+        return Ok(Response::new(StatusCode::Unauthorized));
+    }
+
     let files = File::get_files_in_dir(dir_id, token.uid, &mut conn).await?;
 
     Ok(json!(files).into())
