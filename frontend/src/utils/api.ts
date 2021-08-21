@@ -68,10 +68,13 @@ export async function upload(task: IUploadTask) {
   worker.onmessage = async (e) => {
     const message = e.data;
     if (message.type === "progress") {
-      transferredBytes += message.data;
-      task.progress = transferredBytes / filesize;
+
+      task.progress = (transferredBytes + message.data) / filesize;
       setProgress(task.id, task.progress);
     } else if (message.type === "done") {
+      transferredBytes = end;
+      task.progress = transferredBytes / filesize;
+
       if (end < filesize) {
         start = end;
         end = Math.min(start + length, filesize);

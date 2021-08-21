@@ -8,8 +8,13 @@
   import Login from "./pages/Login.svelte";
   import Setup from "./pages/Setup.svelte";
   import Error404 from "./pages/Error404.svelte";
+  import { clickEventStore } from "./utils/store";
 
   export let path: string;
+
+  const clicked = () => {
+    clickEventStore.set(+new Date());
+  };
 
   const renderPage = (path: string) => {
     switch (path) {
@@ -25,7 +30,7 @@
   };
 </script>
 
-<main class="relative min-h-screen">
+<main class="relative min-h-screen" on:click={clicked}>
   <Router url={path}>
     <Header {path} />
 

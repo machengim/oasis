@@ -1,21 +1,37 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { addUploadTasks, pwdStore } from "../utils/store";
+  import { addUploadTasks, pwdStore, clickEventStore } from "../utils/store";
   import CreateDirModal from "../modals/CreateDirModal.svelte";
 
   let is_checked = false;
   let pwd = +localStorage.getItem("root_dir");
   let isShowMkdirModal = false;
+  let lastClickTime = 0;
 
-  const unsubscribe = pwdStore.subscribe((value) => {
+  const unsubscribePwd = pwdStore.subscribe((value) => {
     if (value > 0 && pwd !== value) {
       pwd = value;
     }
   });
 
-  onDestroy(() => {
-    unsubscribe();
+  const unsubscribeClickEvent = clickEventStore.subscribe((value) => {
+    if (value > 0) {
+      lastClickTime = value;
+    }
   });
+
+  onDestroy(() => {
+    unsubscribePwd();
+    unsubscribeClickEvent();
+  });
+
+  $: if (lastClickTime > 0) {
+    if (is_checked) {
+      is_checked = false;
+    }
+
+    lastClickTime = 0;
+  }
 
   const selectFile = async (event: Event) => {
     let target = <HTMLInputElement>event.target;
@@ -39,10 +55,15 @@
     isShowMkdirModal = false;
     is_checked = false;
   };
+
+  const stopEvent = (e: Event) => {
+    e.stopPropagation();
+  };
 </script>
 
 <div
   class="flex justify-center align-middle fixed bottom-36 right-36 z-10 text-lg"
+  on:click={stopEvent}
 >
   {#if isShowMkdirModal}
     <CreateDirModal onClose={closeMkdirModal} />

@@ -49,3 +49,6 @@ export const completeFileStore: Writable<IFile> = writable(null);
 
 // upload worker store
 export const workerStore: Writable<Worker> = writable(null);
+
+// Global mouse click event
+export const clickEventStore: Writable<number> = writable(0);

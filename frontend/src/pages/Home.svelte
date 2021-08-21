@@ -1,11 +1,18 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { pwdStore, setNotification, completeFileStore } from "../utils/store";
-  import FloatButton from "../sections/FloatButton.svelte";
+  import {
+    pwdStore,
+    setNotification,
+    completeFileStore,
+    clickEventStore,
+  } from "../utils/store";
   import Icon from "../components/Icon.svelte";
   import type { IFile, IFileOrder } from "../utils/types";
   import * as api from "../utils/api";
   import { formatSize, formatTimestamp } from "../utils/util";
+  import FloatButton from "../sections/FloatButton.svelte";
+  import ContextMenu from "../sections/ContextMenu.svelte";
+  import RenameFileModal from "../modals/RenameFileModal.svelte";
 
   let files: IFile[] = [];
   let newCompleteFile: IFile;
@@ -13,7 +20,11 @@
   let root = +localStorage.getItem("root_dir");
   let pwd = root;
   let order: IFileOrder = { key: "name", asc: true };
-  let selectedFile: IFile = null;
+  let selectedFile: IFile;
+  let isOpenContextMenu = false;
+  let isOpenRenameModal = false;
+  let mouseEvent: MouseEvent = null;
+  let lastGlobalClickTime = 0;
 
   const unsubscribePwd = pwdStore.subscribe((value) => {
     if (value > 0 && pwd !== value) {
@@ -28,9 +39,16 @@
     }
   });
 
+  const unsubscribeClickEvent = clickEventStore.subscribe((value) => {
+    if (value > 0) {
+      lastGlobalClickTime = value;
+    }
+  });
+
   onDestroy(() => {
     unsubscribePwd();
     unsubscribeCompleteFile();
+    unsubscribeClickEvent();
   });
 
   $: if (pwd > 0) {
@@ -43,6 +61,15 @@
 
   $: if (newCompleteFile && newCompleteFile.parent_id === pwd) {
     files = [...files, newCompleteFile];
+    newCompleteFile = null;
+  }
+
+  $: if (lastGlobalClickTime > 0) {
+    if (isOpenContextMenu) {
+      isOpenContextMenu = false;
+    }
+
+    lastGlobalClickTime = 0;
   }
 
   const fetchFiles = async () => {
@@ -106,7 +133,7 @@
   };
 
   const getFileStyle = (file: IFile) => {
-    if (file === selectedFile) {
+    if (selectedFile && file.file_id === selectedFile.file_id) {
       return "grid grid-cols-5 border-b border-gray-200 py-2 bg-blue-400 text-white";
     } else {
       return "grid grid-cols-5 border-b border-gray-200 py-2";
@@ -114,21 +141,49 @@
   };
 
   const clickFile = (file: IFile) => {
-    if (file !== selectedFile) {
+    if (!selectedFile || file.file_id !== selectedFile.file_id) {
       selectedFile = file;
       files = files;
     }
   };
 
-  const rightClickFile = (e: Event, file: IFile) => {
+  const rightClickFile = (e: MouseEvent, file: IFile) => {
     e.preventDefault();
 
     clickFile(file);
+    mouseEvent = e;
+    isOpenContextMenu = true;
+  };
+
+  const closeContextMenu = () => {
+    isOpenContextMenu = false;
+  };
+
+  const closeRenameModal = () => {
+    isOpenRenameModal = false;
+  };
+
+  const onContextMenuAction = (action: "rename" | "delete") => {
+    switch (action) {
+      case "rename":
+        isOpenRenameModal = true;
+        break;
+      default:
+        break;
+    }
+
+    isOpenContextMenu = false;
   };
 </script>
 
 <div class="relative w-full h-full">
   <FloatButton />
+  {#if isOpenContextMenu}
+    <ContextMenu {mouseEvent} onAction={onContextMenuAction} />
+  {/if}
+  {#if isOpenRenameModal}
+    <RenameFileModal {selectedFile} onClose={closeRenameModal} />
+  {/if}
   <div class="w-4/5 h-full mx-auto mt-10">
     <div class="grid grid-cols-5 border-b border-gray-200 py-2 font-bold">
       <div class="col-span-2 px-2 flex flex-row items-center">
