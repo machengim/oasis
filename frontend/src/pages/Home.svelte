@@ -48,7 +48,7 @@
   const fetchFiles = async () => {
     try {
       isLoading = true;
-      files = await api.get(`/api/file/dir/${pwd}`);
+      files = await api.get(`/api/dir/${pwd}`);
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read dir content");

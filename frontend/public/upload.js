@@ -12,7 +12,7 @@ self.onmessage = async (e) => {
     const hash = md5(data);
 
     let xhr = new XMLHttpRequest();
-    let endpoint = `/api/file/upload/${uploadId}?index=${index}&hash=${hash}`;
+    let endpoint = `/api/upload/progress/${uploadId}?index=${index}&hash=${hash}`;
 
     xhr.open('POST', endpoint);
 

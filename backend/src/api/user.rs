@@ -1,17 +1,20 @@
 use crate::entity::file::File;
-use crate::entity::user::LoginRequest;
+use crate::request::user::LoginRequest;
 use crate::service::state::State;
 use crate::util;
 use tide::http::Cookie;
-use tide::{Request, Response, Result};
+use tide::{Request, Response, Result, StatusCode};
 use util::env;
 
 // Post "/api/login".
 pub async fn login(mut req: Request<State>) -> Result {
-    let login_req: LoginRequest = req.body_json().await?;
+    let login_req = LoginRequest::from(&mut req).await?;
+    if !login_req.validate() {
+        return Ok(Response::new(StatusCode::BadRequest));
+    }
+
     let mut conn = req.state().get_pool_conn().await?;
     let secret = req.state().get_secret()?;
-
     let user = login_req.login(&mut conn).await?;
     let token_str = user.generate_token().encode(&secret)?;
     let token_expire_days = env::must_get_env_value("TOKEN_EXPIRE_DAYS", 7);

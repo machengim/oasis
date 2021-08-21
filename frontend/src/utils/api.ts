@@ -46,7 +46,7 @@ export async function upload(task: IUploadTask) {
 
   let uploadId: string;
   try {
-    uploadId = await post("/api/file/before-upload", payload, false);
+    uploadId = await post("/api/upload/prepare", payload, false);
   } catch (e) {
     console.error(e);
     setNotification("error", "File " + file.name + " upload failed");
@@ -85,7 +85,7 @@ export async function upload(task: IUploadTask) {
         };
 
         try {
-          const completeFile: IFile = await post(`/api/file/finish-upload`, payload, true);
+          const completeFile: IFile = await post(`/api/upload/finish`, payload, true);
           completeFileStore.set(completeFile);
         } catch (e) {
           console.error(e);

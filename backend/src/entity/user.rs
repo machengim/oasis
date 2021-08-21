@@ -2,9 +2,9 @@ use crate::args;
 use crate::service::token::Token;
 use crate::util::db;
 use crate::util::query::Query;
-use anyhow::{anyhow, Result};
-use bcrypt::{hash, verify, DEFAULT_COST};
-use serde::{Deserialize, Serialize};
+use anyhow::Result;
+use bcrypt::{hash, DEFAULT_COST};
+use serde::Serialize;
 use sqlx::{pool::PoolConnection, FromRow, Sqlite};
 
 #[derive(Serialize, FromRow, Debug, Default)]
@@ -14,12 +14,6 @@ pub struct User {
     pub password: String,
     pub permission: i16,
     pub created_at: String,
-}
-
-#[derive(Deserialize)]
-pub struct LoginRequest {
-    pub username: String,
-    pub password: String,
 }
 
 impl User {
@@ -44,25 +38,5 @@ impl User {
 
     pub fn generate_token(&self) -> Token {
         Token::new(self.user_id, self.permission)
-    }
-}
-
-impl LoginRequest {
-    pub async fn login(&self, conn: &mut PoolConnection<Sqlite>) -> Result<User> {
-        let query = Query::new(
-            "select * from USER where username = ?1",
-            args![&self.username],
-        );
-        let user_option: Option<User> = db::fetch_single(query, conn).await?;
-        match user_option {
-            Some(user) => {
-                if verify(&self.password, &user.password)? {
-                    Ok(user)
-                } else {
-                    Err(anyhow!("Password not match"))
-                }
-            }
-            None => Err(anyhow!("No such user in database")),
-        }
     }
 }

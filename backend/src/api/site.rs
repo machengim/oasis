@@ -1,13 +1,13 @@
 use crate::entity::user::User;
+use crate::request::site::SetupRequest;
 use crate::service::init;
 use crate::service::state::State;
-use crate::util::db;
-use crate::{entity::site::SetupRequest, util};
+use crate::util::{self, db};
 use tide::{Request, Response, Result, StatusCode};
 
 // post "api/setup"
 pub async fn post_setup(mut req: Request<State>) -> Result {
-    let mut setup_req: SetupRequest = req.body_json().await?;
+    let mut setup_req = SetupRequest::from(&mut req).await?;
     if !setup_req.validate()? {
         return Ok(Response::new(StatusCode::BadRequest));
     }
