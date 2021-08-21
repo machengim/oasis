@@ -14,16 +14,16 @@ use util::env;
 pub struct PrepareUploadRequest {
     pub filename: String,
     pub parent_id: i64,
-    pub size: u64,
+    pub size: i64,
+    pub last_modified_at: i64,
 }
 
-#[derive(Deserialize, Default, Debug)]
+#[derive(Deserialize, Default)]
 pub struct SliceUploadQuery {
     pub index: u64,
     pub hash: String,
 }
 
-#[derive(Deserialize, Default, Debug)]
 pub struct SliceUploadRequest {
     pub index: u64,
     pub hash: String,
@@ -79,6 +79,7 @@ impl PrepareUploadRequest {
             owner_id,
             path: String::new(),
             file_type: util::infer_file_type(&self.filename),
+            last_modified_at: self.last_modified_at,
         }
     }
 }

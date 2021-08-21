@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS site (
 	first_run INTEGER NOT NULL DEFAULT 1,
   	storage TEXT,
 	secret TEXT,
-	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+	created_at INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user (
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS user (
 	username TEXT NOT NULL UNIQUE,
   	password TEXT NOT NULL,
   	permission INTEGER NOT NULL DEFAULT 1,
-	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+	created_at INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS file (
@@ -23,8 +23,5 @@ CREATE TABLE IF NOT EXISTS file (
   	file_type TEXT,
   	owner_id INTEGER NOT NULL,
   	parent_id INTEGER NOT NULL,
-	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  	last_modified_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  	last_modified_at INTEGER NOT NULL
 );
-
-INSERT INTO site(version, created_at) VALUES(0.1, datetime());

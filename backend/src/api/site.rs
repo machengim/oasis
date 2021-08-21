@@ -21,9 +21,10 @@ pub async fn post_setup(mut req: Request<State>) -> Result {
     let secret = util::generate_secret_key();
 
     setup_req.storage = storage_path.to_string_lossy().to_string();
-    let insert_user_sql = setup_req.init_admin_query()?;
-    let prepare_root_sql = setup_req.prepare_root_in_db_query();
-    let setup_site_sql = setup_req.update_site_query(&secret);
+    let insert_user_sql = User::from_setup_req(&setup_req).insert_user_query()?;
+    let prepare_root_sql = setup_req.prepare_root_in_db_query(setup_req.time.unwrap());
+    let setup_site_sql = setup_req.init_site_query(&secret);
+
     db::tx_execute(
         vec![insert_user_sql, prepare_root_sql, setup_site_sql],
         &mut conn,

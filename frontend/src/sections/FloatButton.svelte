@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { addUploadTasks, pwdStore } from "../utils/store";
-  import Modal from "../components/Modal.svelte";
   import CreateDirModal from "../modals/CreateDirModal.svelte";
 
   let is_checked = false;
@@ -38,11 +37,7 @@
 
   const closeMkdirModal = () => {
     isShowMkdirModal = false;
-  };
-
-  const mkdirModalContent = () => {
-    return `<div>You're creating a folder inside <b>root</b> folder <br /> 
-      Please enter the folder name:  </div>`;
+    is_checked = false;
   };
 </script>
 

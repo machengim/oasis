@@ -1,9 +1,12 @@
 use crate::args;
+use crate::request::file::CreateDirRequest;
 use crate::util::{db, query::Query};
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::pool::PoolConnection;
 use sqlx::{FromRow, Sqlite};
+
+use super::upload::UploadTask;
 
 #[derive(Deserialize, Serialize, FromRow, Debug)]
 pub struct File {
@@ -14,11 +17,63 @@ pub struct File {
     pub file_type: String,
     pub owner_id: i64,
     pub parent_id: i64,
-    pub created_at: String,
-    pub last_modified_at: String,
+    pub last_modified_at: i64,
 }
 
 impl File {
+    pub fn from_create_dir_req(dir_req: &CreateDirRequest) -> Self {
+        let now = chrono::Utc::now().timestamp_millis();
+
+        Self {
+            file_id: -1,
+            filename: dir_req.dir_name.to_string(),
+            path: String::new(),
+            size: -1,
+            file_type: "Dir".to_string(),
+            owner_id: dir_req.user_id.unwrap(),
+            parent_id: dir_req.parent_id,
+            last_modified_at: now,
+        }
+    }
+
+    pub fn from_upload_task(task: &UploadTask) -> Self {
+        Self {
+            file_id: -1,
+            filename: task.filename.to_string(),
+            path: task.path.to_string(),
+            size: task.size,
+            file_type: task.file_type.to_string(),
+            owner_id: task.owner_id,
+            parent_id: task.parent_id,
+            last_modified_at: task.last_modified_at,
+        }
+    }
+
+    pub async fn insert_to_db(mut self, conn: &mut PoolConnection<Sqlite>) -> Result<Self> {
+        let query = self.insert_to_db_query()?;
+        self.file_id = db::insert_single(query, conn).await?;
+
+        Ok(self)
+    }
+
+    pub fn insert_to_db_query(&self) -> Result<Query<'_>> {
+        let sql = "insert into FILE (filename, path, size, file_type, owner_id, parent_id, last_modified_at) values (?1, ?2, ?3, ?4, ?5, ?6, ?7)";
+        let query = Query::new(
+            sql,
+            args!(
+                &self.filename,
+                &self.path,
+                self.size,
+                self.file_type,
+                self.owner_id,
+                self.parent_id,
+                self.last_modified_at
+            ),
+        );
+
+        Ok(query)
+    }
+
     pub async fn get_files_in_dir(
         dir: i64,
         owner: i64,

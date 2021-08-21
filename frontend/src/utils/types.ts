@@ -36,7 +36,7 @@ export interface IFile {
   owner_id: number,
   parent_id: number,
   created_at: string,
-  last_modified_at: string,
+  last_modified_at: number,
 }
 
 export interface IFileOrder {

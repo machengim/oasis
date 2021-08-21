@@ -1,10 +1,8 @@
 use crate::{
     entity::file::File,
-    request::upload::{
-        FinishUploadRequest, PrepareUploadRequest, SliceUploadQuery, SliceUploadRequest,
-    },
+    request::upload::{FinishUploadRequest, PrepareUploadRequest, SliceUploadRequest},
     service::{state::State, token::Token},
-    util::{self, db},
+    util,
 };
 use tide::{convert::json, Request, Response, Result, StatusCode};
 
@@ -58,11 +56,12 @@ pub async fn post_finish_upload(mut req: Request<State>) -> Result {
     let storage = req.state().get_storage()?;
     task.combine_slices(&storage).await?;
 
-    let insert_file_query = task.insert_file_query()?;
     let mut conn = req.state().get_pool_conn().await?;
-    let id = db::insert_single(insert_file_query, &mut conn).await?;
+
+    let file = File::from_upload_task(&task)
+        .insert_to_db(&mut conn)
+        .await?;
     req.state().remove_task(task)?;
 
-    let file = File::get_file_by_id(id, &mut conn).await?;
     Ok(json!(file).into())
 }

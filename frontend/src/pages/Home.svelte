@@ -5,7 +5,7 @@
   import Icon from "../components/Icon.svelte";
   import type { IFile, IFileOrder } from "../utils/types";
   import * as api from "../utils/api";
-  import { formatSize } from "../utils/util";
+  import { formatSize, formatTimestamp } from "../utils/util";
 
   let files: IFile[] = [];
   let newCompleteFile: IFile;
@@ -92,9 +92,7 @@
         result = a.size - b.size;
         break;
       case "lastModify":
-        const aTime = Date.parse(a.last_modified_at);
-        const bTime = Date.parse(b.last_modified_at);
-        result = aTime > bTime ? 1 : aTime < bTime ? -1 : 0;
+        result = a.last_modified_at - b.last_modified_at;
         break;
       case "type":
         result =
@@ -195,7 +193,7 @@
       >
         <div class="col-span-2 px-2">{file.filename}</div>
         <div class="px-2">{file.file_type}</div>
-        <div class="px-2">{file.last_modified_at}</div>
+        <div class="px-2">{formatTimestamp(file.last_modified_at)}</div>
         <div class="px-2">{formatSize(file.size)}</div>
       </div>
     {/each}

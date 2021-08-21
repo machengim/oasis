@@ -2,9 +2,13 @@ export function upperFirstChar(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
+export function formatTimestamp(timestamp: number) {
+  return new Date(timestamp).toISOString().slice(0, 19).replace("T", " ");
+}
+
 export function formatSize(size: number) {
   if (size < 0) {
-    return null;
+    return "-";
   }
 
   if (size < 1024) {

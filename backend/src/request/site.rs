@@ -1,4 +1,4 @@
-use crate::{args, entity::user::User, service::state::State, util::query::Query};
+use crate::{args, service::state::State, util::query::Query};
 use anyhow::Result;
 use serde::Deserialize;
 use std::path::Path;
@@ -9,11 +9,15 @@ pub struct SetupRequest {
     pub username: String,
     pub password: String,
     pub storage: String,
+    pub time: Option<i64>,
 }
 
 impl SetupRequest {
     pub async fn from(req: &mut Request<State>) -> tide::Result<Self> {
-        Ok(req.body_json().await?)
+        let mut setup_req: Self = req.body_json().await?;
+        setup_req.time = Some(chrono::Utc::now().timestamp_millis());
+
+        Ok(setup_req)
     }
 
     pub fn validate(&self) -> Result<bool> {
@@ -26,24 +30,23 @@ impl SetupRequest {
         Ok(true)
     }
 
-    pub fn update_site_query(&self, secret: &str) -> Query {
-        Query::new(
-            "update SITE set first_run = ?1, storage = ?2, secret = ?3",
-            args![0, &self.storage, secret],
-        )
+    pub fn init_site_query(&self, secret: &str) -> Query {
+        let now = self.time.unwrap();
+        let sql = "insert into SITE (version, first_run, storage, secret, created_at) values (?1, ?2, ?3, ?4, ?5)";
+        Query::new(sql, args![0.1, 0, &self.storage, secret, now])
     }
 
-    pub fn init_admin_query<'a>(&self) -> Result<Query<'a>> {
-        let mut user = User::default();
-        user.username = self.username.clone();
-        user.password = self.password.clone();
-        user.permission = 9;
+    // pub fn init_admin_query<'a>(&self) -> Result<Query<'a>> {
+    //     let mut user = User::default();
+    //     user.username = self.username.clone();
+    //     user.password = self.password.clone();
+    //     user.permission = 9;
 
-        Ok(user.insert_user_query()?)
-    }
+    //     Ok(user.insert_user_query()?)
+    // }
 
-    pub fn prepare_root_in_db_query(&self) -> Query {
-        let sql = "insert into FILE(filename, size, file_type, owner_id, parent_id) values(?1, ?2, ?3, (select user_id from USER where username = ?4), ?5)";
-        Query::new(sql, args!["root", 0, "root", &self.username, 0])
+    pub fn prepare_root_in_db_query(&self, time: i64) -> Query {
+        let sql = "insert into FILE(filename, size, file_type, owner_id, parent_id, last_modified_at) values(?1, ?2, ?3, (select user_id from USER where username = ?4), ?5, ?6)";
+        Query::new(sql, args!["root", 0, "root", &self.username, 0, time])
     }
 }

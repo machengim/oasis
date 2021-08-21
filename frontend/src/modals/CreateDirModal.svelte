@@ -3,9 +3,10 @@
   import Button from "../components/Button.svelte";
   import Modal from "../components/Modal.svelte";
   import { validateForm } from "../utils/util";
-  import { pwdStore } from "../utils/store";
+  import { pwdStore, completeFileStore, setNotification } from "../utils/store";
   import * as api from "../utils/api";
   import { subscribe } from "svelte/internal";
+  import type { IFile } from "../utils/types";
 
   export let onClose: () => void;
   let form: HTMLFormElement;
@@ -36,10 +37,17 @@
   const sendCreateFolderRequest = async () => {
     const payload = {
       parent_id: pwd,
-      folder_name: folderName,
+      dir_name: folderName,
     };
 
-    console.log("payload: ", payload);
+    try {
+      const result: IFile = await api.post("/api/dir", payload, true);
+      completeFileStore.set(result);
+      onClose();
+    } catch (e) {
+      console.error(e);
+      setNotification("error", "Dir " + folderName + " created failed");
+    }
   };
 </script>
 

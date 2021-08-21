@@ -7,12 +7,21 @@ use sqlx::{Pool, Sqlite};
 pub struct Site {
     pub version: f64,
     pub first_run: u8,
-    pub created_at: String,
+    pub created_at: i64,
     pub secret: String,
     pub storage: String,
 }
 
 impl Site {
+    fn default() -> Self {
+        Self {
+            version: 0.1,
+            first_run: 1,
+            created_at: 0,
+            secret: String::new(),
+            storage: String::new(),
+        }
+    }
     // The pool value is only passed at the initialization of app.
     // Later on the pool connection has to be acquired from app state.
     pub async fn init_read(pool: &Pool<Sqlite>) -> Self {
@@ -23,8 +32,7 @@ impl Site {
         };
         match db::fetch_single::<Site>(query, &mut conn).await {
             Ok(Some(site)) => site,
-            Ok(None) => panic!("No site record in db"),
-            Err(e) => panic!("Cannot read site info from db: {}", e),
+            _ => Site::default(),
         }
     }
 }

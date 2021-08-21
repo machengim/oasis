@@ -1,7 +1,7 @@
-use crate::args;
 use crate::service::token::Token;
 use crate::util::db;
 use crate::util::query::Query;
+use crate::{args, request::site::SetupRequest};
 use anyhow::Result;
 use bcrypt::{hash, DEFAULT_COST};
 use serde::Serialize;
@@ -13,10 +13,20 @@ pub struct User {
     pub username: String,
     pub password: String,
     pub permission: i16,
-    pub created_at: String,
+    pub created_at: i64,
 }
 
 impl User {
+    pub fn from_setup_req(req: &SetupRequest) -> Self {
+        Self {
+            user_id: -1,
+            username: req.username.to_string(),
+            password: req.password.to_string(),
+            permission: 9,
+            created_at: req.time.unwrap(),
+        }
+    }
+
     pub async fn find_exist_username(
         username: &str,
         conn: &mut PoolConnection<Sqlite>,
@@ -31,8 +41,13 @@ impl User {
         let encrypt_password = hash(&self.password, DEFAULT_COST)?;
 
         Ok(Query::new(
-            "insert into USER (username, password, permission) values (?1, ?2, ?3)",
-            args![&self.username, encrypt_password, self.permission],
+            "insert into USER (username, password, permission, created_at) values (?1, ?2, ?3, ?4)",
+            args![
+                &self.username,
+                encrypt_password,
+                self.permission,
+                self.created_at
+            ],
         ))
     }
 

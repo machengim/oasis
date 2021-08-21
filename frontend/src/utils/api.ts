@@ -42,6 +42,7 @@ export async function upload(task: IUploadTask) {
     filename: file.name,
     parent_id: task.parent_id,
     size: filesize,
+    last_modified_at: file.lastModified
   };
 
   let uploadId: string;
