@@ -1,6 +1,6 @@
-use crate::args;
 use crate::request::file::CreateDirRequest;
 use crate::util::{db, query::Query};
+use crate::{args, util};
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::pool::PoolConnection;
@@ -72,6 +72,31 @@ impl File {
         );
 
         Ok(query)
+    }
+
+    // TODO: delete folder
+    pub async fn delete(&self, storage: &str, conn: &mut PoolConnection<Sqlite>) -> Result<()> {
+        match &self.file_type.to_lowercase()[..] {
+            "dir" => Ok(()),
+            "root" => return Err(anyhow!("Cannot remove root directory")),
+            _ => self.delete_single_file(storage, conn).await,
+        }
+    }
+
+    async fn delete_single_file(
+        &self,
+        storage: &str,
+        conn: &mut PoolConnection<Sqlite>,
+    ) -> Result<()> {
+        let file_path = util::env::get_files_dir(storage).join(&self.path);
+        if file_path.exists() {
+            async_std::fs::remove_file(file_path).await?;
+        }
+
+        let sql = "delete from FILE where file_id = ?1";
+        let query = Query::new(sql, args![self.file_id]);
+        db::execute(query, conn).await?;
+        Ok(())
     }
 
     pub async fn get_files_in_dir(

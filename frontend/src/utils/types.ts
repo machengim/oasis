@@ -43,3 +43,8 @@ export interface IFileOrder {
   key: "name" | "type" | "size" | "lastModify",
   asc: boolean,
 }
+
+export interface IFileAction {
+  action: "modify" | "delete" | "move",
+  file: IFile,
+}

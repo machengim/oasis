@@ -23,5 +23,8 @@ pub fn mount_api(mut app: Server<State>) -> Server<State> {
     app.at("/api/dir/:dir_id").get(file::get_dir_list);
     app.at("/api/dir").post(file::post_create_dir);
 
+    app.at("/api/file/:file_id").put(file::put_rename_file);
+    app.at("/api/file/:file_id").delete(file::delete_file);
+
     app
 }

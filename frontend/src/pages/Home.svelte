@@ -5,9 +5,10 @@
     setNotification,
     completeFileStore,
     clickEventStore,
+    fileActionStore,
   } from "../utils/store";
   import Icon from "../components/Icon.svelte";
-  import type { IFile, IFileOrder } from "../utils/types";
+  import type { IFile, IFileAction, IFileOrder } from "../utils/types";
   import * as api from "../utils/api";
   import { formatSize, formatTimestamp } from "../utils/util";
   import FloatButton from "../sections/FloatButton.svelte";
@@ -45,11 +46,22 @@
     }
   });
 
+  const unsubscribeFileAction = fileActionStore.subscribe((value) => {
+    if (value && value.file.parent_id === pwd) {
+      handleFileAction(value);
+    }
+  });
+
   onDestroy(() => {
     unsubscribePwd();
     unsubscribeCompleteFile();
     unsubscribeClickEvent();
+    unsubscribeFileAction();
   });
+
+  $: if (files) {
+    console.log(files);
+  }
 
   $: if (pwd > 0) {
     fetchFiles();
@@ -81,6 +93,23 @@
       setNotification("error", "Cannot read dir content");
     }
     isLoading = false;
+  };
+
+  const handleFileAction = (fileAction: IFileAction) => {
+    switch (fileAction.action) {
+      case "modify":
+        let id = files.findIndex(
+          (file) => file.file_id === fileAction.file.file_id
+        );
+        if (id >= 0) {
+          files[id] = fileAction.file;
+          files = files;
+        }
+        break;
+
+      default:
+        break;
+    }
   };
 
   const changeOrder = (key: "name" | "type" | "size" | "lastModify") => {
@@ -163,10 +192,36 @@
     isOpenRenameModal = false;
   };
 
+  const sendDeleteFileRequest = async () => {
+    let endpoint = `/api/file/${selectedFile.file_id}`;
+
+    try {
+      await api.remove(endpoint, null, false);
+      removeFileFromList(selectedFile);
+    } catch (e) {
+      console.error(e);
+      setNotification("error", `Remove file ${selectedFile.filename} failed`);
+    }
+  };
+
+  const removeFileFromList = (file: IFile) => {
+    if (file.parent_id === pwd) {
+      files = files.filter((f) => f.file_id !== file.file_id);
+    }
+  };
+
   const onContextMenuAction = (action: "rename" | "delete") => {
     switch (action) {
       case "rename":
         isOpenRenameModal = true;
+        break;
+      case "delete":
+        let confirm = window.confirm(
+          `Are you sure you want to delete ${selectedFile.filename} ?`
+        );
+        if (confirm) {
+          sendDeleteFileRequest();
+        }
         break;
       default:
         break;

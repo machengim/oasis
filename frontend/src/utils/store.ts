@@ -1,5 +1,5 @@
 import { Writable, writable } from 'svelte/store';
-import type { IProgress, INotification, IUploadTask, IFile } from './types';
+import type { IProgress, INotification, IUploadTask, IFile, IFileAction } from './types';
 
 // Current dir store
 export const pwdStore: Writable<number> = writable(0);
@@ -46,6 +46,9 @@ export function addUploadTasks(files: FileList, parent_id: number) {
 
 // finished upload file store
 export const completeFileStore: Writable<IFile> = writable(null);
+
+// finished update file store
+export const fileActionStore: Writable<IFileAction> = writable(null);
 
 // upload worker store
 export const workerStore: Writable<Worker> = writable(null);

@@ -3,6 +3,8 @@
   import Button from "../components/Button.svelte";
   import { validateForm } from "../utils/util";
   import type { IFile } from "../utils/types";
+  import * as api from "../utils/api";
+  import { setNotification, fileActionStore } from "../utils/store";
 
   export let onClose: () => void;
   export let selectedFile: IFile;
@@ -22,11 +24,23 @@
 
   const sendRenameFileRequest = async () => {
     const payload = {
-      file_id: selectedFile.file_id,
       filename,
     };
 
-    console.log(payload);
+    isSaving = true;
+
+    try {
+      const endpoint = `/api/file/${selectedFile.file_id}`;
+      await api.put(endpoint, payload, false);
+      selectedFile.filename = filename;
+      fileActionStore.set({ action: "modify", file: selectedFile });
+      onClose();
+    } catch (e) {
+      console.error(e);
+      setNotification("error", `Rename file ${selectedFile.filename} failed`);
+    }
+
+    isSaving = false;
   };
 </script>
 
