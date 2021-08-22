@@ -20,7 +20,7 @@ pub fn mount_api(mut app: Server<State>) -> Server<State> {
     app.at("/api/upload/finish")
         .post(upload::post_finish_upload);
 
-    app.at("/api/dir/:dir_id").get(file::get_dir_list);
+    app.at("/api/file/:file_id").get(file::get_file);
     app.at("/api/dir").post(file::post_create_dir);
 
     app.at("/api/file/:file_id").put(file::put_rename_file);

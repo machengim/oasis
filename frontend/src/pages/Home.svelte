@@ -59,10 +59,6 @@
     unsubscribeFileAction();
   });
 
-  $: if (files) {
-    console.log(files);
-  }
-
   $: if (pwd > 0) {
     fetchFiles();
   }
@@ -87,7 +83,7 @@
   const fetchFiles = async () => {
     try {
       isLoading = true;
-      files = await api.get(`/api/dir/${pwd}`);
+      files = await api.get(`/api/file/${pwd}`);
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read dir content");

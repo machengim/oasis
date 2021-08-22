@@ -56,7 +56,7 @@
       await api.post("/api/setup", payload, false);
       setNotification("success", "Launched successfully.");
     } catch (e) {
-      console.log(e);
+      console.error(e);
       if (e.message === "409") {
         setNotification("error", "Username existed.");
       } else {

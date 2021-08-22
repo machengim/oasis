@@ -8,8 +8,8 @@ self.onmessage = async (e) => {
     uploadId = message.data;
   } else {
     const dataArray = new Uint8Array(message);
-    const data = [...dataArray];
-    const hash = md5(data);
+    // const data = [...dataArray];
+    const hash = md5(dataArray);
 
     let xhr = new XMLHttpRequest();
     let endpoint = `/api/upload/progress/${uploadId}?index=${index}&hash=${hash}`;

@@ -53,7 +53,7 @@
       level = back ? level - 1 : level + 1;
       back = false;
     } catch (e) {
-      console.log(e);
+      console.error(e);
       setNotification("error", "Cannot read directory");
     } finally {
       isLoading = false;

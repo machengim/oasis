@@ -119,7 +119,7 @@ impl File {
 
         match db::fetch_single::<File>(query, conn).await? {
             Some(v) => Ok(v),
-            None => Err(anyhow!("No root dir found for user")),
+            None => Err(anyhow!("Cannot find file with id {}", file_id)),
         }
     }
 
@@ -139,7 +139,7 @@ impl File {
 
         match db::fetch_single::<File>(query, conn).await? {
             Some(v) => Ok(v.owner_id),
-            None => Err(anyhow!("No root dir found for user")),
+            None => Err(anyhow!("Cannot find file with id {}", file_id)),
         }
     }
 }

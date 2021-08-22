@@ -40,7 +40,7 @@
       setNotification("success", "Login successfully,");
       return result;
     } catch (e) {
-      console.log(e);
+      console.error(e);
       setNotification("error", "Login failed.");
       return null;
     }

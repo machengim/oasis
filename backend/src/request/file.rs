@@ -10,8 +10,8 @@ use sqlx::{pool::PoolConnection, Sqlite};
 use tide::Request;
 
 #[derive(Deserialize)]
-pub struct DirListRequest {
-    pub dir_id: i64,
+pub struct GetFileRequest {
+    pub file_id: i64,
     pub user_id: i64,
 }
 
@@ -36,11 +36,11 @@ pub struct DeleteFileRequest {
     pub user_id: i64,
 }
 
-impl DirListRequest {
+impl GetFileRequest {
     pub fn from(req: &Request<State>) -> tide::Result<Self> {
-        let dir_id_str = req.param("dir_id")?;
+        let file_id_str = req.param("file_id")?;
 
-        let dir_id = match dir_id_str.parse::<i64>() {
+        let file_id = match file_id_str.parse::<i64>() {
             Ok(v) => v,
             _ => -1,
         };
@@ -48,13 +48,13 @@ impl DirListRequest {
         let token = Token::from_ext(&req)?;
 
         Ok(Self {
-            dir_id,
+            file_id,
             user_id: token.uid,
         })
     }
 
     pub fn validate(&self) -> bool {
-        self.dir_id > 0
+        self.file_id > 0
     }
 
     pub async fn auth(&self, conn: &mut PoolConnection<Sqlite>) -> Result<bool> {
@@ -62,7 +62,7 @@ impl DirListRequest {
             return Ok(false);
         }
 
-        let request_dir = File::get_file_by_id(self.dir_id, conn).await?;
+        let request_dir = File::get_file_by_id(self.file_id, conn).await?;
         if request_dir.owner_id != self.user_id {
             return Ok(false);
         }

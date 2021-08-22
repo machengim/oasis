@@ -1,24 +1,34 @@
-use crate::request::file::{DeleteFileRequest, DirListRequest, RenameFileRequest};
+use crate::request::file::{DeleteFileRequest, GetFileRequest, RenameFileRequest};
 use crate::service::state::State;
 use crate::util::db;
 use crate::{entity::file::File, request::file::CreateDirRequest};
+use async_std::path::Path;
+use std::path::PathBuf;
 use tide::{convert::json, Request, Response, Result, StatusCode};
 
-// Get "/api/dir/:dir_id".
-pub async fn get_dir_list(req: Request<State>) -> Result {
-    let dir_req = DirListRequest::from(&req)?;
+// Get "/api/file/:file_id".
+pub async fn get_file(req: Request<State>) -> Result {
+    let get_file_req = GetFileRequest::from(&req)?;
     let mut conn = req.state().get_pool_conn().await?;
 
-    if !dir_req.validate() {
+    if !get_file_req.validate() {
         return Ok(Response::new(StatusCode::BadRequest));
     }
-    if !dir_req.auth(&mut conn).await? {
+    if !get_file_req.auth(&mut conn).await? {
         return Ok(Response::new(StatusCode::Unauthorized));
     }
 
-    let files = File::get_files_in_dir(dir_req.dir_id, dir_req.user_id, &mut conn).await?;
+    let target_file = File::get_file_by_id(get_file_req.file_id, &mut conn).await?;
 
-    Ok(json!(files).into())
+    match &target_file.file_type.to_lowercase()[..] {
+        "root" | "dir" => {
+            let files =
+                File::get_files_in_dir(get_file_req.file_id, get_file_req.user_id, &mut conn)
+                    .await?;
+            Ok(json!(files).into())
+        }
+        _ => Ok(get_range_file(&req, target_file).await?),
+    }
 }
 
 // Post "/api/dir"
@@ -72,4 +82,34 @@ pub async fn delete_file(req: Request<State>) -> Result {
     file.delete(&storage, &mut conn).await?;
 
     Ok(Response::new(200))
+}
+
+async fn get_range_file(req: &Request<State>, file: File) -> Result {
+    use crate::entity::range::{get_header_contents, get_range_length, read_file_meta};
+
+    let range_header = req.header("Range");
+    let storage = req.state().get_storage()?;
+    // let path = PathBuf::from(storage).join(file.path);
+    let path = PathBuf::from("/home/ma/Temp/lust.mp4");
+    let (mut file, size) = match read_file_meta(&path) {
+        Ok((file, size)) => (file, size),
+        Err(_) => return Ok(Response::new(StatusCode::InternalServerError)),
+    };
+    // let file_type = read_file_ext(&path);
+
+    let (start, end) = get_range_length(size, range_header);
+    let len = end - start + 1;
+
+    let (contents, content_range) = match get_header_contents(start, end, size, &mut file) {
+        Ok((v, l)) => (v, l),
+        Err(_) => return Ok(Response::new(StatusCode::InternalServerError)),
+    };
+
+    let mut res = Response::new(StatusCode::PartialContent);
+    // res.insert_header("Content-Type", file_type);
+    res.insert_header("Content-Range", content_range);
+    res.insert_header("Content-Length", len.to_string());
+    res.set_body(contents);
+
+    Ok(res)
 }
