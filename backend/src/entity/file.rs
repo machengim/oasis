@@ -190,4 +190,15 @@ impl File {
             None => Err(anyhow!("Cannot find file with id {}", file_id)),
         }
     }
+
+    // TODO: complete the mime types
+    pub fn to_http_type(&self) -> String {
+        let result = match self.file_type.to_lowercase().as_str() {
+            "video" => "video/mp4",
+            "pdf" => "application/pdf",
+            _ => "application/octet-stream",
+        };
+
+        String::from(result)
+    }
 }

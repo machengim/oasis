@@ -33,13 +33,27 @@
 </div>
 
 <style>
-  .modal-small {
-    min-width: 20rem;
+  @media only screen and (min-width: 600px) {
+    .modal-small {
+      min-width: 12rem;
+    }
+    .modal-normal {
+      min-width: 16rem;
+    }
+    .modal-large {
+      min-width: 20rem;
+    }
   }
-  .modal-normal {
-    min-width: 30rem;
-  }
-  .modal-large {
-    min-width: 40rem;
+
+  @media only screen and (min-width: 1024px) {
+    .modal-small {
+      min-width: 20rem;
+    }
+    .modal-normal {
+      min-width: 30rem;
+    }
+    .modal-large {
+      min-width: 40rem;
+    }
   }
 </style>

@@ -6,6 +6,7 @@
     completeFileStore,
     clickEventStore,
     fileActionStore,
+    filesStore,
   } from "../utils/store";
   import Icon from "../components/Icon.svelte";
   import type {
@@ -94,6 +95,7 @@
       let res: IFileListResponse = await api.get(`/api/file/${dir_id}`);
       files = res.files;
       dirs = res.dirs;
+      filesStore.set(files);
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read dir content");
@@ -194,6 +196,8 @@
   const dbClickFile = (file: IFile) => {
     if (checkDir(file)) {
       navigate(`/files/${file.file_id}`);
+    } else {
+      navigate(`/detail/${file.file_id}`);
     }
   };
 
@@ -264,7 +268,7 @@
   {#if isOpenRenameModal}
     <RenameFileModal {selectedFile} onClose={closeRenameModal} />
   {/if}
-  <div class="w-4/5 h-full mx-auto mt-10">
+  <div class="w-11/12 lg:w-4/5 h-full mx-auto mt-4 lg:mt-10">
     <div class="grid grid-cols-5 border-b border-gray-200 py-2 font-bold">
       <div class="col-span-2 px-2 flex flex-row items-center">
         <span

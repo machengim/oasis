@@ -62,7 +62,7 @@
 </script>
 
 <div
-  class="flex justify-center align-middle fixed bottom-36 right-36 z-10 text-lg"
+  class="flex justify-center align-middle fixed bottom-12 right-12 lg:bottom-36 lg:right-36 z-10 text-lg"
   on:click={stopEvent}
 >
   {#if isShowMkdirModal}

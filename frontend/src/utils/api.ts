@@ -64,7 +64,6 @@ export async function remove<T, S>(url: string, payload: T, jsonResponse: boolea
   return jsonResponse ? await response.json() : await response.text();
 }
 
-// TODO: process uploading.
 export async function upload(task: IUploadTask) {
   const file = task.file;
   const filesize = file.size;
@@ -89,8 +88,8 @@ export async function upload(task: IUploadTask) {
   let transferredBytes = 0;
   let start = 0;
   let end = Math.min(start + length, filesize);
-  let slice = file.slice(start, end);
-  let buffer = await slice.arrayBuffer();
+  const slice = file.slice(start, end);
+  const buffer = await slice.arrayBuffer();
 
   const worker = new Worker('/upload.js');
   workerStore.set(worker);
@@ -110,8 +109,8 @@ export async function upload(task: IUploadTask) {
       if (end < filesize) {
         start = end;
         end = Math.min(start + length, filesize);
-        slice = file.slice(start, end);
-        buffer = await slice.arrayBuffer();
+        const slice = file.slice(start, end);
+        const buffer = await slice.arrayBuffer();
 
         worker.postMessage(buffer, [buffer]);
       } else {

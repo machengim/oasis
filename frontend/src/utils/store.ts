@@ -4,6 +4,9 @@ import type { IProgress, INotification, IUploadTask, IFile, IFileAction } from '
 // Current dir store
 export const pwdStore: Writable<number> = writable(0);
 
+// Current files in dir store
+export const filesStore: Writable<Array<IFile>> = writable([]);
+
 // Notification store
 export const notificationStore: Writable<INotification> = writable(null);
 

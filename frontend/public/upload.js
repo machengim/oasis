@@ -7,7 +7,7 @@ self.onmessage = async (e) => {
   if (message.type === "uploadId") {
     uploadId = message.data;
   } else {
-    const dataArray = new Uint8Array(message);
+    let dataArray = new Uint8Array(message);
     // const data = [...dataArray];
     const hash = md5(dataArray);
 
@@ -22,6 +22,7 @@ self.onmessage = async (e) => {
 
     xhr.onload = (e) => {
       index++;
+      dataArray = null;
       self.postMessage({ type: "done", data: null });
     }
 

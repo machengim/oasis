@@ -16,7 +16,9 @@
 </script>
 
 <div class="w-full h-14 bg-gray-50 shadow">
-  <div class="w-4/5 h-full flex flex-row justify-between items-center mx-auto">
+  <div
+    class="w-11/12 lg:w-4/5 h-full flex flex-row justify-between items-center mx-auto"
+  >
     <div class="text-xl">{@html buildNav()}</div>
     <div class="flex flex-row">
       <Icon type="profile" color="gray" />

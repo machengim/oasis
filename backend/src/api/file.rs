@@ -1,7 +1,7 @@
 use crate::entity::file::FileListResponse;
 use crate::request::file::{DeleteFileRequest, GetFileRequest, RenameFileRequest};
 use crate::service::state::State;
-use crate::util::db;
+use crate::util::{self, db};
 use crate::{entity::file::File, request::file::CreateDirRequest};
 use std::path::PathBuf;
 use tide::{convert::json, Request, Response, Result, StatusCode};
@@ -86,18 +86,17 @@ pub async fn delete_file(req: Request<State>) -> Result {
     Ok(Response::new(200))
 }
 
-async fn get_range_file(req: &Request<State>, file: File) -> Result {
+async fn get_range_file(req: &Request<State>, file_in: File) -> Result {
     use crate::entity::range::{get_header_contents, get_range_length, read_file_meta};
 
     let range_header = req.header("Range");
     let storage = req.state().get_storage()?;
-    let path = PathBuf::from(storage).join(file.path);
-    // let path = PathBuf::from("/home/ma/Temp/lust.mp4");
+    let path = util::env::get_files_dir(&storage).join(&file_in.path);
     let (mut file, size) = match read_file_meta(&path) {
         Ok((file, size)) => (file, size),
         Err(_) => return Ok(Response::new(StatusCode::InternalServerError)),
     };
-    // let file_type = read_file_ext(&path);
+    let file_type = file_in.to_http_type();
 
     let (start, end) = get_range_length(size, range_header);
     let len = end - start + 1;
@@ -107,8 +106,9 @@ async fn get_range_file(req: &Request<State>, file: File) -> Result {
         Err(_) => return Ok(Response::new(StatusCode::InternalServerError)),
     };
 
+    println!("Content type: {:?}", &file_type);
     let mut res = Response::new(StatusCode::PartialContent);
-    // res.insert_header("Content-Type", file_type);
+    res.insert_header("Content-Type", file_type);
     res.insert_header("Content-Range", content_range);
     res.insert_header("Content-Length", len.to_string());
     res.set_body(contents);
