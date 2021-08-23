@@ -10,8 +10,8 @@ Personal file sharing and syncing system.
 + [x] Login
 + [x] File upload
 + [x] File list
-+ [ ] File delete/rename
-+ [ ] Create folder
++ [x] File delete/rename
++ [x] Create folder
 
 **v0.2 File preview**
 

@@ -26,3 +26,9 @@ Contents include:
 ### V5:
 Contents include:
 + frontend: create-react-app react
+
+### V6:
+Switch from `Rocket` to `Tide`
+
+Contents include:
++ backend: Rocket app
