@@ -2,6 +2,7 @@ pub mod db;
 pub mod env;
 pub mod file_system;
 pub mod query;
+use crate::entity::file::File;
 use anyhow::Result;
 use async_std::fs;
 use rand::{distributions::Alphanumeric, Rng};
@@ -43,4 +44,11 @@ pub fn infer_file_type(filename: &str) -> String {
     };
 
     result.to_string()
+}
+
+pub fn check_dir(file: &File) -> bool {
+    match file.file_type.to_lowercase().as_str() {
+        "root" | "dir" => true,
+        _ => false,
+    }
 }

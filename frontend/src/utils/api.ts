@@ -92,7 +92,7 @@ export async function upload(task: IUploadTask) {
   let slice = file.slice(start, end);
   let buffer = await slice.arrayBuffer();
 
-  const worker = new Worker('upload.js');
+  const worker = new Worker('/upload.js');
   workerStore.set(worker);
   worker.postMessage({ type: "uploadId", data: uploadId });
   worker.postMessage(buffer, [buffer]);

@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
 
   export let mouseEvent: MouseEvent;
-  export let onAction: (action: "rename" | "delete") => void;
+  export let onAction: (action: "rename" | "delete" | "unselect") => void;
   let item: HTMLElement;
   let isFirstRun = true;
 
@@ -39,5 +39,8 @@
   </div>
   <div class="px-2 hover:bg-blue-400" on:click={() => onAction("delete")}>
     Delete
+  </div>
+  <div class="px-2 hover:bg-blue-400" on:click={() => onAction("unselect")}>
+    Unselect
   </div>
 </div>

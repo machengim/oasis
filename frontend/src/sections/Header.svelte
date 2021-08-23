@@ -10,7 +10,7 @@
       case "/login":
         return "Oasis &gt; Login";
       default:
-        return "Oasis &gt; Files";
+        return `<a href="/">Oasis</a> &gt; Files`;
     }
   };
 </script>

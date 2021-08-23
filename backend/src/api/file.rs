@@ -1,8 +1,8 @@
+use crate::entity::file::FileListResponse;
 use crate::request::file::{DeleteFileRequest, GetFileRequest, RenameFileRequest};
 use crate::service::state::State;
 use crate::util::db;
 use crate::{entity::file::File, request::file::CreateDirRequest};
-use async_std::path::Path;
 use std::path::PathBuf;
 use tide::{convert::json, Request, Response, Result, StatusCode};
 
@@ -25,7 +25,9 @@ pub async fn get_file(req: Request<State>) -> Result {
             let files =
                 File::get_files_in_dir(get_file_req.file_id, get_file_req.user_id, &mut conn)
                     .await?;
-            Ok(json!(files).into())
+            let dirs = File::get_all_parents(get_file_req.file_id, &mut conn).await?;
+            let res = FileListResponse { files, dirs };
+            Ok(json!(res).into())
         }
         _ => Ok(get_range_file(&req, target_file).await?),
     }
@@ -89,8 +91,8 @@ async fn get_range_file(req: &Request<State>, file: File) -> Result {
 
     let range_header = req.header("Range");
     let storage = req.state().get_storage()?;
-    // let path = PathBuf::from(storage).join(file.path);
-    let path = PathBuf::from("/home/ma/Temp/lust.mp4");
+    let path = PathBuf::from(storage).join(file.path);
+    // let path = PathBuf::from("/home/ma/Temp/lust.mp4");
     let (mut file, size) = match read_file_meta(&path) {
         Ok((file, size)) => (file, size),
         Err(_) => return Ok(Response::new(StatusCode::InternalServerError)),

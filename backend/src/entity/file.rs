@@ -1,5 +1,5 @@
 use crate::request::file::CreateDirRequest;
-use crate::util::{db, query::Query};
+use crate::util::{check_dir, db, query::Query};
 use crate::{args, util};
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
@@ -8,7 +8,7 @@ use sqlx::{FromRow, Sqlite};
 
 use super::upload::UploadTask;
 
-#[derive(Deserialize, Serialize, FromRow, Debug)]
+#[derive(Deserialize, Serialize, Clone, FromRow, Debug)]
 pub struct File {
     pub file_id: i64,
     pub filename: String,
@@ -18,6 +18,12 @@ pub struct File {
     pub owner_id: i64,
     pub parent_id: i64,
     pub last_modified_at: i64,
+}
+
+#[derive(Serialize)]
+pub struct FileListResponse {
+    pub files: Vec<File>,
+    pub dirs: Vec<File>,
 }
 
 impl File {
@@ -74,10 +80,9 @@ impl File {
         Ok(query)
     }
 
-    // TODO: delete folder
     pub async fn delete(&self, storage: &str, conn: &mut PoolConnection<Sqlite>) -> Result<()> {
         match &self.file_type.to_lowercase()[..] {
-            "dir" => Ok(()),
+            "dir" => self.delete_dir_all(storage, conn).await,
             "root" => return Err(anyhow!("Cannot remove root directory")),
             _ => self.delete_single_file(storage, conn).await,
         }
@@ -88,14 +93,36 @@ impl File {
         storage: &str,
         conn: &mut PoolConnection<Sqlite>,
     ) -> Result<()> {
-        let file_path = util::env::get_files_dir(storage).join(&self.path);
-        if file_path.exists() {
-            async_std::fs::remove_file(file_path).await?;
+        if !check_dir(self) {
+            let file_path = util::env::get_files_dir(storage).join(&self.path);
+
+            if file_path.exists() {
+                async_std::fs::remove_file(file_path).await?;
+            }
         }
 
         let sql = "delete from FILE where file_id = ?1";
         let query = Query::new(sql, args![self.file_id]);
         db::execute(query, conn).await?;
+        Ok(())
+    }
+
+    async fn delete_dir_all(&self, storage: &str, conn: &mut PoolConnection<Sqlite>) -> Result<()> {
+        let sql = "WITH RECURSIVE children_files(n) AS (
+            VALUES(?1) UNION
+            SELECT file_id FROM file, children_files
+            WHERE file.parent_id=children_files.n
+            )
+            SELECT * FROM file
+            WHERE file.file_id IN children_files";
+
+        let query = Query::new(sql, args![self.file_id]);
+        let files: Vec<File> = db::fetch_multiple(query, conn).await?;
+
+        for file in files.iter() {
+            file.delete_single_file(storage, conn).await?;
+        }
+
         Ok(())
     }
 
@@ -107,10 +134,31 @@ impl File {
         println!("dir_id is {} and owner_id is {}", dir, owner);
         let sql = "select * from FILE where parent_id=?1 and owner_id=?2";
         let query = Query::new(sql, args![dir, owner]);
-
         let files: Vec<File> = db::fetch_multiple(query, conn).await?;
 
         Ok(files)
+    }
+
+    pub async fn get_all_parents(
+        file_id: i64,
+        conn: &mut PoolConnection<Sqlite>,
+    ) -> Result<Vec<File>> {
+        let mut current_file = File::get_file_by_id(file_id, conn).await?;
+        let mut dirs: Vec<File> = vec![];
+
+        while current_file.parent_id != 0 {
+            let sql = "select * from FILE where file_id = ?1";
+            let query = Query::new(sql, args![current_file.parent_id]);
+            match db::fetch_single::<File>(query, conn).await? {
+                Some(file) => {
+                    current_file = file;
+                    dirs.push(current_file.clone());
+                }
+                None => break,
+            }
+        }
+
+        Ok(dirs)
     }
 
     pub async fn get_file_by_id(file_id: i64, conn: &mut PoolConnection<Sqlite>) -> Result<File> {
