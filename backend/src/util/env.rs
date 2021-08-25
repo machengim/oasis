@@ -34,11 +34,3 @@ pub fn get_front_index() -> anyhow::Result<PathBuf> {
 
     Ok(path.to_path_buf())
 }
-
-pub fn get_files_dir(storage: &str) -> PathBuf {
-    PathBuf::from(storage).join("files")
-}
-
-pub fn get_tmp_dir(storage: &str) -> PathBuf {
-    PathBuf::from(storage).join("tmp")
-}

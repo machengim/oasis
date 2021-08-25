@@ -1,8 +1,9 @@
+use crate::request::user::LoginRequest;
+use crate::service::query::Query;
 use crate::service::token::Token;
-use crate::util::db;
-use crate::util::query::Query;
-use crate::{args, request::site::SetupRequest};
-use anyhow::Result;
+use crate::{args, service::db};
+use anyhow::{anyhow, Result};
+use bcrypt::verify;
 use bcrypt::{hash, DEFAULT_COST};
 use serde::Serialize;
 use sqlx::{pool::PoolConnection, FromRow, Sqlite};
@@ -17,16 +18,6 @@ pub struct User {
 }
 
 impl User {
-    pub fn from_setup_req(req: &SetupRequest) -> Self {
-        Self {
-            user_id: -1,
-            username: req.username.to_string(),
-            password: req.password.to_string(),
-            permission: 9,
-            created_at: req.time.unwrap(),
-        }
-    }
-
     pub async fn find_exist_username(
         username: &str,
         conn: &mut PoolConnection<Sqlite>,
@@ -37,7 +28,21 @@ impl User {
         Ok(user)
     }
 
-    pub fn insert_user_query<'a>(&self) -> Result<Query<'a>> {
+    pub async fn login(req: &LoginRequest, conn: &mut PoolConnection<Sqlite>) -> Result<Self> {
+        let sql = "select * from USER where username = ?1";
+        let query = Query::new(sql, args![&req.username]);
+        let user: User = match db::fetch_single(query, conn).await? {
+            Some(u) => u,
+            None => return Err(anyhow!("Cannot find user in db")),
+        };
+
+        match verify(&req.password, &user.password)? {
+            true => Ok(user),
+            false => Err(anyhow!("User password incorrect")),
+        }
+    }
+
+    pub fn insert_query<'a>(&self) -> Result<Query<'a>> {
         let encrypt_password = hash(&self.password, DEFAULT_COST)?;
 
         Ok(Query::new(
@@ -52,6 +57,6 @@ impl User {
     }
 
     pub fn generate_token(&self) -> Token {
-        Token::new(self.user_id, self.permission)
+        Token::new(self.user_id, &self.username, self.permission)
     }
 }

@@ -1,7 +1,7 @@
 use async_std::fs;
 use async_std::path::{Path, PathBuf};
 use async_std::prelude::*;
-// use std::path::{Path, PathBuf};
+use std::path::PathBuf as StdPathBuf;
 use std::process::Command;
 
 pub fn get_system_volumes() -> anyhow::Result<Vec<String>> {
@@ -48,8 +48,7 @@ fn get_mac_volumes() -> anyhow::Result<Vec<String>> {
 // the conversion between OsString and String should be double checked.
 // Besides, the automatic PathBuf conversion from the request uri
 // should be tested on different OSs as well.
-pub async fn get_system_dirs(dir: &str) -> anyhow::Result<Vec<String>> {
-    let dir = PathBuf::from(dir);
+pub async fn get_dir_content(dir: PathBuf, only_dir: bool) -> anyhow::Result<Vec<StdPathBuf>> {
     let dir_absolute = match dir.is_absolute() {
         true => dir,
         false => Path::new("/").join(dir),
@@ -60,19 +59,11 @@ pub async fn get_system_dirs(dir: &str) -> anyhow::Result<Vec<String>> {
     }
 
     let mut dir_iterator = fs::read_dir(&dir_absolute).await?;
-    let mut sub_dirs: Vec<String> = Vec::new();
+    let mut sub_dirs: Vec<StdPathBuf> = Vec::new();
     while let Some(entry) = dir_iterator.next().await {
         let path = entry?.path();
-        if path.is_dir().await {
-            match path.into_os_string().into_string() {
-                Ok(v) => sub_dirs.push(v.to_owned()),
-                Err(e) => {
-                    return Err(anyhow::anyhow!(
-                        "Cannot convert path name to string: {:?}",
-                        e
-                    ))
-                }
-            }
+        if !only_dir || path.is_dir().await {
+            sub_dirs.push(path.into());
         }
     }
 
@@ -96,9 +87,9 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn test_get_sub_directories() {
-        let path = "/home";
+        let path = PathBuf::from("/home");
         // let rt = tokio::runtime::Runtime::new().unwrap();
-        let sub_directories = block_on(get_system_dirs(path)).unwrap();
+        let sub_directories = block_on(get_dir_content(path, true)).unwrap();
 
         println!("sub_directories: {:?}", &sub_directories);
         assert!(sub_directories.len() > 0);

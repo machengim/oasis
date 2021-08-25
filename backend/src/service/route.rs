@@ -1,4 +1,3 @@
-use crate::entity::file::File;
 use crate::service::{state::State, token::Token};
 use crate::util::env;
 use tide::{Body, Redirect, Request, Response, Result, Server, StatusCode};
@@ -8,16 +7,15 @@ pub fn mount_static(mut app: Server<State>) -> Server<State> {
     app.at("/index.html").get(get_index);
     app.at("/login").get(get_login);
     app.at("/setup").get(get_setup);
-    app.at("/files").get(get_root_files);
-    app.at("/files/:file_id").get(get_specific_file);
+    app.at("/files").get(get_files);
+    app.at("/files/*").get(get_files);
     // app.at("/detail/:file_id").get(get_specific_file);
 
     app
 }
 
 async fn get_index(req: Request<State>) -> Result {
-    let state = req.state();
-    let first_run = state.get_first_run()?;
+    let first_run = req.state().get_first_run()?;
 
     if first_run {
         Ok(Redirect::temporary("/setup").into())
@@ -48,10 +46,11 @@ async fn get_setup(req: Request<State>) -> Result {
     Ok(res)
 }
 
-async fn get_root_files(req: Request<State>) -> Result {
+async fn get_files(req: Request<State>) -> Result {
     let token = Token::from_ext(&req)?;
-    if token.uid <= 0 {
-        return Ok(Response::new(StatusCode::Unauthorized));
+
+    if token.uid <= 0 || token.permission <= 0 {
+        return Ok(Redirect::temporary("/login").into());
     }
 
     let mut res = Response::new(200);
@@ -60,22 +59,34 @@ async fn get_root_files(req: Request<State>) -> Result {
     Ok(res)
 }
 
-async fn get_specific_file(req: Request<State>) -> Result {
-    let file_id: i64 = req.param("file_id")?.parse()?;
-    let user_id = Token::from_ext(&req)?.uid;
-    if user_id <= 0 {
-        return Ok(Response::new(StatusCode::Unauthorized));
-    }
+// async fn get_root_files(req: Request<State>) -> Result {
+//     let token = Token::from_ext(&req)?;
+//     if token.uid <= 0 {
+//         return Ok(Response::new(StatusCode::Unauthorized));
+//     }
 
-    let mut conn = req.state().get_pool_conn().await?;
-    let file_owner_id = File::find_file_owner(file_id, &mut conn).await?;
+//     let mut res = Response::new(200);
+//     res.set_body(Body::from_file(env::get_front_index()?).await?);
 
-    if file_owner_id != user_id {
-        return Ok(Response::new(StatusCode::Unauthorized));
-    }
+//     Ok(res)
+// }
 
-    let mut res = Response::new(200);
-    res.set_body(Body::from_file(env::get_front_index()?).await?);
+// async fn get_specific_file(req: Request<State>) -> Result {
+//     let file_id: i64 = req.param("file_id")?.parse()?;
+//     let user_id = Token::from_ext(&req)?.uid;
+//     if user_id <= 0 {
+//         return Ok(Response::new(StatusCode::Unauthorized));
+//     }
 
-    Ok(res)
-}
+//     let mut conn = req.state().get_pool_conn().await?;
+//     let file_owner_id = File::find_file_owner(file_id, &mut conn).await?;
+
+//     if file_owner_id != user_id {
+//         return Ok(Response::new(StatusCode::Unauthorized));
+//     }
+
+//     let mut res = Response::new(200);
+//     res.set_body(Body::from_file(env::get_front_index()?).await?);
+
+//     Ok(res)
+// }

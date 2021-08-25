@@ -18,15 +18,7 @@
       return;
     }
 
-    isLoading = true;
-    const result = await sendLoginRequest();
-    isLoading = false;
-
-    if (result) {
-      localStorage.setItem("root_dir", result);
-      pwdStore.set(+result);
-      navigate("/");
-    }
+    await sendLoginRequest();
   };
 
   const sendLoginRequest = async () => {
@@ -35,15 +27,16 @@
       password,
     };
 
+    isLoading = true;
     try {
-      const result: string = await api.post("/api/login", payload, false);
+      await api.post("/api/login", payload, false);
       setNotification("success", "Login successfully,");
-      return result;
+      navigate("/");
     } catch (e) {
       console.error(e);
       setNotification("error", "Login failed.");
-      return null;
     }
+    isLoading = false;
   };
 </script>
 

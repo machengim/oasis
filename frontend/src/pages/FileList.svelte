@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import {
     pwdStore,
     setNotification,
@@ -9,27 +9,18 @@
     filesStore,
   } from "../utils/store";
   import Icon from "../components/Icon.svelte";
-  import type {
-    IFile,
-    IFileAction,
-    IFileOrder,
-    IFileListResponse,
-  } from "../utils/types";
+  import type { IFile, IFileAction, IFileOrder } from "../utils/types";
   import * as api from "../utils/api";
   import { formatSize, formatTimestamp, checkDir } from "../utils/util";
   import FloatButton from "../sections/FloatButton.svelte";
   import ContextMenu from "../sections/ContextMenu.svelte";
   import RenameFileModal from "../modals/RenameFileModal.svelte";
-  import { useNavigate, useParams } from "svelte-navigator";
+  import { useNavigate } from "svelte-navigator";
 
   const navigate = useNavigate();
-  const param = useParams();
-  const root_id = +localStorage.getItem("root_dir");
 
-  let pwd = 0;
-  let url_file_id = 0;
+  export let dirs: Array<string> = [];
   let files: IFile[] = [];
-  let dirs: IFile[] = [];
   let newCompleteFile: IFile;
   let isLoading = false;
   let order: IFileOrder = { key: "name", asc: true };
@@ -52,34 +43,30 @@
     }
   });
 
-  const unsubscribeFileAction = fileActionStore.subscribe((value) => {
-    if (value && value.file.parent_id === pwd) {
-      handleFileAction(value);
-    }
+  // const unsubscribeFileAction = fileActionStore.subscribe((value) => {
+  //   if (value && value.file.parent_id === pwd) {
+  //     handleFileAction(value);
+  //   }
+  // });
+
+  onMount(() => {
+    fetchDir();
   });
 
   onDestroy(() => {
     unsubscribeCompleteFile();
     unsubscribeClickEvent();
-    unsubscribeFileAction();
+    // unsubscribeFileAction();
   });
-
-  $: url_file_id = +$param.file_id;
-  $: pwd = url_file_id || root_id;
-
-  $: if (pwd > 0) {
-    pwdStore.set(pwd);
-    fetchFiles(pwd);
-  }
 
   $: if (files.length > 0 && order) {
     orderFiles();
   }
 
-  $: if (newCompleteFile && newCompleteFile.parent_id === pwd) {
-    files = [...files, newCompleteFile];
-    newCompleteFile = null;
-  }
+  // $: if (newCompleteFile && newCompleteFile.parent_id === pwd) {
+  //   files = [...files, newCompleteFile];
+  //   newCompleteFile = null;
+  // }
 
   $: if (lastGlobalClickTime > 0) {
     if (isOpenContextMenu) {
@@ -89,13 +76,14 @@
     lastGlobalClickTime = 0;
   }
 
-  const fetchFiles = async (dir_id: number) => {
+  const fetchDir = async () => {
+    const dir = encodeURIComponent(dirs.join("/"));
+    const endpoint = dir ? `/api/dir/${dir}`: "/api/dir";
+    console.log("dir is: ", dir);
     isLoading = true;
 
     try {
-      let res: IFileListResponse = await api.get(`/api/file/${dir_id}`);
-      files = res.files;
-      dirs = res.dirs;
+      files = await api.get(endpoint);
       filesStore.set(files);
     } catch (e) {
       console.error(e);
@@ -196,18 +184,18 @@
 
     try {
       await api.remove(endpoint, null, false);
-      removeFileFromList(selectedFile);
+      // removeFileFromList(selectedFile);
     } catch (e) {
       console.error(e);
       setNotification("error", `Remove file ${selectedFile.filename} failed`);
     }
   };
 
-  const removeFileFromList = (file: IFile) => {
-    if (file.parent_id === pwd) {
-      files = files.filter((f) => f.file_id !== file.file_id);
-    }
-  };
+  // const removeFileFromList = (file: IFile) => {
+  //   if (file.parent_id === pwd) {
+  //     files = files.filter((f) => f.file_id !== file.file_id);
+  //   }
+  // };
 
   const onContextMenuAction = (action: "rename" | "delete") => {
     switch (action) {
@@ -230,14 +218,13 @@
   };
 
   const backToParentDir = () => {
-    let parent_id = 0;
-    if (dirs.length === 0) {
-      parent_id = root_id;
-    } else {
-      parent_id = dirs[0].file_id;
-    }
-
-    navigate(`/files/${parent_id}`);
+    //   let parent_id = 0;
+    //   if (dirs.length === 0) {
+    //     parent_id = root_id;
+    //   } else {
+    //     parent_id = dirs[0].file_id;
+    //   }
+    //   navigate(`/files/${parent_id}`);
   };
 </script>
 
@@ -297,7 +284,7 @@
         {/if}
       </div>
     </div>
-    {#if pwd !== root_id}
+    {#if dirs && dirs.length > 1}
       <div
         class="grid grid-cols-5 border-b border-gray-200 py-2 hover:bg-gray-200 cursor-pointer"
         on:click={backToParentDir}

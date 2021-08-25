@@ -1,11 +1,11 @@
 use crate::service::state::State;
 use anyhow::Result;
-use std::path::Path;
+use async_std::path::PathBuf;
 use tide::Request;
 
 #[derive(Debug)]
 pub struct SysDirsRequest {
-    pub path: String,
+    pub path: PathBuf,
 }
 
 impl SysDirsRequest {
@@ -15,17 +15,12 @@ impl SysDirsRequest {
         let path = urlencoding::decode(dir_str)?;
 
         Ok(Self {
-            path: path.to_string(),
+            path: PathBuf::from(path.to_string()),
         })
     }
 
-    pub fn validate(&self) -> bool {
-        if self.path.len() == 0 {
-            eprintln!("Empty dir request not support");
-            return false;
-        }
-
-        if !Path::new(&self.path).exists() {
+    pub async fn validate(&self) -> bool {
+        if !self.path.exists().await {
             eprintln!("Invalid path in sys dir request: {:?}", self);
             return false;
         }

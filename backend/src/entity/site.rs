@@ -1,9 +1,12 @@
-use crate::util::{db, query::Query};
+use crate::args;
+use crate::service::db;
+use crate::service::query::Query;
+use anyhow::{anyhow, Result};
 use serde::Serialize;
-use sqlx::FromRow;
-use sqlx::{Pool, Sqlite};
+use sqlx::pool::PoolConnection;
+use sqlx::{FromRow, Pool, Sqlite};
 
-#[derive(Serialize, FromRow, Debug, Clone)]
+#[derive(Serialize, FromRow, Default, Debug, Clone)]
 pub struct Site {
     pub version: f64,
     pub first_run: u8,
@@ -13,17 +16,20 @@ pub struct Site {
 }
 
 impl Site {
-    fn default() -> Self {
-        Self {
-            version: 0.1,
-            first_run: 1,
-            created_at: 0,
-            secret: String::new(),
-            storage: String::new(),
-        }
+    pub fn create_query(&self) -> Query {
+        let sql = "insert into SITE (version, first_run, created_at, secret, storage) values(?1, ?2, ?3, ?4, ?5)";
+        Query::new(
+            sql,
+            args![
+                self.version,
+                self.first_run,
+                self.created_at,
+                &self.secret,
+                &self.storage
+            ],
+        )
     }
-    // The pool value is only passed at the initialization of app.
-    // Later on the pool connection has to be acquired from app state.
+
     pub async fn init_read(pool: &Pool<Sqlite>) -> Self {
         let query = Query::new("SELECT * FROM site", vec![]);
         let mut conn = match pool.acquire().await {
@@ -32,7 +38,10 @@ impl Site {
         };
         match db::fetch_single::<Site>(query, &mut conn).await {
             Ok(Some(site)) => site,
-            _ => Site::default(),
+            _ => Site {
+                first_run: 1,
+                ..Default::default()
+            },
         }
     }
 }

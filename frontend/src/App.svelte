@@ -5,12 +5,11 @@
   import Notification from "./sections/Notification.svelte";
   import UploadTasks from "./sections/UploadTasks.svelte";
   import Home from "./pages/Home.svelte";
-  import FileList from "./pages/FileList.svelte";
-  import FileDetail from "./pages/FileDetail.svelte";
   import Login from "./pages/Login.svelte";
   import Setup from "./pages/Setup.svelte";
   import Error404 from "./pages/Error404.svelte";
   import { clickEventStore } from "./utils/store";
+  import Files from "./pages/Files.svelte";
 
   export let path: string;
 
@@ -28,9 +27,9 @@
 
     <Route path="login" component={Login} />
     <Route path="setup" component={Setup} />
-    <Route path="files" component={FileList} />
-    <Route path="files/:file_id" component={FileList} />
-    <Route path="detail/:file_id" component={FileDetail} />
+    <Route path="files" component={Files} />
+    <Route path="files/*dir" component={Files} />
+    <Route path="files/*dir?preview=bb" component={Files} />
     <Route path="/"><Home /></Route>
   </Router>
 </main>

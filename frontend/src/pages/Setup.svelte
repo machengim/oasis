@@ -49,7 +49,7 @@
     const payload: ISetupRequest = {
       username,
       password,
-      storage: selectedDir,
+      storage: encodeURIComponent(selectedDir),
     };
 
     try {

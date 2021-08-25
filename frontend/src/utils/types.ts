@@ -48,8 +48,3 @@ export interface IFileAction {
   action: "modify" | "delete" | "move",
   file: IFile,
 }
-
-export interface IFileListResponse {
-  files: Array<IFile>,
-  dirs: Array<IFile>
-}
