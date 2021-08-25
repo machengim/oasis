@@ -126,7 +126,7 @@
   }
 
   .menu {
-    opacity: 0;
+    visibility: hidden;
     transition: all 0.4s ease-in-out;
     background: #fff;
     width: 100%;
@@ -140,7 +140,7 @@
   }
 
   #toggle:checked ~ .menu {
-    opacity: 1;
+    visibility: visible;
     transform: translateY(10%);
   }
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Link } from "svelte-navigator";
   import Icon from "../components/Icon.svelte";
 
   export let path: string = "/";
@@ -10,7 +11,7 @@
       case "/login":
         return "Oasis &gt; Login";
       default:
-        return `<a href="/">Oasis</a> &gt; Files`;
+        return `Oasis &gt; Files`;
     }
   };
 </script>

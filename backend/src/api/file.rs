@@ -3,7 +3,6 @@ use crate::request::file::{DeleteFileRequest, GetFileRequest, RenameFileRequest}
 use crate::service::state::State;
 use crate::util::{self, db};
 use crate::{entity::file::File, request::file::CreateDirRequest};
-use std::path::PathBuf;
 use tide::{convert::json, Request, Response, Result, StatusCode};
 
 // Get "/api/file/:file_id".

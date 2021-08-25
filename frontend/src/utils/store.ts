@@ -58,3 +58,6 @@ export const workerStore: Writable<Worker> = writable(null);
 
 // Global mouse click event
 export const clickEventStore: Writable<number> = writable(0);
+
+// Dir info for breadcrumb
+export const dirStructureStore: Writable<Array<IFile>> = writable([]);

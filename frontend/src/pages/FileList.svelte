@@ -90,8 +90,9 @@
   }
 
   const fetchFiles = async (dir_id: number) => {
+    isLoading = true;
+
     try {
-      isLoading = true;
       let res: IFileListResponse = await api.get(`/api/file/${dir_id}`);
       files = res.files;
       dirs = res.dirs;
@@ -170,30 +171,15 @@
     return result * ascFactor;
   };
 
-  const getFileStyle = (file: IFile) => {
-    if (selectedFile && file.file_id === selectedFile.file_id) {
-      return "grid grid-cols-5 border-b border-gray-200 py-2 bg-blue-400 text-white";
-    } else {
-      return "grid grid-cols-5 border-b border-gray-200 py-2";
-    }
-  };
-
-  const clickFile = (file: IFile) => {
-    if (!selectedFile || file.file_id !== selectedFile.file_id) {
-      selectedFile = file;
-      files = files;
-    }
-  };
-
   const rightClickFile = (e: MouseEvent, file: IFile) => {
     e.preventDefault();
 
-    clickFile(file);
+    selectedFile = file;
     mouseEvent = e;
     isOpenContextMenu = true;
   };
 
-  const dbClickFile = (file: IFile) => {
+  const selectFile = (file: IFile) => {
     if (checkDir(file)) {
       navigate(`/files/${file.file_id}`);
     } else {
@@ -223,7 +209,7 @@
     }
   };
 
-  const onContextMenuAction = (action: "rename" | "delete" | "unselect") => {
+  const onContextMenuAction = (action: "rename" | "delete") => {
     switch (action) {
       case "rename":
         isOpenRenameModal = true;
@@ -236,11 +222,6 @@
           sendDeleteFileRequest();
         }
         break;
-      case "unselect":
-        if (selectedFile) {
-          selectedFile = null;
-          files = files;
-        }
       default:
         break;
     }
@@ -318,21 +299,20 @@
     </div>
     {#if pwd !== root_id}
       <div
-        class="grid grid-cols-5 border-b border-gray-200 py-2"
-        on:dblclick={backToParentDir}
+        class="grid grid-cols-5 border-b border-gray-200 py-2 hover:bg-gray-200 cursor-pointer"
+        on:click={backToParentDir}
       >
         <div class="col-span-2 px-2">..</div>
         <div class="px-2" />
-        <div class="px-2">2021-08-16 14:39</div>
+        <div class="px-2" />
         <div class="px-2" />
       </div>
     {/if}
     {#each files as file}
       <div
-        class={getFileStyle(file)}
-        on:dblclick={() => dbClickFile(file)}
+        class="grid grid-cols-5 border-b border-gray-200 py-2 hover:bg-gray-200 cursor-pointer"
         on:contextmenu={(e) => rightClickFile(e, file)}
-        on:click={() => clickFile(file)}
+        on:click={() => selectFile(file)}
       >
         <div class="col-span-2 px-2">{file.filename}</div>
         <div class="px-2">{file.file_type}</div>
