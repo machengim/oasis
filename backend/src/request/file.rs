@@ -1,4 +1,7 @@
-use crate::service::{state::State, token::Token};
+use crate::{
+    service::{state::State, token::Token},
+    util::file_system,
+};
 use anyhow::Result;
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -21,8 +24,6 @@ impl GetDirRequest {
             }
         }
 
-        println!("joined path as: {:?}", &path);
-
         Ok(Self { path })
     }
 
@@ -30,17 +31,11 @@ impl GetDirRequest {
         self.path.exists() && self.path.is_dir()
     }
 
-    pub fn auth(&self, req: &Request<State>) -> Result<bool> {
-        let token = Token::from_ext(req)?;
-
-        Ok(token.uid > 0 && token.permission > 0)
-    }
-
     fn get_user_files_dir(req: &Request<State>, token: &Token) -> Result<PathBuf> {
         let storage = req.state().get_storage()?;
         let username = &token.username;
 
-        Ok(PathBuf::from(storage).join(username).join("files"))
+        Ok(file_system::get_user_files_dir(&storage, username).into())
     }
 }
 

@@ -78,8 +78,7 @@
 
   const fetchDir = async () => {
     const dir = encodeURIComponent(dirs.join("/"));
-    const endpoint = dir ? `/api/dir/${dir}`: "/api/dir";
-    console.log("dir is: ", dir);
+    const endpoint = dir ? `/api/dir/${dir}` : "/api/dir";
     isLoading = true;
 
     try {
@@ -284,7 +283,7 @@
         {/if}
       </div>
     </div>
-    {#if dirs && dirs.length > 1}
+    {#if dirs && dirs.length > 0}
       <div
         class="grid grid-cols-5 border-b border-gray-200 py-2 hover:bg-gray-200 cursor-pointer"
         on:click={backToParentDir}

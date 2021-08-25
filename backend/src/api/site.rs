@@ -3,6 +3,7 @@ use crate::service::{db, state::State};
 use crate::util::init;
 use crate::{request::site::SiteSetupRequest, util};
 use tide::{Request, Response, Result, StatusCode};
+use util::file_system;
 
 // Post "/api/site"
 pub async fn post_setup(mut req: Request<State>) -> Result {
@@ -25,6 +26,7 @@ pub async fn post_setup(mut req: Request<State>) -> Result {
 
     let root_path = init::create_site_dir(&setup_req.storage).await?;
     setup_req.storage = root_path.to_string_lossy().to_string();
+    file_system::create_user_dirs(&setup_req.storage, &setup_req.username).await?;
     let secret = util::generate_secret_key();
     let site = setup_req.to_site(&secret);
     let new_site_query = site.create_query();

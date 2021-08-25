@@ -1,10 +1,11 @@
+use anyhow::Result;
 use async_std::fs;
 use async_std::path::{Path, PathBuf};
 use async_std::prelude::*;
 use std::path::PathBuf as StdPathBuf;
 use std::process::Command;
 
-pub fn get_system_volumes() -> anyhow::Result<Vec<String>> {
+pub fn get_system_volumes() -> Result<Vec<String>> {
     match std::env::consts::OS {
         "linux" => get_linux_volumes(),
         "macos" => get_mac_volumes(),
@@ -13,7 +14,7 @@ pub fn get_system_volumes() -> anyhow::Result<Vec<String>> {
     }
 }
 
-fn get_linux_volumes() -> anyhow::Result<Vec<String>> {
+fn get_linux_volumes() -> Result<Vec<String>> {
     let lsblk_output = Command::new("sh").arg("-c").arg("lsblk").output()?;
     let lines = std::str::from_utf8(&lsblk_output.stdout)?.lines();
     let mut mountpoints: Vec<String> = Vec::new();
@@ -29,7 +30,7 @@ fn get_linux_volumes() -> anyhow::Result<Vec<String>> {
     Ok(mountpoints)
 }
 
-fn get_mac_volumes() -> anyhow::Result<Vec<String>> {
+fn get_mac_volumes() -> Result<Vec<String>> {
     let df_output = Command::new("sh").arg("-c").arg("df -Hl").output()?;
     let lines = std::str::from_utf8(&df_output.stdout)?.lines();
     let mut mountpoints: Vec<String> = Vec::new();
@@ -48,7 +49,7 @@ fn get_mac_volumes() -> anyhow::Result<Vec<String>> {
 // the conversion between OsString and String should be double checked.
 // Besides, the automatic PathBuf conversion from the request uri
 // should be tested on different OSs as well.
-pub async fn get_dir_content(dir: PathBuf, only_dir: bool) -> anyhow::Result<Vec<StdPathBuf>> {
+pub async fn get_dir_content(dir: PathBuf, only_dir: bool) -> Result<Vec<StdPathBuf>> {
     let dir_absolute = match dir.is_absolute() {
         true => dir,
         false => Path::new("/").join(dir),
@@ -68,6 +69,32 @@ pub async fn get_dir_content(dir: PathBuf, only_dir: bool) -> anyhow::Result<Vec
     }
 
     Ok(sub_dirs)
+}
+
+pub async fn create_user_dirs(storage: &str, username: &str) -> Result<()> {
+    let files_dir = get_user_files_dir(storage, username);
+    if !files_dir.exists().await {
+        fs::create_dir_all(files_dir).await?;
+    }
+
+    let tmp_dir = get_user_tmp_dir(storage, username);
+    if !tmp_dir.exists().await {
+        fs::create_dir_all(tmp_dir).await?;
+    }
+
+    Ok(())
+}
+
+pub fn get_user_root_dir(storage: &str, username: &str) -> PathBuf {
+    PathBuf::from(storage).join(username)
+}
+
+pub fn get_user_files_dir(storage: &str, username: &str) -> PathBuf {
+    get_user_root_dir(storage, username).join("files")
+}
+
+pub fn get_user_tmp_dir(storage: &str, username: &str) -> PathBuf {
+    get_user_root_dir(storage, username).join("tmp")
 }
 
 #[cfg(test)]

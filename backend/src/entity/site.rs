@@ -1,9 +1,7 @@
 use crate::args;
 use crate::service::db;
 use crate::service::query::Query;
-use anyhow::{anyhow, Result};
 use serde::Serialize;
-use sqlx::pool::PoolConnection;
 use sqlx::{FromRow, Pool, Sqlite};
 
 #[derive(Serialize, FromRow, Default, Debug, Clone)]
