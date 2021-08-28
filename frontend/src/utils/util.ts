@@ -14,7 +14,7 @@ export function checkDir(file: IFile) {
 }
 
 export function formatSize(size: number) {
-  if (size < 0) {
+  if (size <= 0) {
     return "-";
   }
 

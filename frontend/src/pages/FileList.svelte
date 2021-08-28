@@ -56,7 +56,7 @@
   });
 
   onMount(() => {
-    fetchDir();
+    fetchDir(dir_paths);
   });
 
   onDestroy(() => {
@@ -64,6 +64,8 @@
     unsubscribeClickEvent();
     unsubscribeFileAction();
   });
+
+  $: fetchDir(dir_paths);
 
   $: if (files.length > 0 && order) {
     orderFiles();
@@ -82,8 +84,8 @@
     lastGlobalClickTime = 0;
   }
 
-  const fetchDir = async () => {
-    const encodedPath = encodeURIComponent(dir_paths.join("/"));
+  const fetchDir = async (paths) => {
+    const encodedPath = encodeURIComponent(paths.join("/"));
     const endpoint = encodedPath ? `/api/dir/${encodedPath}` : "/api/dir";
     isLoading = true;
 
