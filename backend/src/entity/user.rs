@@ -6,7 +6,10 @@ use anyhow::{anyhow, Result};
 use bcrypt::verify;
 use bcrypt::{hash, DEFAULT_COST};
 use serde::Serialize;
+use sqlx::Transaction;
 use sqlx::{pool::PoolConnection, FromRow, Sqlite};
+
+use super::file::{File, FileType};
 
 #[derive(Serialize, FromRow, Debug, Default)]
 pub struct User {
@@ -42,10 +45,22 @@ impl User {
         }
     }
 
-    pub fn insert_query<'a>(&self) -> Result<Query<'a>> {
+    pub fn create_root_file(&self) -> File {
+        File {
+            file_id: 0,
+            filename: String::new(),
+            size: 0,
+            file_type: FileType::Dir,
+            owner_id: self.user_id,
+            parent_id: 0,
+            last_modified_at: self.created_at,
+        }
+    }
+
+    pub async fn create_query<'a>(&self, tx: &mut Transaction<'_, Sqlite>) -> Result<i64> {
         let encrypt_password = hash(&self.password, DEFAULT_COST)?;
 
-        Ok(Query::new(
+        let query = Query::new(
             "insert into USER (username, password, permission, created_at) values (?1, ?2, ?3, ?4)",
             args![
                 &self.username,
@@ -53,7 +68,10 @@ impl User {
                 self.permission,
                 self.created_at
             ],
-        ))
+        );
+
+        let user_id = db::tx_execute(query, tx).await?;
+        Ok(user_id)
     }
 
     pub fn generate_token(&self) -> Token {

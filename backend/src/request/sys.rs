@@ -9,7 +9,7 @@ pub struct SysDirsRequest {
 }
 
 impl SysDirsRequest {
-    pub fn from(req: &Request<State>) -> tide::Result<Self> {
+    pub fn from_req(req: &Request<State>) -> tide::Result<Self> {
         let dir_str = req.param("dir")?;
 
         let path = urlencoding::decode(dir_str)?;

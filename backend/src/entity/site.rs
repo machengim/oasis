@@ -1,8 +1,9 @@
 use crate::args;
 use crate::service::db;
 use crate::service::query::Query;
+use anyhow::Result;
 use serde::Serialize;
-use sqlx::{FromRow, Pool, Sqlite};
+use sqlx::{FromRow, Pool, Sqlite, Transaction};
 
 #[derive(Serialize, FromRow, Default, Debug, Clone)]
 pub struct Site {
@@ -14,9 +15,9 @@ pub struct Site {
 }
 
 impl Site {
-    pub fn create_query(&self) -> Query {
+    pub async fn create_query(&self, tx: &mut Transaction<'_, Sqlite>) -> Result<()> {
         let sql = "insert into SITE (version, first_run, created_at, secret, storage) values(?1, ?2, ?3, ?4, ?5)";
-        Query::new(
+        let query = Query::new(
             sql,
             args![
                 self.version,
@@ -25,7 +26,10 @@ impl Site {
                 &self.secret,
                 &self.storage
             ],
-        )
+        );
+
+        db::tx_execute(query, tx).await?;
+        Ok(())
     }
 
     pub async fn init_read(pool: &Pool<Sqlite>) -> Self {

@@ -3,25 +3,30 @@
   import Button from "../components/Button.svelte";
   import Modal from "../components/Modal.svelte";
   import { validateForm } from "../utils/util";
-  import { pwdStore, completeFileStore, setNotification } from "../utils/store";
+  import { dirsStore, fileActionStore, setNotification } from "../utils/store";
   import * as api from "../utils/api";
   import { subscribe } from "svelte/internal";
-  import type { IFile } from "../utils/types";
+  import type { IFile, IFileAction } from "../utils/types";
 
   export let onClose: () => void;
+  let dirs: Array<string>;
   let form: HTMLFormElement;
   let folderName = "";
   let isSaving = false;
-  let pwd = +localStorage.getItem("root_dir");
+  // let pwd = +localStorage.getItem("root_dir");
 
-  const unsubscribePwd = subscribe(pwdStore, (value) => {
-    if (value > 0 && value !== pwd) {
-      pwd = value;
-    }
+  // const unsubscribePwd = subscribe(pwdStore, (value) => {
+  //   if (value > 0 && value !== pwd) {
+  //     pwd = value;
+  //   }
+  // });
+
+  const unsubscribeDirs = subscribe(dirsStore, (value) => {
+    dirs = value;
   });
 
   onDestroy(() => {
-    unsubscribePwd();
+    unsubscribeDirs();
   });
 
   const onSubmit = async (e: Event) => {
@@ -36,13 +41,15 @@
 
   const sendCreateFolderRequest = async () => {
     const payload = {
-      parent_id: pwd,
+      paths: dirs,
       dir_name: folderName,
     };
 
     try {
       const result: IFile = await api.post("/api/dir", payload, true);
-      completeFileStore.set(result);
+      // completeFileStore.set(result);
+      const CreateDirAction: IFileAction = { action: "complete", file: result };
+      fileActionStore.set(CreateDirAction);
       onClose();
     } catch (e) {
       console.error(e);

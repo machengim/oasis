@@ -1,54 +1,61 @@
 use crate::{
     service::{state::State, token::Token},
-    util::file_system,
+    util,
 };
-use anyhow::Result;
+use anyhow::{anyhow, Result};
+use async_std::fs;
 use serde::Deserialize;
-use std::path::PathBuf;
 use tide::Request;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Default, Debug)]
 pub struct GetDirRequest {
-    pub path: PathBuf,
+    // pub path: PathBuf,
+    pub path: Vec<String>,
+}
+
+#[derive(Deserialize, Default, Debug)]
+pub struct CreateDirRequest {
+    // pub path: PathBuf,
+    pub paths: Vec<String>,
+    pub dir_name: String,
 }
 
 impl GetDirRequest {
-    pub async fn from(req: &mut Request<State>) -> tide::Result<Self> {
-        let token = Token::from_ext(req)?;
-        let mut path = Self::get_user_files_dir(req, &token)?;
+    pub async fn from_req(req: &mut Request<State>) -> Result<Self> {
+        let mut result = Self::default();
 
         if let Ok(dir_path) = req.param("dir_path") {
-            let dir_split = split_dir_string(dir_path)?;
-            for sub_dir in dir_split.iter() {
-                path = path.join(sub_dir);
-            }
+            result.path = util::split_dir_string(dir_path)?;
         }
 
-        Ok(Self { path })
-    }
-
-    pub fn validate(&self) -> bool {
-        self.path.exists() && self.path.is_dir()
-    }
-
-    fn get_user_files_dir(req: &Request<State>, token: &Token) -> Result<PathBuf> {
-        let storage = req.state().get_storage()?;
-        let username = &token.username;
-
-        Ok(file_system::get_user_files_dir(&storage, username).into())
+        Ok(result)
     }
 }
 
-fn split_dir_string(dir_str: &str) -> Result<Vec<String>> {
-    let dir_decode = urlencoding::decode(dir_str)?;
-    let dir_split: Vec<String> = dir_decode
-        .to_string()
-        .split("/")
-        .map(|s| match urlencoding::decode(s) {
-            Ok(v) => v.to_string(),
-            _ => "".to_owned(),
-        })
-        .collect();
+impl CreateDirRequest {
+    pub async fn from_req(req: &mut Request<State>) -> tide::Result<Self> {
+        req.body_json().await
+    }
 
-    Ok(dir_split)
+    pub fn validate(&self) -> bool {
+        self.dir_name.len() > 0
+    }
+
+    pub async fn create_dir(&self, req: &mut Request<State>) -> Result<()> {
+        let storage = req.state().get_storage()?;
+        let username = Token::from_ext(req)?.username;
+        let dir = util::file_system::get_required_dir(&storage, &username, &self.paths);
+
+        if !dir.exists().await || !dir.is_dir().await {
+            return Err(anyhow!("Parent directory not found"));
+        }
+
+        let sub_dir = dir.join(&self.dir_name);
+
+        if sub_dir.exists().await {
+            return Err(anyhow!("Sub directory already existed"));
+        }
+
+        Ok(fs::create_dir(sub_dir).await?)
+    }
 }

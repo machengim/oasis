@@ -31,7 +31,7 @@
     try {
       await api.post("/api/login", payload, false);
       setNotification("success", "Login successfully,");
-      navigate("/");
+      navigate("/files");
     } catch (e) {
       console.error(e);
       setNotification("error", "Login failed.");

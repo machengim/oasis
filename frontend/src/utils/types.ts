@@ -30,7 +30,6 @@ export interface IProgress {
 export interface IFile {
   file_id: number,
   filename: string,
-  path: string,
   size: number,
   file_type: string,
   owner_id: number,
@@ -45,6 +44,11 @@ export interface IFileOrder {
 }
 
 export interface IFileAction {
-  action: "modify" | "delete" | "move",
+  action: "complete" | "modify" | "delete" | "move",
   file: IFile,
+}
+
+export interface IDirContentResponse {
+  dir: IFile,
+  contents: Array<IFile>
 }

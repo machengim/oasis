@@ -1,15 +1,21 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import {
-    pwdStore,
+    dirsStore,
     setNotification,
     completeFileStore,
     clickEventStore,
     fileActionStore,
     filesStore,
+    pwdStore,
   } from "../utils/store";
   import Icon from "../components/Icon.svelte";
-  import type { IFile, IFileAction, IFileOrder } from "../utils/types";
+  import type {
+    IDirContentResponse,
+    IFile,
+    IFileAction,
+    IFileOrder,
+  } from "../utils/types";
   import * as api from "../utils/api";
   import { formatSize, formatTimestamp, checkDir } from "../utils/util";
   import FloatButton from "../sections/FloatButton.svelte";
@@ -19,7 +25,7 @@
 
   const navigate = useNavigate();
 
-  export let dirs: Array<string> = [];
+  export let dir_paths: Array<string> = [];
   let files: IFile[] = [];
   let newCompleteFile: IFile;
   let isLoading = false;
@@ -43,11 +49,11 @@
     }
   });
 
-  // const unsubscribeFileAction = fileActionStore.subscribe((value) => {
-  //   if (value && value.file.parent_id === pwd) {
-  //     handleFileAction(value);
-  //   }
-  // });
+  const unsubscribeFileAction = fileActionStore.subscribe((value) => {
+    if (value && value.file.parent_id === $pwdStore.file_id) {
+      handleFileAction(value);
+    }
+  });
 
   onMount(() => {
     fetchDir();
@@ -56,7 +62,7 @@
   onDestroy(() => {
     unsubscribeCompleteFile();
     unsubscribeClickEvent();
-    // unsubscribeFileAction();
+    unsubscribeFileAction();
   });
 
   $: if (files.length > 0 && order) {
@@ -77,13 +83,15 @@
   }
 
   const fetchDir = async () => {
-    const dir = encodeURIComponent(dirs.join("/"));
-    const endpoint = dir ? `/api/dir/${dir}` : "/api/dir";
+    const encodedPath = encodeURIComponent(dir_paths.join("/"));
+    const endpoint = encodedPath ? `/api/dir/${encodedPath}` : "/api/dir";
     isLoading = true;
 
     try {
-      files = await api.get(endpoint);
+      const result: IDirContentResponse = await api.get(endpoint);
+      files = result.contents;
       filesStore.set(files);
+      pwdStore.set(result.dir);
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read dir content");
@@ -103,7 +111,9 @@
           files = files;
         }
         break;
-
+      case "complete":
+        files = [...files, fileAction.file];
+        break;
       default:
         break;
     }
@@ -168,7 +178,8 @@
 
   const selectFile = (file: IFile) => {
     if (checkDir(file)) {
-      navigate(`/files/${file.file_id}`);
+      let current_dir = $dirsStore.join("/") + "/" + file.filename;
+      navigate(`/files/${current_dir}`);
     } else {
       navigate(`/detail/${file.file_id}`);
     }
@@ -217,13 +228,11 @@
   };
 
   const backToParentDir = () => {
-    //   let parent_id = 0;
-    //   if (dirs.length === 0) {
-    //     parent_id = root_id;
-    //   } else {
-    //     parent_id = dirs[0].file_id;
-    //   }
-    //   navigate(`/files/${parent_id}`);
+    let parent_dir = $dirsStore.slice(0, -1).join("/");
+    if (!parent_dir) {
+      dirsStore.set([]);
+    }
+    navigate(`/files/${parent_dir}`);
   };
 </script>
 
@@ -283,7 +292,7 @@
         {/if}
       </div>
     </div>
-    {#if dirs && dirs.length > 0}
+    {#if dir_paths && dir_paths.length > 0}
       <div
         class="grid grid-cols-5 border-b border-gray-200 py-2 hover:bg-gray-200 cursor-pointer"
         on:click={backToParentDir}

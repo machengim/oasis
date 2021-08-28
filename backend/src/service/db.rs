@@ -1,7 +1,7 @@
 use super::query::Query;
 use sqlx::pool::PoolConnection;
 use sqlx::sqlite::SqliteRow;
-use sqlx::{Connection, FromRow, Sqlite};
+use sqlx::{Connection, FromRow, Sqlite, Transaction};
 
 pub async fn fetch_single<'r, T>(
     query: Query<'r>,
@@ -25,7 +25,7 @@ where
     Ok(stmt.fetch_all(conn).await?)
 }
 
-pub async fn tx_execute<'r>(
+pub async fn tx_execute_2<'r>(
     queries: Vec<Query<'r>>,
     conn: &mut PoolConnection<Sqlite>,
 ) -> anyhow::Result<()> {
@@ -38,6 +38,19 @@ pub async fn tx_execute<'r>(
 
     tx.commit().await?;
     Ok(())
+}
+
+pub async fn tx_execute<'r>(
+    query: Query<'r>,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> anyhow::Result<i64> {
+    let mut insert_id = -1;
+    let stmt = prepare_exec_sql(query.sql, &query.args);
+    if query.sql.to_lowercase().starts_with("insert") {
+        insert_id = stmt.execute(&mut *tx).await?.last_insert_rowid();
+    }
+
+    Ok(insert_id)
 }
 
 pub async fn execute<'a>(

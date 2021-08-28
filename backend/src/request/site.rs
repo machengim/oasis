@@ -16,7 +16,7 @@ pub struct SiteSetupRequest {
 }
 
 impl SiteSetupRequest {
-    pub async fn from(req: &mut Request<State>) -> tide::Result<Self> {
+    pub async fn from_req(req: &mut Request<State>) -> tide::Result<Self> {
         let mut setup_req: Self = req.body_json().await?;
         setup_req.time = Some(chrono::Utc::now().timestamp_millis());
 

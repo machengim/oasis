@@ -9,7 +9,7 @@ pub struct LoginRequest {
 }
 
 impl LoginRequest {
-    pub async fn from(req: &mut Request<State>) -> tide::Result<Self> {
+    pub async fn from_req(req: &mut Request<State>) -> tide::Result<Self> {
         Ok(req.body_json().await?)
     }
 

@@ -97,6 +97,15 @@ pub fn get_user_tmp_dir(storage: &str, username: &str) -> PathBuf {
     get_user_root_dir(storage, username).join("tmp")
 }
 
+pub fn get_required_dir(storage: &str, username: &str, paths: &Vec<String>) -> PathBuf {
+    let mut dir = get_user_files_dir(storage, username);
+    for path in paths.iter() {
+        dir = dir.join(path);
+    }
+
+    dir
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

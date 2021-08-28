@@ -17,7 +17,7 @@ pub async fn get_system_volumes(req: Request<State>) -> Result {
 
 // get "/api/sys/dirs/:dir"
 pub async fn get_system_dirs(req: Request<State>) -> Result {
-    let dir_req = SysDirsRequest::from(&req)?;
+    let dir_req = SysDirsRequest::from_req(&req)?;
 
     if !dir_req.validate().await {
         return Ok(Response::new(StatusCode::BadRequest));

@@ -2,12 +2,14 @@
   import { useLocation } from "svelte-navigator";
   import FilePreview from "./FilePreview.svelte";
   import FileList from "./FileList.svelte";
+  import { dirsStore } from "../utils/store";
 
   const location = useLocation();
-  let dirs: Array<string> = [];
+  let dir_paths: Array<string> = [];
   let filename: string;
 
   $: if ($location) parseLocation();
+  else dirsStore.set([]);
 
   const parseLocation = () => {
     getFilename();
@@ -31,12 +33,13 @@
     let splits = param.split("/").filter((s) => s.length > 0 && s !== "files");
     if (splits.length === 0) return;
 
-    dirs = splits;
+    dir_paths = splits;
+    dirsStore.set(dir_paths);
   };
 </script>
 
 {#if filename}
   <FilePreview />
 {:else}
-  <FileList {dirs} />
+  <FileList {dir_paths} />
 {/if}

@@ -8,7 +8,7 @@ use util::env;
 
 // Post "/api/login".
 pub async fn login(mut req: Request<State>) -> Result {
-    let login_req = LoginRequest::from(&mut req).await?;
+    let login_req = LoginRequest::from_req(&mut req).await?;
     if !login_req.validate() {
         return Ok(Response::new(StatusCode::BadRequest));
     }

@@ -9,7 +9,6 @@ pub fn mount_static(mut app: Server<State>) -> Server<State> {
     app.at("/setup").get(get_setup);
     app.at("/files").get(get_files);
     app.at("/files/*").get(get_files);
-    // app.at("/detail/:file_id").get(get_specific_file);
 
     app
 }
