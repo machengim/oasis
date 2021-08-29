@@ -1,8 +1,6 @@
 use anyhow::Result;
-use async_std::fs;
-use async_std::path::{Path, PathBuf};
-use async_std::prelude::*;
-use std::path::PathBuf as StdPathBuf;
+use rocket::tokio::fs;
+use std::path::PathBuf;
 use std::process::Command;
 
 pub fn get_system_volumes() -> Result<Vec<String>> {
@@ -45,71 +43,27 @@ fn get_mac_volumes() -> Result<Vec<String>> {
     Ok(mountpoints)
 }
 
-// Due to the complexity of the filename encoding methods on different OSs,
-// the conversion between OsString and String should be double checked.
-// Besides, the automatic PathBuf conversion from the request uri
-// should be tested on different OSs as well.
-pub async fn get_dir_content(dir: PathBuf, only_dir: bool) -> Result<Vec<StdPathBuf>> {
-    let dir_absolute = match dir.is_absolute() {
-        true => dir,
-        false => Path::new("/").join(dir),
-    };
-
-    if !dir_absolute.is_dir().await {
+pub async fn get_sub_dirs(dir: &PathBuf) -> Result<Vec<PathBuf>> {
+    if !dir.is_dir() {
         return Err(anyhow::anyhow!("Not a directory!"));
     }
 
-    let mut dir_iterator = fs::read_dir(&dir_absolute).await?;
-    let mut sub_dirs: Vec<StdPathBuf> = Vec::new();
-    while let Some(entry) = dir_iterator.next().await {
-        let path = entry?.path();
-        if !only_dir || path.is_dir().await {
-            sub_dirs.push(path.into());
+    let mut dir_iterator = fs::read_dir(dir).await?;
+    let mut sub_dirs: Vec<PathBuf> = Vec::new();
+    while let Some(entry) = dir_iterator.next_entry().await? {
+        let path = entry.path();
+        if path.is_dir() {
+            sub_dirs.push(path);
         }
     }
 
     Ok(sub_dirs)
 }
 
-pub async fn create_user_dirs(storage: &str, username: &str) -> Result<()> {
-    let files_dir = get_user_files_dir(storage, username);
-    if !files_dir.exists().await {
-        fs::create_dir_all(files_dir).await?;
-    }
-
-    let tmp_dir = get_user_tmp_dir(storage, username);
-    if !tmp_dir.exists().await {
-        fs::create_dir_all(tmp_dir).await?;
-    }
-
-    Ok(())
-}
-
-pub fn get_user_root_dir(storage: &str, username: &str) -> PathBuf {
-    PathBuf::from(storage).join(username)
-}
-
-pub fn get_user_files_dir(storage: &str, username: &str) -> PathBuf {
-    get_user_root_dir(storage, username).join("files")
-}
-
-pub fn get_user_tmp_dir(storage: &str, username: &str) -> PathBuf {
-    get_user_root_dir(storage, username).join("tmp")
-}
-
-pub fn get_required_dir(storage: &str, username: &str, paths: &Vec<String>) -> PathBuf {
-    let mut dir = get_user_files_dir(storage, username);
-    for path in paths.iter() {
-        dir = dir.join(path);
-    }
-
-    dir
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use async_std::task::block_on;
+    use tokio::runtime::Runtime;
 
     #[cfg(target_os = "linux")]
     #[test]
@@ -124,8 +78,8 @@ mod tests {
     #[test]
     fn test_get_sub_directories() {
         let path = PathBuf::from("/home");
-        // let rt = tokio::runtime::Runtime::new().unwrap();
-        let sub_directories = block_on(get_dir_content(path, true)).unwrap();
+        let rt = Runtime::new().unwrap();
+        let sub_directories = rt.block_on(get_sub_dirs(&path)).unwrap();
 
         println!("sub_directories: {:?}", &sub_directories);
         assert!(sub_directories.len() > 0);

@@ -1,46 +1,37 @@
+#[macro_use]
+extern crate rocket;
 mod api;
 mod entity;
-mod request;
 mod service;
 mod util;
-use service::{middleware, route, state::State};
-use util::{env, init};
+use entity::site::Site;
+use rocket::fs::FileServer;
+use service::app_state::AppState;
+use util::init;
 
-use tide::Result;
-
-#[async_std::main]
-async fn main() -> Result<()> {
-    tide::log::start();
-    dotenv::dotenv().ok();
-
-    if !init::check_app_installed() {
-        if let Err(e) = init::init_app_db().await {
-            eprintln!("Cannot create database: {}", e);
-            std::process::exit(1);
-        }
+#[tokio::main]
+async fn main() -> Result<(), sqlx::Error> {
+    if !init::check_db_file() {
+        init::create_db().await?;
     }
 
-    let pool = match init::get_db_pool().await {
-        Ok(pool) => pool,
-        Err(e) => {
-            eprintln!("Cannot get connection pool: {}", e);
-            std::process::exit(1);
-        }
+    let pool = init::get_db_pool().await?;
+    let mut conn = pool.acquire().await?;
+
+    let state = match Site::read(&mut conn).await? {
+        Some(site) => AppState::new_with_site(site, pool),
+        None => AppState::new_without_site(pool),
     };
 
-    let state = State::init(pool).await;
-    let mut app = tide::with_state(state);
-    app.with(middleware::load_token);
+    let server = rocket::build()
+        .manage(state)
+        .mount("/api", api::serve())
+        .mount("/", service::static_route::serve())
+        .mount("/", FileServer::from("../frontend/public"))
+        .launch()
+        .await;
 
-    app = api::mount_api(app);
-    app = route::mount_static(app);
-
-    // Mount static folder
-    let front_dir = env::get_front_dir()?;
-    app.at("/").serve_dir(front_dir)?;
-
-    let address = init::get_listen_address();
-    app.listen(address).await?;
+    server.expect("server failed unexpectedly");
 
     Ok(())
 }

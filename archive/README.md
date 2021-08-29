@@ -3,32 +3,53 @@
 ---
 
 ### V1:
+
 An attempt to build a movie hosting app.
 Contents include:
-+ backend: warp
-+ frontend: react
-+ docs
+
+- backend: warp
+- frontend: react
+- docs
 
 ### V2:
-Switch to file hosting app.
+
+Switch to personal cloud app.
 
 Contents include:
-+ backend: warp
+
+- backend: warp
 
 ### V3:
+
 Contents include:
-+ backend: actix
+
+- backend: actix
 
 ### V4:
+
 Contents include:
-+ frontend: snowpack react
+
+- frontend: snowpack react
 
 ### V5:
+
 Contents include:
-+ frontend: create-react-app react
+
+- frontend: create-react-app react
 
 ### V6:
+
 Switch from `Rocket` to `Tide`
 
 Contents include:
-+ backend: Rocket app
+
+- backend: Rocket app
+
+### V7:
+
+Big change in `Tide`
+
+### V8:
+
+Switch from Personal Cloud App to Personal Static File Hosting App
+Switch from `Tide` to `Rocket` again.

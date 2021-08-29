@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { Link } from "svelte-navigator";
+  import { useLocation } from "svelte-navigator";
   import Icon from "../components/Icon.svelte";
+  const location = useLocation();
 
-  export let path: string = "/";
+  let pathname;
+  $: pathname = $location.pathname;
 
   const buildNav = () => {
-    switch (path) {
+    switch (pathname) {
       case "/setup":
         return "Oasis &gt; Setup";
       case "/login":
@@ -21,8 +23,10 @@
     class="w-11/12 lg:w-4/5 h-full flex flex-row justify-between items-center mx-auto"
   >
     <div class="text-xl">{@html buildNav()}</div>
-    <div class="flex flex-row">
-      <Icon type="profile" color="gray" />
-    </div>
+    {#if pathname === "/files"}
+      <div class="flex flex-row">
+        <Icon type="profile" color="gray" />
+      </div>
+    {/if}
   </div>
 </div>

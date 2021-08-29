@@ -53,7 +53,7 @@
     };
 
     try {
-      await api.post("/api/setup", payload, false);
+      await api.post("/api/sys/setup", payload, false);
       setNotification("success", "Launched successfully.");
     } catch (e) {
       console.error(e);

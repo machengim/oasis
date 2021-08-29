@@ -1,16 +1,9 @@
-import type { IFile } from "./types";
-
 export function upperFirstChar(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
 export function formatTimestamp(timestamp: number) {
   return new Date(timestamp).toISOString().slice(0, 16).replace("T", " ");
-}
-
-export function checkDir(file: IFile) {
-  let file_type = file.file_type.toLowerCase();
-  return file_type === "root" || file_type === "dir";
 }
 
 export function formatSize(size: number) {

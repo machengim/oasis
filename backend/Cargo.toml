@@ -1,23 +1,21 @@
 [package]
 name = "backend"
 version = "0.1.0"
+authors = ["Cheng <machengiam@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tide = "0.16.0"
+rocket = {version = "0.5.0-rc.1", features = ["json"]}
 anyhow = "1.0"
-async-std = { version = "1.8.0", features = ["attributes"] }
-bcrypt = "0.10"
 chrono = "0.4"
-dirs = "3.0"
 dotenv = "0.15.0"
+bcrypt = "0.10"
 jsonwebtoken = "7"
-md5 = "0.7"
 rand = "0.8.4"
-serde = { version = "1.0", features = ["derive"] }
-sqlx = { version = "0.5", features = [ "runtime-async-std-native-tls", "sqlite" ] }
+sqlx = { version = "0.5", features = [ "runtime-tokio-rustls", "sqlite" ] }
+tokio = { version = "1.10.1", features = ["full"] }
 time = "0.2.11"
 urlencoding = "2.1.0"
 uuid = { version = "0.8", features = ["v4"] }

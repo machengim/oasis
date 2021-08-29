@@ -1,11 +1,12 @@
-pub mod env;
+pub mod db;
 pub mod file_system;
 pub mod init;
-use anyhow::Result;
+use anyhow::Result as AnyResult;
 use rand::{distributions::Alphanumeric, Rng};
+use std::path::PathBuf;
 
 pub fn generate_secret_key() -> String {
-    let secret_length = env::must_get_env_value("SECRET_LENGTH", 32);
+    let secret_length = 32;
 
     rand::thread_rng()
         .sample_iter(&Alphanumeric)
@@ -14,20 +15,8 @@ pub fn generate_secret_key() -> String {
         .collect()
 }
 
-pub fn get_timestamp() -> i64 {
-    chrono::Utc::now().timestamp_millis()
-}
+pub fn parse_encoded_url(url: &str) -> AnyResult<PathBuf> {
+    let url_decode = urlencoding::decode(url)?;
 
-pub fn split_dir_string(dir_str: &str) -> Result<Vec<String>> {
-    let dir_decode = urlencoding::decode(dir_str)?;
-    let dir_split: Vec<String> = dir_decode
-        .to_string()
-        .split("/")
-        .map(|s| match urlencoding::decode(s) {
-            Ok(v) => v.to_string(),
-            _ => "".to_owned(),
-        })
-        .collect();
-
-    Ok(dir_split)
+    Ok(PathBuf::from(url_decode.into_owned()))
 }

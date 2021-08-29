@@ -1,49 +1,55 @@
-use crate::args;
-use crate::service::db;
-use crate::service::query::Query;
-use anyhow::Result;
-use serde::Serialize;
-use sqlx::{FromRow, Pool, Sqlite, Transaction};
+use std::path::PathBuf;
 
-#[derive(Serialize, FromRow, Default, Debug, Clone)]
+use crate::args;
+use crate::util::{
+    self,
+    db::{self, fetch_single, Query},
+};
+use sqlx::pool::PoolConnection;
+use sqlx::{FromRow, Sqlite, Transaction};
+
+#[derive(FromRow, Default, Debug)]
 pub struct Site {
+    pub site_id: i64,
     pub version: f64,
-    pub first_run: u8,
-    pub created_at: i64,
-    pub secret: String,
     pub storage: String,
+    pub secret: String,
+    pub created_at: i64,
 }
 
 impl Site {
-    pub async fn create_query(&self, tx: &mut Transaction<'_, Sqlite>) -> Result<()> {
-        let sql = "insert into SITE (version, first_run, created_at, secret, storage) values(?1, ?2, ?3, ?4, ?5)";
-        let query = Query::new(
-            sql,
-            args![
-                self.version,
-                self.first_run,
-                self.created_at,
-                &self.secret,
-                &self.storage
-            ],
-        );
+    pub fn new(storage: &PathBuf, created_at: i64) -> Self {
+        let secret = util::generate_secret_key();
+        let storage_str = storage.to_str().unwrap().to_owned();
 
-        db::tx_execute(query, tx).await?;
-        Ok(())
+        Self {
+            site_id: 0,
+            version: 0.1,
+            storage: storage_str,
+            secret,
+            created_at,
+        }
     }
 
-    pub async fn init_read(pool: &Pool<Sqlite>) -> Self {
-        let query = Query::new("SELECT * FROM site", vec![]);
-        let mut conn = match pool.acquire().await {
-            Ok(conn) => conn,
-            Err(_) => panic!("Cannot get db connection"),
-        };
-        match db::fetch_single::<Site>(query, &mut conn).await {
-            Ok(Some(site)) => site,
-            _ => Site {
-                first_run: 1,
-                ..Default::default()
-            },
+    pub async fn read(conn: &mut PoolConnection<Sqlite>) -> Result<Option<Self>, sqlx::Error> {
+        let sql = "select * from Site";
+        let query = Query::new(sql, vec![]);
+
+        match fetch_single(query, conn).await? {
+            Some(v) => Ok(Some(v)),
+            _ => Ok(None),
         }
+    }
+
+    pub async fn insert_query(&self, tx: &mut Transaction<'_, Sqlite>) -> anyhow::Result<i64> {
+        let sql = "insert into SITE (version, storage, secret, created_at) values (?1, ?2, ?3, ?4)";
+        let query = Query::new(
+            sql,
+            args![self.version, &self.storage, &self.secret, self.created_at],
+        );
+
+        let site_id = db::execute(query, tx).await?;
+
+        Ok(site_id)
     }
 }

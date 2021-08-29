@@ -1,10 +1,10 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification, pwdStore } from "../utils/store";
-  import type { ILoginRequest } from "../utils/types";
+  import { setNotification } from "../utils/store";
   import { navigate } from "svelte-navigator";
   import { validateForm } from "../utils/util";
+  import type { ILoginRequest } from "../utils/types";
 
   let username = "";
   let password = "";
