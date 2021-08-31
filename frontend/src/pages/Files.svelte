@@ -28,7 +28,10 @@
     let param = $location.pathname;
     if (!param) return;
 
-    let splits = param.split("/").filter((s) => s.length > 0 && s !== "files");
+    let splits = param
+      .split("/")
+      .slice(1)
+      .filter((s) => s.length > 0);
     if (splits.length === 0) return;
 
     dir_paths = splits;

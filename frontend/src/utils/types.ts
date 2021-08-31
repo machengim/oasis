@@ -13,3 +13,9 @@ export interface ILoginRequest {
   username: string;
   password: string;
 }
+
+export interface IFile {
+  filename: string,
+  file_type: string,
+  size: number,
+}

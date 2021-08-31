@@ -2,7 +2,6 @@ use super::{app_state::AppState, error::Error};
 use anyhow::Result as AnyResult;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use rocket::{
-    http::Status,
     request::{FromRequest, Outcome},
     serde::{Deserialize, Serialize},
     Request,

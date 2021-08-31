@@ -53,6 +53,12 @@ impl<'r> Responder<'r, 'static> for Error {
     }
 }
 
+impl From<std::io::Error> for Error {
+    fn from(_: std::io::Error) -> Self {
+        Error::InternalServerError
+    }
+}
+
 impl From<sqlx::Error> for Error {
     fn from(_: sqlx::Error) -> Self {
         Error::InternalServerError
