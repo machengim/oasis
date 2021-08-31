@@ -6,6 +6,7 @@
   import Login from "./pages/Login.svelte";
   import Setup from "./pages/Setup.svelte";
   import Home from "./pages/Home.svelte";
+  import Files from "./pages/Files.svelte";
 </script>
 
 <main>
@@ -15,6 +16,7 @@
 
     <Route path="/login" component={Login} />
     <Route path="/setup" component={Setup} />
+    <Route path="/files" component={Files} />
     <Route path="/" component={Home} />
   </Router>
 </main>

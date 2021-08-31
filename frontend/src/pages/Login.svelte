@@ -1,15 +1,18 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification } from "../utils/store";
-  import { navigate } from "svelte-navigator";
+  import { setNotification, sectionStore } from "../utils/store";
+  import { useNavigate } from "svelte-navigator";
   import { validateForm } from "../utils/util";
   import type { ILoginRequest } from "../utils/types";
 
+  const navigate = useNavigate();
   let username = "";
   let password = "";
   let isLoading = false;
   let form: HTMLFormElement;
+
+  sectionStore.set("login");
 
   const onConfirm = async (e: Event) => {
     e.preventDefault();

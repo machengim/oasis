@@ -1,12 +1,12 @@
 <script lang="ts">
   import { useLocation } from "svelte-navigator";
-  import FilePreview from "./FilePreview.svelte";
-  import FileList from "./FileList.svelte";
+  import { sectionStore } from "../utils/store";
 
   const location = useLocation();
   let dir_paths: Array<string> = [];
   let filename: string;
 
+  sectionStore.set("files");
   $: if ($location) parseLocation();
 
   const parseLocation = () => {
@@ -36,8 +36,8 @@
   };
 </script>
 
-{#if filename}
+<!-- {#if filename}
   <FilePreview />
 {:else}
   <FileList {dir_paths} />
-{/if}
+{/if} -->

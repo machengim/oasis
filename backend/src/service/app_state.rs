@@ -35,6 +35,10 @@ impl AppState {
         self.first_run.store(new_first_run, Ordering::Relaxed);
     }
 
+    pub fn get_secret(&self) -> AnyResult<String> {
+        Ok(self.get_site()?.secret.to_owned())
+    }
+
     pub async fn get_pool_conn(&self) -> Result<PoolConnection<Sqlite>, sqlx::Error> {
         Ok(self.pool.acquire().await?)
     }

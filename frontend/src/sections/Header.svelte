@@ -1,29 +1,26 @@
 <script lang="ts">
-  import { useLocation } from "svelte-navigator";
+  import { onDestroy } from "svelte";
+  import { sectionStore } from "../utils/store";
   import Icon from "../components/Icon.svelte";
-  const location = useLocation();
+  import Title from "./Title.svelte";
 
-  let pathname;
-  $: pathname = $location.pathname;
+  let section: string;
 
-  const buildNav = () => {
-    switch (pathname) {
-      case "/setup":
-        return "Oasis &gt; Setup";
-      case "/login":
-        return "Oasis &gt; Login";
-      default:
-        return `Oasis &gt; Files`;
-    }
-  };
+  const unsubscribeSection = sectionStore.subscribe((newSection) => {
+    if (newSection) section = newSection;
+  });
+
+  onDestroy(() => {
+    unsubscribeSection();
+  });
 </script>
 
 <div class="w-full h-14 bg-gray-50 shadow">
   <div
     class="w-11/12 lg:w-4/5 h-full flex flex-row justify-between items-center mx-auto"
   >
-    <div class="text-xl">{@html buildNav()}</div>
-    {#if pathname === "/files"}
+    <Title {section} />
+    {#if section === "files"}
       <div class="flex flex-row">
         <Icon type="profile" color="gray" />
       </div>

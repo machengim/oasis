@@ -40,3 +40,7 @@ export function validateForm(form: HTMLFormElement) {
 
   return true;
 };
+
+export function captilizeFirst(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}

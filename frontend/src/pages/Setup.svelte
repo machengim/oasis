@@ -3,7 +3,7 @@
   import DirBrowser from "../sections/DirBrowser.svelte";
   import * as api from "../utils/api";
   import type { ISetupRequest } from "../utils/types";
-  import { setNotification } from "../utils/store";
+  import { setNotification, sectionStore } from "../utils/store";
   import { useNavigate } from "svelte-navigator";
   const navigate = useNavigate();
 
@@ -14,6 +14,8 @@
   let isLoading = false;
   let isNoStorageError = false;
   let isOpenDirBrowser = false;
+
+  sectionStore.set("setup");
 
   const onConfirm = async (e: Event) => {
     e.preventDefault();

@@ -8,3 +8,5 @@ export function setNotification(type: 'success' | 'error', msg: string) {
     const newNotification: INotification = { type, msg };
     notificationStore.set(newNotification);
 }
+
+export const sectionStore: Writable<string> = writable(null);

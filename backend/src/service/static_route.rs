@@ -1,10 +1,12 @@
+use super::error::Error;
+use super::token::Token;
 use crate::service::app_state::AppState;
 use rocket::fs::NamedFile;
 use rocket::response::Redirect;
-use rocket::{Route, Shutdown, State};
+use rocket::{Either, Route, Shutdown, State};
 
 pub fn serve() -> Vec<Route> {
-    routes![index, index_html, shutdown, login, setup]
+    routes![index, index_html, shutdown, login, setup, files]
 }
 
 #[get("/")]
@@ -21,7 +23,7 @@ fn handle_index(first_run: bool) -> Redirect {
     if first_run {
         Redirect::temporary(uri!("/setup"))
     } else {
-        Redirect::temporary(uri!("/login"))
+        Redirect::temporary(uri!("/files"))
     }
 }
 
@@ -35,13 +37,26 @@ async fn setup() -> Option<NamedFile> {
     open_index_page().await
 }
 
-async fn open_index_page() -> Option<NamedFile> {
-    let index = "../frontend/public/index.html";
-    NamedFile::open(index).await.ok()
+#[get("/files")]
+async fn files(token: Token) -> Either<Option<NamedFile>, Redirect> {
+    if token.uid > 0 && token.permission > 0 {
+        Either::Left(open_index_page().await)
+    } else {
+        Either::Right(Redirect::temporary(uri!("/login")))
+    }
 }
 
 #[get("/shutdown")]
-fn shutdown(shutdown: Shutdown) -> &'static str {
+fn shutdown(shutdown: Shutdown, token: Token) -> Result<&'static str, Error> {
+    if token.uid <= 0 || token.permission != 9 {
+        return Err(Error::Forbidden);
+    }
+
     shutdown.notify();
-    "Shutting down..."
+    Ok("The server is shutting down...")
+}
+
+async fn open_index_page() -> Option<NamedFile> {
+    let index = "../frontend/public/index.html";
+    NamedFile::open(index).await.ok()
 }
