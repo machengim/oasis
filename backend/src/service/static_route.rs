@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use super::error::Error;
 use super::token::Token;
 use crate::service::app_state::AppState;
@@ -6,7 +8,7 @@ use rocket::response::Redirect;
 use rocket::{Either, Route, Shutdown, State};
 
 pub fn serve() -> Vec<Route> {
-    routes![index, index_html, shutdown, login, setup, files]
+    routes![index, index_html, shutdown, login, setup, files, files_all]
 }
 
 #[get("/")]
@@ -39,6 +41,15 @@ async fn setup() -> Option<NamedFile> {
 
 #[get("/files")]
 async fn files(token: Token) -> Either<Option<NamedFile>, Redirect> {
+    handle_files(token).await
+}
+
+#[get("/files/<_dirs..>")]
+async fn files_all(token: Token, _dirs: PathBuf) -> Either<Option<NamedFile>, Redirect> {
+    handle_files(token).await
+}
+
+async fn handle_files(token: Token) -> Either<Option<NamedFile>, Redirect> {
     if token.uid > 0 && token.permission > 0 {
         Either::Left(open_index_page().await)
     } else {

@@ -4,6 +4,14 @@ use std::path::PathBuf;
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
+pub struct File {
+    pub filename: String,
+    pub file_type: FileType,
+    pub size: u64,
+}
+
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
 pub enum FileType {
     Dir,
     Code,
@@ -37,24 +45,20 @@ impl FileType {
     }
 }
 
-#[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
-pub struct File {
-    pub filename: String,
-    pub file_type: FileType,
-    pub size: u64,
-}
-
 impl File {
     pub fn from_path(path: &PathBuf) -> AnyResult<Self> {
         let filename = path.file_name().unwrap().to_string_lossy().to_string();
         let file_type = FileType::get_file_type(path);
-        let meta = path.metadata()?;
+        let size = if path.is_dir() {
+            0
+        } else {
+            path.metadata()?.len()
+        };
 
         Ok(Self {
             filename,
             file_type,
-            size: meta.len(),
+            size,
         })
     }
 }

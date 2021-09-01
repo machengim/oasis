@@ -17,6 +17,7 @@
     <Route path="/login" component={Login} />
     <Route path="/setup" component={Setup} />
     <Route path="/files" component={Files} />
+    <Route path="/files/*" component={Files} />
     <Route path="/" component={Home} />
   </Router>
 </main>

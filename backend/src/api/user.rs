@@ -34,6 +34,7 @@ async fn login(
     let cookie = Cookie::build("token", token_str)
         .path("/")
         .http_only(true)
+        .max_age(time::Duration::days(7))
         .finish();
 
     jar.add(cookie);

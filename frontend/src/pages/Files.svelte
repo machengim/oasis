@@ -1,6 +1,7 @@
 <script lang="ts">
   import { useLocation } from "svelte-navigator";
   import { sectionStore } from "../utils/store";
+  import DirList from "./DirList.svelte";
 
   const location = useLocation();
   let dir_paths: Array<string> = [];
@@ -18,7 +19,7 @@
     let query = $location.search;
     if (!query) return;
 
-    let splits = query.split("?preview=").filter((s) => s.length > 0);
+    let splits = query.split("?view=").filter((s) => s.length > 0);
     if (splits.length !== 1) return;
 
     filename = splits[0];
@@ -28,14 +29,10 @@
     let param = $location.pathname;
     if (!param) return;
 
-    let splits = param
+    dir_paths = param
       .split("/")
-      .slice(1)
-      .filter((s) => s.length > 0);
-    if (splits.length === 0) return;
-
-    dir_paths = splits;
-    // dirsStore.set(dir_paths);
+      .filter((s) => s.length > 0)
+      .slice(1);
   };
 </script>
 
@@ -44,3 +41,5 @@
 {:else}
   <FileList {dir_paths} />
 {/if} -->
+
+<DirList dirs={dir_paths} />

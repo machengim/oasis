@@ -12,9 +12,9 @@ pub fn route() -> Vec<Route> {
     routes![dir_content]
 }
 
-#[get("/dir/<dir>")]
+#[get("/dir?<path>")]
 async fn dir_content(
-    dir: &str,
+    path: Option<&str>,
     token: Token,
     state: &State<AppState>,
 ) -> Result<Json<Vec<File>>, Error> {
@@ -22,9 +22,11 @@ async fn dir_content(
         return Err(Error::Unauthorized);
     }
 
-    let dir = util::parse_encoded_url(dir)?;
     let storage = state.get_site()?.storage.clone();
-    let target_path = PathBuf::from(storage).join(&dir);
+    let target_path = match path {
+        Some(dir) => PathBuf::from(storage).join(&util::parse_encoded_url(dir)?),
+        None => PathBuf::from(storage),
+    };
 
     if !target_path.exists() || !target_path.is_dir() {
         eprintln!("Invalid path: {:?}", &target_path);

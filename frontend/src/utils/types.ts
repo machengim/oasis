@@ -19,3 +19,8 @@ export interface IFile {
   file_type: string,
   size: number,
 }
+
+export interface IFileOrder {
+  key: "name" | "type" | "size",
+  asc: boolean,
+}
