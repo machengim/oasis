@@ -2,15 +2,17 @@
   import { useLocation } from "svelte-navigator";
   import { sectionStore } from "../utils/store";
   import DirList from "./DirList.svelte";
+  import FileVeiw from "./FileVeiw.svelte";
 
   const location = useLocation();
-  let dir_paths: Array<string> = [];
+  let dirs: Array<string> = [];
   let filename: string;
 
   sectionStore.set("files");
   $: if ($location) parseLocation();
 
   const parseLocation = () => {
+    filename = null;
     getFilename();
     getDir();
   };
@@ -29,17 +31,15 @@
     let param = $location.pathname;
     if (!param) return;
 
-    dir_paths = param
+    dirs = param
       .split("/")
       .filter((s) => s.length > 0)
       .slice(1);
   };
 </script>
 
-<!-- {#if filename}
-  <FilePreview />
+{#if filename}
+  <FileVeiw {dirs} {filename} />
 {:else}
-  <FileList {dir_paths} />
-{/if} -->
-
-<DirList dirs={dir_paths} />
+  <DirList {dirs} />
+{/if}

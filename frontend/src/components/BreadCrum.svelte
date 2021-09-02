@@ -4,6 +4,7 @@
   import { captilizeFirst } from "../utils/util";
 
   export let dirs: Array<string>;
+  export let filename = "";
   export let className = "";
 
   const elementStyle = "flex flex-row text-lg leading-tight " + className;
@@ -35,4 +36,8 @@
       class="hover:bg-blue-400 hover:text-white px-1 rounded">{dir}</Link
     >
   {/each}
+  {#if filename}
+    <span>/</span>
+    <span class="px-1 rounded">{filename}</span>
+  {/if}
 </div>

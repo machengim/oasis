@@ -1,6 +1,7 @@
 use crate::entity::file::File;
 use crate::service::app_state::AppState;
 use crate::service::error::Error;
+use crate::service::range::RangedFile;
 use crate::service::token::Token;
 use crate::util;
 use rocket::serde::json::Json;
@@ -9,7 +10,7 @@ use rocket::{Route, State};
 use std::path::PathBuf;
 
 pub fn route() -> Vec<Route> {
-    routes![dir_content]
+    routes![dir_content, file_content]
 }
 
 #[get("/dir?<path>")]
@@ -29,7 +30,7 @@ async fn dir_content(
     };
 
     if !target_path.exists() || !target_path.is_dir() {
-        eprintln!("Invalid path: {:?}", &target_path);
+        eprintln!("Invalid dir path: {:?}", &target_path);
         return Err(Error::BadRequest);
     }
 
@@ -41,4 +42,25 @@ async fn dir_content(
     }
 
     Ok(Json(content))
+}
+
+#[get("/file?<path>")]
+async fn file_content(
+    path: &str,
+    token: Token,
+    state: &State<AppState>,
+) -> Result<RangedFile, Error> {
+    if token.uid <= 0 || token.permission <= 0 {
+        return Err(Error::Unauthorized);
+    }
+
+    let storage = state.get_site()?.storage.clone();
+    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+
+    if !target_path.exists() || !target_path.is_file() {
+        eprintln!("Invalid file path: {:?}", &target_path);
+        return Err(Error::BadRequest);
+    }
+
+    Ok(RangedFile { path: target_path })
 }

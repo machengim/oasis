@@ -84,10 +84,14 @@
   };
 
   const selectFile = (file: IFile) => {
+    let path: string;
     if (file.file_type.toLowerCase() === "dir") {
-      const path = dirs.join("/") + "/" + file.filename;
-      navigateFile(path);
+      path = dirs.join("/") + "/" + file.filename;
+    } else {
+      path = dirs.join("/") + "?view=" + file.filename;
     }
+
+    navigateFile(path);
   };
 
   const backToParentDir = () => {
