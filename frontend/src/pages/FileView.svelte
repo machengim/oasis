@@ -1,15 +1,8 @@
 <script lang="ts">
-  import { useNavigate } from "svelte-navigator";
-  import { setNotification } from "../utils/store";
-  import type { IFile, IFileOrder } from "../utils/types";
-  import * as api from "../utils/api";
-  import Icon from "../components/Icon.svelte";
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
   import VideoPlayer from "../players/VideoPlayer.svelte";
-  import { formatSize } from "../utils/util";
 
-  const navigate = useNavigate();
   export let dirs: Array<string>;
   export let filename: string;
   let isLoading = false;
@@ -40,10 +33,11 @@
       <div class="flex flex-row flex-wrap mt-4">
         <div class="w-full lg:w-3/4">
           {#if file_ext === "mp4"}
+            <!-- <VideoPlayer {dirs} {filename} /> -->
             <VideoPlayer {dirs} {filename} />
           {/if}
         </div>
-        <div class="flex flex-col w-full lg:w-1/4 lg:pl-4 lg:mt-4">
+        <div class="flex flex-col w-full lg:w-1/4 lg:pl-4 mt-4 lg:mt-0">
           File list
         </div>
       </div>

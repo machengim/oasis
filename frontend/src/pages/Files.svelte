@@ -24,7 +24,7 @@
     let splits = query.split("?view=").filter((s) => s.length > 0);
     if (splits.length !== 1) return;
 
-    filename = splits[0];
+    filename = decodeURIComponent(splits[0]);
   };
 
   const getDir = () => {
@@ -34,6 +34,7 @@
     dirs = param
       .split("/")
       .filter((s) => s.length > 0)
+      .map((s) => decodeURIComponent(s))
       .slice(1);
   };
 </script>
