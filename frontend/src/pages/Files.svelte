@@ -2,7 +2,7 @@
   import { useLocation } from "svelte-navigator";
   import { sectionStore } from "../utils/store";
   import DirList from "./DirList.svelte";
-  import FileVeiw from "./FileVeiw.svelte";
+  import FileView from "./FileView.svelte";
 
   const location = useLocation();
   let dirs: Array<string> = [];
@@ -39,7 +39,7 @@
 </script>
 
 {#if filename}
-  <FileVeiw {dirs} {filename} />
+  <FileView {dirs} {filename} />
 {:else}
   <DirList {dirs} />
 {/if}
