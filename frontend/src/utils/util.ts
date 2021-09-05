@@ -1,4 +1,4 @@
-import  {FileType} from './types';
+import { FileType, IFile, IFileOrder } from './types';
 
 export function upperFirstChar(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
@@ -49,7 +49,7 @@ export function captilizeFirst(input: string) {
 
 export function compareArray<T>(arrayA: Array<T>, arrayB: Array<T>) {
   return arrayA.length === arrayB.length &&
-    arrayA.every(function(value, index) { return value === arrayB[index]});
+    arrayA.every(function (value, index) { return value === arrayB[index] });
 }
 
 export function inferFileType(ext: string) {
@@ -70,7 +70,7 @@ export function inferFileType(ext: string) {
     case "jpeg":
       return FileType.Image;
     case "mp3":
-    case "ogg" :
+    case "ogg":
     case "flac":
     case "aac":
       return FileType.Music;
@@ -79,6 +79,7 @@ export function inferFileType(ext: string) {
     case "mkv":
     case "avi":
     case "mov":
+    case "flv":
       return FileType.Video;
     case "pdf":
       return FileType.Pdf;
@@ -88,3 +89,27 @@ export function inferFileType(ext: string) {
       return FileType.Unknown;
   }
 }
+
+export function compareFile(a: IFile, b: IFile, order: IFileOrder) {
+  let ascFactor = order.asc ? 1 : -1;
+  let result = 0;
+
+  switch (order.key) {
+    case "name":
+      const aUpper = a.filename.toUpperCase();
+      const bUpper = b.filename.toUpperCase();
+      result = aUpper > bUpper ? 1 : aUpper < bUpper ? -1 : 0;
+      break;
+    case "size":
+      result = a.size - b.size;
+      break;
+    case "type":
+      result =
+        a.file_type > b.file_type ? 1 : a.file_type < b.file_type ? -1 : 0;
+      break;
+    default:
+      break;
+  }
+
+  return result * ascFactor;
+};

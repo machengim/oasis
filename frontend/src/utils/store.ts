@@ -14,3 +14,5 @@ export const sectionStore: Writable<string> = writable(null);
 export const dirsStore: Writable<Array<string>> = writable([]);
 
 export const filesStore: Writable<Array<IFile>> = writable([]);
+
+export const autoPlayStore: Writable<boolean> = writable(false);

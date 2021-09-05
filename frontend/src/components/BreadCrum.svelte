@@ -38,6 +38,6 @@
   {/each}
   {#if filename}
     <span>/</span>
-    <span class="px-1 rounded">{filename}</span>
+    <span class="px-1 rounded text-gray-500">{filename}</span>
   {/if}
 </div>

@@ -6,7 +6,7 @@
   import Icon from "../components/Icon.svelte";
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
-  import { formatSize } from "../utils/util";
+  import { formatSize, compareFile } from "../utils/util";
 
   const navigate = useNavigate();
   export let dirs: Array<string>;
@@ -55,34 +55,10 @@
     let dirs = files.filter((f) => f.file_type.toUpperCase() === "DIR");
     let others = files.filter((f) => f.file_type.toUpperCase() !== "DIR");
 
-    dirs.sort(compareFile);
-    others.sort(compareFile);
+    dirs.sort((a, b) => compareFile(a, b, order));
+    others.sort((a, b) => compareFile(a, b, order));
 
     files = dirs.concat(others);
-  };
-
-  const compareFile = (a: IFile, b: IFile) => {
-    let ascFactor = order.asc ? 1 : -1;
-    let result = 0;
-
-    switch (order.key) {
-      case "name":
-        const aUpper = a.filename.toUpperCase();
-        const bUpper = b.filename.toUpperCase();
-        result = aUpper > bUpper ? 1 : aUpper < bUpper ? -1 : 0;
-        break;
-      case "size":
-        result = a.size - b.size;
-        break;
-      case "type":
-        result =
-          a.file_type > b.file_type ? 1 : a.file_type < b.file_type ? -1 : 0;
-        break;
-      default:
-        break;
-    }
-
-    return result * ascFactor;
   };
 
   const selectFile = (file: IFile) => {

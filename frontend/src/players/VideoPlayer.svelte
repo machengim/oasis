@@ -1,13 +1,15 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { autoPlayStore } from "../utils/store";
   import Plyr from "plyr";
 
   export let dirs: Array<string>;
   export let filename: string;
+  export let onComplete: () => void;
   let player: Plyr;
-  let video_path: string;
-  let track_path = "https://media.vimejs.com/subs/english.vtt";
-  let is_loop = false;
+  let videoPath: string;
+  let trackPath = "https://media.vimejs.com/subs/english.vtt";
+  let isLoop = false;
 
   onMount(() => {
     player = new Plyr("video", {
@@ -27,29 +29,45 @@
       keyboard: { focused: true, global: true },
       speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
     });
+
+    player.on("ended", (_) => {
+      onComplete();
+    });
+
+    player.on("ready", (_) => {
+      if ($autoPlayStore) {
+        player.play();
+      }
+    });
   });
 
   $: if (dirs && filename) {
     buildVideoPath();
   }
 
+  $: if (player && videoPath) {
+    player.source = {
+      type: "video",
+      sources: [
+        {
+          src: videoPath,
+          type: "video/mp4",
+        },
+      ],
+    };
+  }
+
   const buildVideoPath = () => {
     let dir = dirs.join("/");
-    let file_path = dir ? dir + "/" + filename : filename;
+    let filePath = dir ? dir + "/" + filename : filename;
 
-    video_path = "/api/file?path=" + encodeURIComponent(file_path);
+    videoPath = "/api/file?path=" + encodeURIComponent(filePath);
   };
 </script>
 
 <div>
-  <video
-    id="player"
-    crossorigin="anonymous"
-    playsinline
-    controls
-    loop={is_loop}
-  >
-    <source src={video_path} type="video/mp4" />
-    <track kind="captions" src={track_path} default />
+  <video id="player" crossorigin="anonymous" playsinline controls loop={isLoop}>
+    <source src={videoPath} type="video/mp4" />
+    <track kind="captions" src={trackPath} default />
   </video>
 </div>
