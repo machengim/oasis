@@ -1,3 +1,5 @@
+import  {FileType} from './types';
+
 export function upperFirstChar(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
@@ -41,6 +43,48 @@ export function validateForm(form: HTMLFormElement) {
   return true;
 };
 
-export function captilizeFirst(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+export function captilizeFirst(input: string) {
+  return input.charAt(0).toUpperCase() + input.slice(1);
+}
+
+export function compareArray<T>(arrayA: Array<T>, arrayB: Array<T>) {
+  return arrayA.length === arrayB.length &&
+    arrayA.every(function(value, index) { return value === arrayB[index]});
+}
+
+export function inferFileType(ext: string) {
+  switch (ext.toLowerCase()) {
+    case "c":
+    case "cpp":
+    case "js":
+    case "ts":
+    case "rs":
+    case "py":
+    case "java":
+    case "html":
+    case "css":
+      return FileType.Code;
+    case "png":
+    case "gif":
+    case "jpg":
+    case "jpeg":
+      return FileType.Image;
+    case "mp3":
+    case "ogg" :
+    case "flac":
+    case "aac":
+      return FileType.Music;
+    case "mp4":
+    case "webm":
+    case "mkv":
+    case "avi":
+    case "mov":
+      return FileType.Video;
+    case "pdf":
+      return FileType.Pdf;
+    case "txt":
+      return FileType.Text;
+    default:
+      return FileType.Unknown;
+  }
 }

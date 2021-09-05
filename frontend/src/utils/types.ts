@@ -16,11 +16,21 @@ export interface ILoginRequest {
 
 export interface IFile {
   filename: string,
-  file_type: string,
+  file_type: FileType,
   size: number,
 }
 
 export interface IFileOrder {
   key: "name" | "type" | "size",
   asc: boolean,
+}
+
+export enum FileType {
+  Code = "Code",
+  Image = "Image",
+  Pdf = "Pdf",
+  Music = "Music",
+  Text = "Text",
+  Video = "Video",
+  Unknown = "Unknown",
 }

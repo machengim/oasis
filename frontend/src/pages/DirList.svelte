@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useNavigate } from "svelte-navigator";
-  import { setNotification } from "../utils/store";
+  import { setNotification, dirsStore, filesStore } from "../utils/store";
   import type { IFile, IFileOrder } from "../utils/types";
   import * as api from "../utils/api";
   import Icon from "../components/Icon.svelte";
@@ -29,6 +29,8 @@
     isLoading = true;
     try {
       files = await api.get(endpoint);
+      dirsStore.set(dirs);
+      filesStore.set(files);
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read directory");

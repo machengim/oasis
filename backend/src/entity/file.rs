@@ -30,7 +30,7 @@ impl FileType {
             "jpg" | "jpeg" | "gif" | "png" => Self::Image,
             "mp3" | "flac" | "aac" | "ogg" => Self::Music,
             "pdf" => Self::Pdf,
-            "mp4" | "mov" | "avi" | "mkv" => Self::Video,
+            "mp4" | "mov" | "avi" | "mkv" | "webm" => Self::Video,
             "txt" => Self::Text,
             _ => Self::Unknown,
         }

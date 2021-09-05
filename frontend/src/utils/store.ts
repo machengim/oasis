@@ -1,5 +1,5 @@
 import { Writable, writable } from 'svelte/store';
-import type { INotification } from './types';
+import type { IFile, INotification } from './types';
 
 // Notification store
 export const notificationStore: Writable<INotification> = writable(null);
@@ -10,3 +10,7 @@ export function setNotification(type: 'success' | 'error', msg: string) {
 }
 
 export const sectionStore: Writable<string> = writable(null);
+
+export const dirsStore: Writable<Array<string>> = writable([]);
+
+export const filesStore: Writable<Array<IFile>> = writable([]);
