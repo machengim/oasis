@@ -101,10 +101,13 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bcrypt",
+ "chardetng",
  "chrono",
  "dotenv",
+ "encoding_rs",
  "jsonwebtoken",
  "rand",
+ "regex",
  "rocket",
  "sqlx",
  "time 0.2.27",
@@ -203,6 +206,17 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "chardetng"
+version = "0.1.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36a5a2ca47925d19fb6835f53b3e70dec0d25659211c8ee5cc784f1fd6838f9c"
+dependencies = [
+ "cfg-if",
+ "encoding_rs",
+ "memchr",
+]
 
 [[package]]
 name = "chrono"

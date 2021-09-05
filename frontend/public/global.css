@@ -19,3 +19,10 @@ input:disabled {
 .border-circle {
   border-radius: 50%;
 }
+
+:root {
+  --plyr-font-size-small: 1rem;
+  --plyr-font-size-base: 1.3rem;
+  --plyr-font-size-large: 1.6rem;
+  --plyr-font-size-xlarge: 2rem;
+}

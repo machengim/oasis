@@ -7,8 +7,6 @@
   export let filename: string;
   export let onComplete: () => void;
   let player: Plyr;
-  let videoPath: string;
-  let trackPath = "https://media.vimejs.com/subs/english.vtt";
   let isLoop = false;
 
   onMount(() => {
@@ -30,28 +28,32 @@
       speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
     });
 
-    player.on("ended", (_) => {
-      onComplete();
-    });
-
     player.on("ready", (_) => {
       if ($autoPlayStore) {
         player.play();
       }
     });
+
+    player.on("ended", (_) => {
+      onComplete();
+    });
   });
 
-  $: if (dirs && filename) {
-    buildVideoPath();
-  }
-
-  $: if (player && videoPath) {
+  $: if (dirs && filename && player) {
     player.source = {
       type: "video",
       sources: [
         {
-          src: videoPath,
+          src: buildVideoPath(),
           type: "video/mp4",
+        },
+      ],
+      tracks: [
+        {
+          kind: "captions",
+          label: "Caption",
+          src: buildTrackPath(),
+          default: true,
         },
       ],
     };
@@ -61,13 +63,31 @@
     let dir = dirs.join("/");
     let filePath = dir ? dir + "/" + filename : filename;
 
-    videoPath = "/api/file?path=" + encodeURIComponent(filePath);
+    return "/api/file?path=" + encodeURIComponent(filePath);
+  };
+
+  const buildTrackPath = () => {
+    const splits = filename.split(".");
+    if (splits.length <= 1) return null;
+
+    splits.pop();
+    const trackFilename = splits.join("") + ".vtt";
+    let dir = dirs.join("/");
+    let filePath = dir ? dir + "/" + trackFilename : trackFilename;
+
+    return "/api/track?path=" + encodeURIComponent(filePath);
   };
 </script>
 
 <div>
-  <video id="player" crossorigin="anonymous" playsinline controls loop={isLoop}>
-    <source src={videoPath} type="video/mp4" />
-    <track kind="captions" src={trackPath} default />
+  <video
+    class="player"
+    crossorigin="anonymous"
+    playsinline
+    controls
+    loop={isLoop}
+  >
+    <source type="video/mp4" />
+    <track kind="captions" default />
   </video>
 </div>

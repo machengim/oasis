@@ -9,11 +9,14 @@ edition = "2018"
 [dependencies]
 rocket = {version = "0.5.0-rc.1", features = ["json"]}
 anyhow = "1.0"
+chardetng = "0.1.14"
 chrono = "0.4"
 dotenv = "0.15.0"
 bcrypt = "0.10"
+encoding_rs = "0.8.28"
 jsonwebtoken = "7"
 rand = "0.8.4"
+regex = "1.0"
 sqlx = { version = "0.5", features = [ "runtime-tokio-rustls", "sqlite" ] }
 tokio = { version = "1.10.1", features = ["full"] }
 time = "0.2.11"

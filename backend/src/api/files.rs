@@ -3,6 +3,7 @@ use crate::service::app_state::AppState;
 use crate::service::error::Error;
 use crate::service::range::RangedFile;
 use crate::service::token::Token;
+use crate::service::track;
 use crate::util;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
@@ -10,7 +11,7 @@ use rocket::{Route, State};
 use std::path::PathBuf;
 
 pub fn route() -> Vec<Route> {
-    routes![dir_content, file_content]
+    routes![dir_content, file_content, video_track]
 }
 
 #[get("/dir?<path>")]
@@ -63,4 +64,24 @@ async fn file_content(
     }
 
     Ok(RangedFile { path: target_path })
+}
+
+#[get("/track?<path>")]
+async fn video_track(path: &str, token: Token, state: &State<AppState>) -> Result<String, Error> {
+    if token.uid <= 0 || token.permission <= 0 {
+        return Err(Error::Unauthorized);
+    }
+
+    let storage = state.get_site()?.storage.clone();
+    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+
+    let track_str = match track::get_track(target_path).await {
+        Ok(str) => str,
+        Err(e) => {
+            eprintln!("{}", e);
+            return Err(Error::InternalServerError);
+        }
+    };
+
+    Ok(track_str)
 }
