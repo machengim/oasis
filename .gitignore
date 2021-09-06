@@ -103,6 +103,7 @@ dist
 .tern-port
 
 **/build/**
+**/release/**
 **/target/**
 **/oasis.exe
 **/a.txt
