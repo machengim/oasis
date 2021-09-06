@@ -12,7 +12,7 @@
   import Spinner from "../components/Spinner.svelte";
   import Switch from "../components/Switch.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
-  import VideoPlayer from "../players/VideoPlayer.svelte";
+  import MediaPlayer from "../players/MediaPlayer.svelte";
   import { inferFileType, compareArray, compareFile } from "../utils/util";
   import * as api from "../utils/api";
 
@@ -113,8 +113,13 @@
     {:else}
       <div class="flex flex-row flex-wrap mt-4">
         <div class="w-full lg:w-3/4">
-          {#if fileType === FileType.Video}
-            <VideoPlayer {dirs} {filename} onComplete={onMediaComplete} />
+          {#if fileType === FileType.Video || fileType === FileType.Music}
+            <MediaPlayer
+              {dirs}
+              {filename}
+              {fileType}
+              onComplete={onMediaComplete}
+            />
           {/if}
         </div>
         <div
