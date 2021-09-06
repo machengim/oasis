@@ -6,12 +6,31 @@
     | "add"
     | "close"
     | "up"
-    | "down";
-  export let color: "green" | "yellow" | "red" | "gray" | "black" | "white" =
-    "black";
+    | "down"
+    | "folder"
+    | "code"
+    | "image"
+    | "text"
+    | "music"
+    | "video"
+    | "unknown";
+  export let color:
+    | "green"
+    | "yellow"
+    | "red"
+    | "pink"
+    | "gray"
+    | "black"
+    | "white"
+    | "blue" = "black";
   export let size: "small" | "tiny" | "default" = "default";
   export let className: string = "";
   export let onClick: () => void = null;
+  let iconColor = "#000";
+
+  $: if (color) {
+    iconColor = convertColor();
+  }
 
   const buildStyle = () => {
     let style: string;
@@ -33,6 +52,25 @@
     return style;
   };
 
+  const convertColor = () => {
+    switch (color) {
+      case "green":
+        return "#34D399";
+      case "blue":
+        return "#60a5fa";
+      case "red":
+        return "#EF4444";
+      case "yellow":
+        return "#FBBF24";
+      case "gray":
+        return "#9CA3AF";
+      case "pink":
+        return "#F472B6";
+      default:
+        return color;
+    }
+  };
+
   const getIcon = () => {
     switch (type) {
       case "success":
@@ -42,13 +80,27 @@
       case "profile":
         return `<path d="M258.9,48C141.92,46.42,46.42,141.92,48,258.9,49.56,371.09,140.91,462.44,253.1,464c117,1.6,212.48-93.9,210.88-210.88C462.44,140.91,371.09,49.56,258.9,48ZM385.32,375.25a4,4,0,0,1-6.14-.32,124.27,124.27,0,0,0-32.35-29.59C321.37,329,289.11,320,256,320s-65.37,9-90.83,25.34a124.24,124.24,0,0,0-32.35,29.58,4,4,0,0,1-6.14.32A175.32,175.32,0,0,1,80,259C78.37,161.69,158.22,80.24,255.57,80S432,158.81,432,256A175.32,175.32,0,0,1,385.32,375.25Z"/><path d="M256,144c-19.72,0-37.55,7.39-50.22,20.82s-19,32-17.57,51.93C191.11,256,221.52,288,256,288s64.83-32,67.79-71.24c1.48-19.74-4.8-38.14-17.68-51.82C293.39,151.44,275.59,144,256,144Z"/>`;
       case "add":
-        return `<line x1="256" y1="112" x2="256" y2="400" style="fill:none;stroke:${color};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="400" y1="256" x2="112" y2="256" style="fill:none;stroke:${color};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+        return `<line x1="256" y1="112" x2="256" y2="400" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="400" y1="256" x2="112" y2="256" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
       case "close":
-        return `<line x1="368" y1="368" x2="144" y2="144" style="fill:none;stroke:${color};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="368" y1="144" x2="144" y2="368" style="fill:none;stroke:${color};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+        return `<line x1="368" y1="368" x2="144" y2="144" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="368" y1="144" x2="144" y2="368" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
       case "down":
-        return `<polyline points="112 184 256 328 400 184" style="fill:none;stroke:${color};stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>`;
+        return `<polyline points="112 184 256 328 400 184" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>`;
       case "up":
-        return `<polyline points="112 328 256 184 400 328" style="fill:none;stroke:${color};stroke-linecap:square;stroke-miterlimit:10;stroke-width:48px"/>`;
+        return `<polyline points="112 328 256 184 400 328" style="fill:none;stroke:${iconColor};stroke-linecap:square;stroke-miterlimit:10;stroke-width:48px"/>`;
+      case "folder":
+        return `<path d="M64,192V120a40,40,0,0,1,40-40h75.89a40,40,0,0,1,22.19,6.72l27.84,18.56A40,40,0,0,0,252.11,112H408a40,40,0,0,1,40,40v40" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M479.9,226.55,463.68,392a40,40,0,0,1-39.93,40H88.25a40,40,0,0,1-39.93-40L32.1,226.55A32,32,0,0,1,64,192h384.1A32,32,0,0,1,479.9,226.55Z" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+      case "code":
+        return `<polyline points="160 368 32 256 160 144" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="352 368 480 256 352 144" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="304" y1="96" x2="208" y2="416" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+      case "image":
+        return `<rect x="48" y="80" width="416" height="352" rx="48" ry="48" style="fill:none;stroke:${iconColor};stroke-linejoin:round;stroke-width:32px"/><circle cx="336" cy="176" r="32" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/><path d="M304,335.79,213.34,245.3A32,32,0,0,0,169.47,244L48,352" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M224,432,347.34,308.66a32,32,0,0,1,43.11-2L464,368" style="fill:none;${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+      case "text":
+        return `<path d="M416,221.25V416a48,48,0,0,1-48,48H144a48,48,0,0,1-48-48V96a48,48,0,0,1,48-48h98.75a32,32,0,0,1,22.62,9.37L406.63,198.63A32,32,0,0,1,416,221.25Z" style="fill:none;stroke:${iconColor};stroke-linejoin:round;stroke-width:32px"/><path d="M256,56V176a32,32,0,0,0,32,32H408" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="176" y1="288" x2="336" y2="288" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="176" y1="368" x2="336" y2="368" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+      case "music":
+        return `<path d="M192,218v-6c0-14.84,10-27,24.24-30.59l174.59-46.68A20,20,0,0,1,416,154V176" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M416,295.94v80c0,13.91-8.93,25.59-22,30l-22,8c-25.9,8.72-52-10.42-52-38h0a33.37,33.37,0,0,1,23-32l51-18.15c13.07-4.4,22-15.94,22-29.85V58a10,10,0,0,0-12.6-9.61L204,102a16.48,16.48,0,0,0-12,16v226c0,13.91-8.93,25.6-22,30l-52,18c-13.88,4.68-22,17.22-22,32h0c0,27.58,26.52,46.55,52,38l22-8c13.07-4.4,22-16.08,22-30v-80" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+      case "video":
+        return `<path d="M374.79,308.78,457.5,367A16,16,0,0,0,480,352.38V159.62A16,16,0,0,0,457.5,145l-82.71,58.22A16,16,0,0,0,368,216.3v79.4A16,16,0,0,0,374.79,308.78Z" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M268,384H84a52.15,52.15,0,0,1-52-52V180a52.15,52.15,0,0,1,52-52H268.48A51.68,51.68,0,0,1,320,179.52V332A52.15,52.15,0,0,1,268,384Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/>`;
+      case "unknown":
+        return `<path d="M160,164s1.44-33,33.54-59.46C212.6,88.83,235.49,84.28,256,84c18.73-.23,35.47,2.94,45.48,7.82C318.59,100.2,352,120.6,352,164c0,45.67-29.18,66.37-62.35,89.18S248,298.36,248,324" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:40px"/><circle cx="248" cy="399.99" r="32" style="fill:${iconColor};"/>`;
       default:
         return null;
     }
@@ -67,18 +119,21 @@
 
 <style>
   .fill-green {
-    fill: rgb(52, 211, 153);
+    fill: #34d399;
   }
   .fill-red {
-    fill: rgb(248, 113, 113);
+    fill: #ef4444;
   }
   .fill-gray {
-    fill: #374151;
+    fill: #9ca3af;
   }
   .fill-black {
     fill: black;
   }
   .fill-white {
     fill: white;
+  }
+  .fill-blue {
+    fill: #60a5fa;
   }
 </style>

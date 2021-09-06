@@ -27,10 +27,22 @@ export interface IFileOrder {
 
 export enum FileType {
   Code = "Code",
+  Dir = "Dir",
   Image = "Image",
   Pdf = "Pdf",
   Music = "Music",
   Text = "Text",
   Video = "Video",
   Unknown = "Unknown",
+}
+
+export enum IconType {
+  success = "success",
+  error = "error",
+  profile = "profile",
+  add = "add",
+  close = "close",
+  up = "up",
+  down = "down",
+  folder = "folder",
 }

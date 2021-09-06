@@ -7,6 +7,7 @@
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
   import { formatSize, compareFile } from "../utils/util";
+  import FileIcon from "../components/FileIcon.svelte";
 
   const navigate = useNavigate();
   export let dirs: Array<string>;
@@ -143,7 +144,12 @@
           class="grid grid-cols-5 border-b border-gray-200 py-2 hover:bg-gray-200 cursor-pointer"
           on:click={() => selectFile(file)}
         >
-          <div class="col-span-3 px-2">{file.filename}</div>
+          <div class="col-span-3 px-2 flex flex-row items-center">
+            <FileIcon file_type={file.file_type} />
+            <span class="ml-2">
+              {file.filename}
+            </span>
+          </div>
           <div class="px-2">{file.file_type}</div>
           <div class="px-2">{formatSize(file.size)}</div>
         </div>
