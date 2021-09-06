@@ -90,11 +90,6 @@ fn detect_encoding(buffer: &[u8]) -> AnyResult<&'static Encoding> {
 }
 
 #[cfg(test)]
-mod test {
-    use super::*;
-}
-
-#[cfg(test)]
 mod tests {
     use super::*;
     use tokio::runtime::Runtime;

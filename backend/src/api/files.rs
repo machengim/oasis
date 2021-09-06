@@ -4,14 +4,14 @@ use crate::service::error::Error;
 use crate::service::range::RangedFile;
 use crate::service::token::Token;
 use crate::service::track;
-use crate::util;
+use crate::util::{self, file_system};
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
 use rocket::{Route, State};
 use std::path::PathBuf;
 
 pub fn route() -> Vec<Route> {
-    routes![dir_content, file_content, video_track]
+    routes![dir_content, file_content, video_track, text_file_content]
 }
 
 #[get("/dir?<path>")]
@@ -66,7 +66,7 @@ async fn file_content(
     Ok(RangedFile { path: target_path })
 }
 
-#[get("/track?<path>")]
+#[get("/file/track?<path>")]
 async fn video_track(path: &str, token: Token, state: &State<AppState>) -> Result<String, Error> {
     if token.uid <= 0 || token.permission <= 0 {
         return Err(Error::Unauthorized);
@@ -79,9 +79,30 @@ async fn video_track(path: &str, token: Token, state: &State<AppState>) -> Resul
         Ok(str) => str,
         Err(e) => {
             eprintln!("{}", e);
-            return Err(Error::InternalServerError);
+            return Err(Error::NotFound);
         }
     };
 
     Ok(track_str)
+}
+
+#[get("/file/text?<path>")]
+async fn text_file_content(
+    path: &str,
+    token: Token,
+    state: &State<AppState>,
+) -> Result<String, Error> {
+    if token.uid <= 0 || token.permission <= 0 {
+        return Err(Error::Unauthorized);
+    }
+
+    let storage = state.get_site()?.storage.clone();
+    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+
+    if !target_path.exists() || !target_path.is_file() {
+        eprintln!("Invalid file path: {:?}", &target_path);
+        return Err(Error::NotFound);
+    }
+
+    Ok(file_system::read_text_file(target_path).await?)
 }

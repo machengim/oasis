@@ -84,6 +84,8 @@ export function inferFileType(ext: string) {
     case "pdf":
       return FileType.Pdf;
     case "txt":
+    case "srt":
+    case "vtt":
       return FileType.Text;
     default:
       return FileType.Unknown;

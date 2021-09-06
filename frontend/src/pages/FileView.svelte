@@ -15,6 +15,7 @@
   import MediaPlayer from "../players/MediaPlayer.svelte";
   import { inferFileType, compareArray, compareFile } from "../utils/util";
   import * as api from "../utils/api";
+  import TextViewer from "../players/TextViewer.svelte";
 
   const navigate = useNavigate();
   export let dirs: Array<string>;
@@ -120,6 +121,10 @@
               {fileType}
               onComplete={onMediaComplete}
             />
+          {:else if fileType === FileType.Text || fileType === FileType.Code}
+            <TextViewer {dirs} {filename} {fileType} />
+          {:else}
+            <div>Cannot display this file.</div>
           {/if}
         </div>
         <div
@@ -127,13 +132,15 @@
         >
           <div class="flex flex-row items-center justify-between px-2 py-1">
             <div class="text-xl">File list</div>
-            <div class="flex flex-row items-center">
-              <span class="mr-2">Auto play</span>
-              <Switch
-                toggleCheck={toggleAutoPlay}
-                defaultCheck={$autoPlayStore}
-              />
-            </div>
+            {#if fileType === FileType.Video || fileType === FileType.Music || fileType === FileType.Image}
+              <div class="flex flex-row items-center">
+                <span class="mr-2">Auto play</span>
+                <Switch
+                  toggleCheck={toggleAutoPlay}
+                  defaultCheck={$autoPlayStore}
+                />
+              </div>
+            {/if}
           </div>
           <div class="overflow-y-auto flex-grow">
             {#each siblings as sibling, i}

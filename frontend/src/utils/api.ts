@@ -1,4 +1,4 @@
-export async function get<T>(url: string): Promise<T> {
+export async function get<T>(url: string, jsonResponse: boolean = true): Promise<T> {
   let response: Response;
   try {
     response = await fetch(url);
@@ -10,7 +10,7 @@ export async function get<T>(url: string): Promise<T> {
     throw new Error(response.status.toString());
   }
 
-  return await response.json();
+  return jsonResponse ? await response.json() : await response.text();
 }
 
 export async function post<T, S>(url: string, payload: T, jsonResponse: boolean): Promise<S> {

@@ -99,7 +99,7 @@
     let dir = dirs.join("/");
     let filePath = dir ? dir + "/" + trackFilename : trackFilename;
 
-    return "/api/track?path=" + encodeURIComponent(filePath);
+    return "/api/file/track?path=" + encodeURIComponent(filePath);
   };
 </script>
 
@@ -116,7 +116,9 @@
       <track kind="captions" default />
     </video>
   {:else}
-    <div class="mt-36 lg:px-24">
+    <div
+      class="mt-36 xl:w-2/3 mx-auto p-2 border-2 rounded border-blue-400 shadow"
+    >
       <audio class="player" controls>
         <source type="audio/mp3" />
         <track kind="captions" default />
