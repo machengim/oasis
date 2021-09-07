@@ -47,12 +47,21 @@ impl FileType {
 
 impl File {
     pub fn from_path(path: &PathBuf) -> AnyResult<Self> {
-        let filename = path.file_name().unwrap().to_string_lossy().to_string();
+        let filename = match path.file_name() {
+            Some(str) => str.to_string_lossy().to_string(),
+            None => {
+                return Err(anyhow::anyhow!("Cannot get filename"));
+            }
+        };
+
         let file_type = FileType::get_file_type(path);
         let size = if path.is_dir() {
             0
         } else {
-            path.metadata()?.len()
+            match path.metadata() {
+                Ok(meta) => meta.len(),
+                Err(_) => 0,
+            }
         };
 
         Ok(Self {

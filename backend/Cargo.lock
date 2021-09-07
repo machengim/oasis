@@ -96,28 +96,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
-name = "backend"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bcrypt",
- "chardetng",
- "chrono",
- "dotenv",
- "encoding_rs",
- "jsonwebtoken",
- "rand",
- "regex",
- "rocket",
- "sqlx",
- "sysinfo",
- "time 0.2.27",
- "tokio",
- "urlencoding",
- "uuid",
-]
-
-[[package]]
 name = "base-x"
 version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -964,6 +942,28 @@ checksum = "05499f3756671c15885fee9034446956fff3f243d6077b91e5767df161f766b3"
 dependencies = [
  "hermit-abi",
  "libc",
+]
+
+[[package]]
+name = "oasis"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bcrypt",
+ "chardetng",
+ "chrono",
+ "dotenv",
+ "encoding_rs",
+ "jsonwebtoken",
+ "rand",
+ "regex",
+ "rocket",
+ "sqlx",
+ "sysinfo",
+ "time 0.2.27",
+ "tokio",
+ "urlencoding",
+ "uuid",
 ]
 
 [[package]]
