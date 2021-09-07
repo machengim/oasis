@@ -78,7 +78,7 @@ async fn video_track(path: &str, token: Token, state: &State<AppState>) -> Resul
     let track_str = match track::get_track(target_path).await {
         Ok(str) => str,
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("Error when getting track: {}", e);
             return Err(Error::NotFound);
         }
     };

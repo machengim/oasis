@@ -10,13 +10,14 @@ def main():
 
     os.mkdir("release")
     filename = "oasis.exe" if os.name == "nt" else "oasis"
+    shellEnable = True if os.name == "nt" else False   
     
     os.chdir("frontend")
-    subprocess.run(["npm", "run", "build"], shell=True)
+    subprocess.run(["npm", "run", "build"], shell=shellEnable)
     shutil.copytree("public", "../release/public")
 
     os.chdir("../backend")
-    subprocess.run(["cargo", "build", "--release"], shell=True)
+    subprocess.run(["cargo", "build", "--release"], shell=shellEnable)
     shutil.copyfile("target/release/" + filename, "../release/" + filename)
     shutil.copytree("migrations", "../release/migrations")
     shutil.copyfile(".env-release", "../release/.env")
