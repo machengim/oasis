@@ -9,20 +9,18 @@ def main():
         shutil.rmtree("release")
 
     os.mkdir("release")
-    os.mkdir("release/bin")
-    os.mkdir("release/frontend")
 
     os.chdir("frontend")
     subprocess.run(["npm", "run", "build"])
-    shutil.copytree("public", "../release/frontend/public")
+    shutil.copytree("public", "../release/public")
 
     os.chdir("../backend")
     subprocess.run(["cargo", "build", "--release"])
-    shutil.copyfile("target/release/backend", "../release/bin/oasis")
-    shutil.copyfile("Rocket.toml", "../release/bin/Rocket.toml")
-    shutil.copytree("migrations", "../release/bin/migrations")
+    shutil.copyfile("target/release/backend", "../release/oasis")
+    shutil.copytree("migrations", "../release/migrations")
+    shutil.copyfile(".env-release", "../release/.env")
 
-    os.chdir("../release/bin")
+    os.chdir("../release")
     os.chmod("oasis", 0o755)
 
 

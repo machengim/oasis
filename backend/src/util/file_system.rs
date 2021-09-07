@@ -3,47 +3,19 @@ use chardetng::EncodingDetector;
 use encoding_rs::Encoding;
 use rocket::tokio::fs;
 use std::path::PathBuf;
-use std::process::Command;
+use sysinfo::{DiskExt, System, SystemExt};
 use tokio::io::AsyncReadExt;
 
 pub fn get_system_volumes() -> AnyResult<Vec<String>> {
-    match std::env::consts::OS {
-        "linux" => get_linux_volumes(),
-        "macos" => get_mac_volumes(),
-        // "windows" => Vec::new(),
-        _ => Err(anyhow::anyhow!("Not supported system")),
-    }
-}
+    let mut sys = System::new_all();
+    sys.refresh_all();
 
-fn get_linux_volumes() -> AnyResult<Vec<String>> {
-    let lsblk_output = Command::new("sh").arg("-c").arg("lsblk").output()?;
-    let lines = std::str::from_utf8(&lsblk_output.stdout)?.lines();
-    let mut mountpoints: Vec<String> = Vec::new();
-
-    for line in lines {
-        let words: Vec<&str> = line.split_whitespace().collect();
-        let last_word = words.last().unwrap_or(&"");
-        if last_word.starts_with('/') {
-            mountpoints.push(last_word.to_string());
-        }
+    let mut volumes = vec![];
+    for disk in sys.disks() {
+        volumes.push(disk.mount_point().to_string_lossy().to_string());
     }
 
-    Ok(mountpoints)
-}
-
-fn get_mac_volumes() -> AnyResult<Vec<String>> {
-    let df_output = Command::new("sh").arg("-c").arg("df -Hl").output()?;
-    let lines = std::str::from_utf8(&df_output.stdout)?.lines();
-    let mut mountpoints: Vec<String> = Vec::new();
-
-    for line in lines {
-        let words: Vec<&str> = line.split_whitespace().collect();
-        let last_word = words.last().unwrap_or(&"");
-        if last_word.starts_with('/') && !last_word.starts_with("/System") {
-            mountpoints.push(last_word.to_string());
-        }
-    }
-    Ok(mountpoints)
+    Ok(volumes)
 }
 
 pub async fn get_sub_dirs(dir: &PathBuf) -> AnyResult<Vec<PathBuf>> {
@@ -93,15 +65,6 @@ fn detect_encoding(buffer: &[u8]) -> AnyResult<&'static Encoding> {
 mod tests {
     use super::*;
     use tokio::runtime::Runtime;
-
-    #[cfg(target_os = "linux")]
-    #[test]
-    fn test_get_linux_volumes() {
-        let mountpoints = get_linux_volumes().unwrap();
-
-        println!("mountpoints: {:?}", &mountpoints);
-        assert!(mountpoints.len() > 0);
-    }
 
     #[cfg(target_os = "linux")]
     #[test]

@@ -20,3 +20,14 @@ pub fn parse_encoded_url(url: &str) -> AnyResult<PathBuf> {
 
     Ok(PathBuf::from(url_decode.into_owned()))
 }
+
+pub fn get_frontend_path() -> PathBuf {
+    let front_dir = std::env::var("FRONTEND_DIR").unwrap_or("./public".to_string());
+    let path = PathBuf::from(front_dir);
+
+    if !path.exists() || !path.is_dir() {
+        panic!("Invalid frontend directory");
+    }
+
+    path
+}

@@ -11,6 +11,8 @@ use util::init;
 
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error> {
+    dotenv::dotenv().ok();
+
     if !init::check_db_file() {
         init::create_db().await?;
     }
@@ -27,7 +29,7 @@ async fn main() -> Result<(), sqlx::Error> {
         .manage(state)
         .mount("/api", api::serve())
         .mount("/", service::static_route::serve())
-        .mount("/", FileServer::from("../frontend/public"))
+        .mount("/", FileServer::from(util::get_frontend_path()))
         .launch()
         .await;
 

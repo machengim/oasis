@@ -1,11 +1,11 @@
-use std::path::PathBuf;
-
 use super::error::Error;
 use super::token::Token;
 use crate::service::app_state::AppState;
+use crate::util;
 use rocket::fs::NamedFile;
 use rocket::response::Redirect;
 use rocket::{Either, Route, Shutdown, State};
+use std::path::PathBuf;
 
 pub fn serve() -> Vec<Route> {
     routes![index, index_html, shutdown, login, setup, files, files_all]
@@ -59,7 +59,7 @@ async fn handle_files(token: Token) -> Either<Option<NamedFile>, Redirect> {
 
 #[get("/shutdown")]
 fn shutdown(shutdown: Shutdown, token: Token) -> Result<&'static str, Error> {
-    if token.uid <= 0 || token.permission != 9 {
+    if token.uid <= 0 || token.permission < 9 {
         return Err(Error::Forbidden);
     }
 
@@ -68,6 +68,6 @@ fn shutdown(shutdown: Shutdown, token: Token) -> Result<&'static str, Error> {
 }
 
 async fn open_index_page() -> Option<NamedFile> {
-    let index = "../frontend/public/index.html";
+    let index = util::get_frontend_path().join("index.html");
     NamedFile::open(index).await.ok()
 }
