@@ -65,6 +65,7 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for RangedFile {
             .raw_header("Content-Type", file_type)
             .raw_header("Content-Range", content_range)
             .raw_header("Content-Length", len.to_string())
+            .raw_header("Cache-Control", "private, max-age=3600")
             .sized_body(len as usize, Cursor::new(contents))
             .ok()
     }

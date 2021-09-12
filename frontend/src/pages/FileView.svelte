@@ -16,6 +16,7 @@
   import { inferFileType, compareArray, compareFile } from "../utils/util";
   import * as api from "../utils/api";
   import TextViewer from "../players/TextViewer.svelte";
+  import ImageViewer from "../players/ImageViewer.svelte";
 
   const navigate = useNavigate();
   export let dirs: Array<string>;
@@ -99,9 +100,22 @@
   };
 
   const onMediaComplete = () => {
+    if (!$autoPlayStore) return;
+
+    moveNext();
+  };
+
+  const moveNext = () => {
     let currentIndex = siblings.findIndex((s) => s.filename === filename);
     if (currentIndex + 1 < siblings.length) {
       selectSibling(currentIndex + 1);
+    }
+  };
+
+  const moveBack = () => {
+    let currentIndex = siblings.findIndex((s) => s.filename === filename);
+    if (currentIndex - 1 >= 0) {
+      selectSibling(currentIndex - 1);
     }
   };
 </script>
@@ -123,6 +137,14 @@
             />
           {:else if fileType === FileType.Text || fileType === FileType.Code}
             <TextViewer {dirs} {filename} {fileType} />
+          {:else if fileType === FileType.Image}
+            <ImageViewer
+              {dirs}
+              {filename}
+              {onMediaComplete}
+              {moveBack}
+              {moveNext}
+            />
           {:else}
             <div>Cannot display this file.</div>
           {/if}

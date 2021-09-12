@@ -25,6 +25,14 @@ export interface IFileOrder {
   asc: boolean,
 }
 
+export interface IPartialBlob {
+  blob: Blob,
+  start: number,
+  end: number,
+  size: number,
+  type: string,
+}
+
 export enum FileType {
   Code = "Code",
   Dir = "Dir",

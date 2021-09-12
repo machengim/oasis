@@ -13,6 +13,9 @@
     | "text"
     | "music"
     | "video"
+    | "back"
+    | "forward"
+    | "expand"
     | "unknown";
   export let color:
     | "green"
@@ -23,7 +26,7 @@
     | "black"
     | "white"
     | "blue" = "black";
-  export let size: "small" | "tiny" | "default" = "default";
+  export let size: "small" | "tiny" | "default" | "large" = "default";
   export let className: string = "";
   export let onClick: () => void = null;
   let iconColor = "#000";
@@ -40,6 +43,9 @@
         break;
       case "tiny":
         style = "w-4 h-4";
+        break;
+      case "large":
+        style = "w-12 h-12";
         break;
       default:
         style = "w-8 h-8";
@@ -101,6 +107,12 @@
         return `<path d="M374.79,308.78,457.5,367A16,16,0,0,0,480,352.38V159.62A16,16,0,0,0,457.5,145l-82.71,58.22A16,16,0,0,0,368,216.3v79.4A16,16,0,0,0,374.79,308.78Z" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M268,384H84a52.15,52.15,0,0,1-52-52V180a52.15,52.15,0,0,1,52-52H268.48A51.68,51.68,0,0,1,320,179.52V332A52.15,52.15,0,0,1,268,384Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/>`;
       case "unknown":
         return `<path d="M160,164s1.44-33,33.54-59.46C212.6,88.83,235.49,84.28,256,84c18.73-.23,35.47,2.94,45.48,7.82C318.59,100.2,352,120.6,352,164c0,45.67-29.18,66.37-62.35,89.18S248,298.36,248,324" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:40px"/><circle cx="248" cy="399.99" r="32" style="fill:${iconColor};"/>`;
+      case "back":
+        return `<polyline points="328 112 184 256 328 400" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>`;
+      case "forward":
+        return `<polyline points="184 112 328 256 184 400" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>`;
+      case "expand":
+        return `<polyline points="432 320 432 432 320 432" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="421.8" y1="421.77" x2="304" y2="304" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="80 192 80 80 192 80" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="90.2" y1="90.23" x2="208" y2="208" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="320 80 432 80 432 192" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="421.77" y1="90.2" x2="304" y2="208" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="192 432 80 432 80 320" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="90.23" y1="421.8" x2="208" y2="304" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
       default:
         return null;
     }

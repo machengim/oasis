@@ -7,7 +7,9 @@
   export let filename = "";
   export let className = "";
 
-  const elementStyle = "flex flex-row text-lg leading-tight " + className;
+  const elementStyle =
+    "flex flex-row max-w-full text-lg leading-tight break-word overflow-x-hidden " +
+    className;
 
   const buildLink = (index: number) => {
     if (index >= dirs.length) {
@@ -26,18 +28,22 @@
 <div class={elementStyle}>
   <Link
     to={"/" + $sectionStore}
-    class="hover:bg-blue-400 hover:text-white px-1 rounded"
+    class="hover:bg-blue-400 hover:text-white px-1 rounded whitespace-nowrap overflow-ellipsis"
     >{captilizeFirst($sectionStore)}</Link
   >
   {#each dirs as dir, i}
     <span>/</span>
     <Link
       to={buildLink(i)}
-      class="hover:bg-blue-400 hover:text-white px-1 rounded">{dir}</Link
+      class="hover:bg-blue-400 hover:text-white px-1 rounded whitespace-nowrap  overflow-ellipsis"
+      >{dir}</Link
     >
   {/each}
   {#if filename}
     <span>/</span>
-    <span class="px-1 rounded text-gray-500">{filename}</span>
+    <span
+      class="px-1 rounded text-gray-500 whitespace-nowrap  overflow-ellipsis"
+      >{filename}</span
+    >
   {/if}
 </div>

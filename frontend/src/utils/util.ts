@@ -115,3 +115,7 @@ export function compareFile(a: IFile, b: IFile, order: IFileOrder) {
 
   return result * ascFactor;
 };
+
+export function checkMobile() {
+  return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+}
