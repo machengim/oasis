@@ -22,6 +22,8 @@
   let isLoading = false;
   let showMenu = false;
   let touchPointX = -1;
+  let loaded = false;
+  let loadTime = 0;
   let autoPlayTimeout: NodeJS.Timeout;
   let menuTimeout: NodeJS.Timeout;
 
@@ -53,16 +55,10 @@
   $: if (dirs && filename) {
     reset();
     imagePath = buildMediaPath();
-
-    if (menuTimeout) {
-      clearTimeout(menuTimeout);
-      menuTimeout = setTimeout(() => {
-        showMenu = false;
-      }, 2000);
-    }
   }
 
   $: if (imagePath) {
+    isLoading = true;
     fetchImage(0);
   }
 
@@ -71,9 +67,15 @@
   }
 
   $: if (blobs.length > 0) {
-    const imageBlob = new Blob(blobs, { type: imageType });
-    imgSrc = URL.createObjectURL(imageBlob);
-    isLoading = false;
+    const current = +new Date();
+    if (loaded || current - loadTime > 700) {
+      const imageBlob = new Blob(blobs, { type: imageType });
+      imgSrc = URL.createObjectURL(imageBlob);
+      loadTime = current;
+      if (isLoading) {
+        isLoading = false;
+      }
+    }
   }
 
   $: if (showMenu) {
@@ -89,6 +91,19 @@
     imageType = null;
     blobs = [];
     isLoading = false;
+    loaded = false;
+    loadTime = 0;
+
+    if (menuTimeout) {
+      clearTimeout(menuTimeout);
+      menuTimeout = setTimeout(() => {
+        showMenu = false;
+      }, 2000);
+    }
+
+    if (autoPlayTimeout) {
+      clearTimeout(autoPlayTimeout);
+    }
 
     onAutoPlay($autoPlayStore);
   };
@@ -101,8 +116,6 @@
   };
 
   const fetchImage = async (startFrom: number) => {
-    isLoading = true;
-
     const partialBlob: IPartialBlob = await getRange(imagePath, startFrom);
     if (!imageType) {
       imageType = partialBlob.type;
@@ -112,6 +125,8 @@
     blobs = blobs;
     if (partialBlob.end + 1 < partialBlob.size) {
       start = partialBlob.end + 1;
+    } else {
+      loaded = true;
     }
   };
 

@@ -8,7 +8,7 @@
   export let className = "";
 
   const elementStyle =
-    "flex flex-row max-w-full text-lg leading-tight break-word overflow-x-hidden " +
+    "flex flex-row flex-wrap max-w-full text-lg leading-tight break-word overflow-x-hidden " +
     className;
 
   const buildLink = (index: number) => {
