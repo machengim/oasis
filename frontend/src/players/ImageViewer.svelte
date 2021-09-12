@@ -73,7 +73,6 @@
   $: if (blobs.length > 0) {
     const imageBlob = new Blob(blobs, { type: imageType });
     imgSrc = URL.createObjectURL(imageBlob);
-    console.log("img src: ", imgSrc);
     isLoading = false;
   }
 
@@ -191,7 +190,7 @@
     </div>
   {:else}
     <div class="w-full h-full flex flex-row justify-center items-center">
-      <img src={imgSrc} alt={filename} />
+      <img src={imgSrc} alt={filename} class="max-w-full max-h-full" />
     </div>
     {#if showMenu}
       <div class="absolute top-0 left-0 z-10 w-full h-full">

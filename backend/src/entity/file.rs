@@ -25,7 +25,7 @@ pub enum FileType {
 
 impl FileType {
     fn infer_file_type(ext: &str) -> Self {
-        match ext {
+        match ext.to_lowercase().as_str() {
             "c" | "cpp" | "js" | "ts" | "rs" | "py" | "java" | "html" | "css" => Self::Code,
             "jpg" | "jpeg" | "gif" | "png" => Self::Image,
             "mp3" | "flac" | "aac" | "ogg" => Self::Music,
