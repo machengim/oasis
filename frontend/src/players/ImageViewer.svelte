@@ -4,6 +4,8 @@
   import Icon from "../components/Icon.svelte";
   import { checkMobile } from "../utils/util";
   import { EIconType, EIconColor, ELoopMethod } from "../utils/types";
+  import Spinner from '../components/Spinner.svelte';
+  import * as api from "../utils/api";
 
   export let filename: string;
   export let filePath: string;
@@ -13,6 +15,8 @@
 
   let player: HTMLElement;
   let imgDiv: HTMLElement;
+  let isLoading = false;
+  let imgSrc: string = null;
   let showMenu = false;
   let touchPointX = -1;
   let fullscreen = false;
@@ -62,6 +66,7 @@
 
   $: if (filePath) {
     reset();
+    fetchImage();
   }
 
   $: if (showMenu) {
@@ -72,6 +77,11 @@
 
   const reset = () => {
     touchPointX = -1;
+    isLoading = false;
+    if (imgSrc) {
+      URL.revokeObjectURL(imgSrc);
+      imgSrc = null;
+    }
 
     if (menuTimeout) {
       clearTimeout(menuTimeout);
@@ -86,6 +96,18 @@
 
     onAutoPlay($loopStore);
   };
+
+  async function fetchImage() {
+    isLoading = true;
+    const currentPath = filePath;
+    let imageBlob = await api.get(filePath, "blob");
+    if (currentPath !== filePath) {
+      return;
+    }
+
+    imgSrc = URL.createObjectURL(imageBlob);
+    isLoading = false;
+  }
 
   const toggleFullScreen = async () => {
     if (player && !fullscreen) {
@@ -186,9 +208,16 @@
   on:dblclick={toggleFullScreen}
   on:mousemove={onMoveInImage}
 >
+{#if isLoading}
+    <div
+      class="w-full img-height py-6 flex flex-row justify-center items-center"
+    >
+      <Spinner text={"Loading " + filename + "..."} />
+    </div>
+  {:else}
   <div class={buildImgClass()} bind:this={imgDiv}>
     <img
-      src={filePath}
+      src={imgSrc}
       alt={filename}
       class="max-w-full h-full object-contain"
     />
@@ -235,6 +264,7 @@
         />
       </div>
     </div>
+    {/if}
   {/if}
 </div>
 

@@ -7,6 +7,7 @@ mod util;
 use entity::site::Site;
 use rocket::fs::FileServer;
 use service::app_state::AppState;
+use service::fairings::CacheFairing;
 use util::init;
 
 #[tokio::main]
@@ -27,6 +28,7 @@ async fn main() -> Result<(), sqlx::Error> {
 
     let server = rocket::build()
         .manage(state)
+        .attach(CacheFairing)
         .mount("/api", api::serve())
         .mount("/", service::static_route::serve())
         .mount("/", FileServer::from(util::get_frontend_path()))

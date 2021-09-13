@@ -99,7 +99,7 @@
     const dir = dirs.join("/");
     const path = dir ? dir + "/" + filename : filename;
 
-    return "/api/file?path=" + encodeURIComponent(path);
+    return "/api/file/" + encodeURIComponent(path);
   };
 
   const buildTrackPath = () => {

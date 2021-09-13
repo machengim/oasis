@@ -45,7 +45,7 @@ async fn dir_content(
     Ok(Json(content))
 }
 
-#[get("/file?<path>")]
+#[get("/file/<path>")]
 async fn file_content(
     path: &str,
     token: Token,

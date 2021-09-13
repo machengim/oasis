@@ -19,7 +19,7 @@
     const endpoint = buildResourcePath();
 
     try {
-      content = await api.get(endpoint, false);
+      content = await api.get(endpoint, "text");
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot fetch text file content");
