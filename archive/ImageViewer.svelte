@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { loopStore } from "../utils/store";
+  import { getRange } from "../utils/api";
   import Icon from "../components/Icon.svelte";
+  import Spinner from "../components/Spinner.svelte";
+  import type { IPartialBlob } from "../utils/types";
   import { checkMobile } from "../utils/util";
   import { EIconType, EIconColor, ELoopMethod } from "../utils/types";
 
@@ -13,8 +16,15 @@
 
   let player: HTMLElement;
   let imgDiv: HTMLElement;
+  let imageType: string;
+  let start: number = 0;
+  let imgSrc: string = null;
+  let blobs: Array<Blob> = [];
+  let isLoading = false;
   let showMenu = false;
   let touchPointX = -1;
+  let loaded = false;
+  let loadTime = 0;
   let fullscreen = false;
   let autoPlayTimeout: NodeJS.Timeout;
   let menuTimeout: NodeJS.Timeout;
@@ -62,6 +72,29 @@
 
   $: if (filePath) {
     reset();
+    isLoading = true;
+    fetchImage(0);
+  }
+
+  $: if (start) {
+    fetchImage(start);
+  }
+
+  $: if (blobs.length > 0) {
+    const current = +new Date();
+    if (loaded || current - loadTime > 600) {
+      let imageBlob = new Blob(blobs, { type: imageType });
+      const prevSrc = imgSrc;
+      imgSrc = URL.createObjectURL(imageBlob);
+      loadTime = current;
+
+      if (isLoading) {
+        isLoading = false;
+      }
+      if (prevSrc) {
+        URL.revokeObjectURL(prevSrc);
+      }
+    }
   }
 
   $: if (showMenu) {
@@ -71,7 +104,18 @@
   }
 
   const reset = () => {
+    if (imgSrc) {
+      URL.revokeObjectURL(imgSrc);
+    }
+
     touchPointX = -1;
+    start = 0;
+    imgSrc = null;
+    imageType = null;
+    blobs = [];
+    isLoading = false;
+    loaded = false;
+    loadTime = 0;
 
     if (menuTimeout) {
       clearTimeout(menuTimeout);
@@ -85,6 +129,26 @@
     }
 
     onAutoPlay($loopStore);
+  };
+
+  const fetchImage = async (startFrom: number) => {
+    const currentPath = filePath;
+    let partialBlob: IPartialBlob = await getRange(filePath, startFrom);
+    if (currentPath !== filePath) {
+      return;
+    }
+
+    if (!imageType) {
+      imageType = partialBlob.type;
+    }
+
+    blobs.push(partialBlob.blob);
+    blobs = blobs;
+    if (partialBlob.end + 1 < partialBlob.size) {
+      start = partialBlob.end + 1;
+    } else {
+      loaded = true;
+    }
   };
 
   const toggleFullScreen = async () => {
@@ -186,55 +250,63 @@
   on:dblclick={toggleFullScreen}
   on:mousemove={onMoveInImage}
 >
-  <div class={buildImgClass()} bind:this={imgDiv}>
-    <img
-      src={filePath}
-      alt={filename}
-      class="max-w-full h-full object-contain"
-    />
-  </div>
-  {#if showMenu}
-    <div class="absolute top-0 left-0 z-10 w-full h-full">
-      {#if fullscreen}
-        <div class="absolute top-2 right-2 xl:top-8 xl:right-8">
-          <Icon
-            type={EIconType.closecircle}
-            color={EIconColor.gray}
-            size="large"
-            className="cursor-pointer"
-            onClick={toggleFullScreen}
-          />
-        </div>
-      {:else}
-        <div class="absolute bottom-2 right-2 xl:bottom-8 xl:right-8">
-          <Icon
-            type={EIconType.expand}
-            color={EIconColor.gray}
-            size="large"
-            className="cursor-pointer"
-            onClick={toggleFullScreen}
-          />
-        </div>
-      {/if}
-      <div
-        class="w-full h-full px-2 xl:px-8 flex flex-row justify-between items-center my-auto"
-      >
-        <Icon
-          type={EIconType.back}
-          color={EIconColor.gray}
-          size="large"
-          className="cursor-pointer"
-          onClick={() => changeImage(-1)}
-        />
-        <Icon
-          type={EIconType.forward}
-          color={EIconColor.gray}
-          size="large"
-          className="cursor-pointer"
-          onClick={() => changeImage(1)}
-        />
-      </div>
+  {#if isLoading}
+    <div
+      class="w-full img-height py-6 flex flex-row justify-center items-center"
+    >
+      <Spinner text={"Loading " + filename + "..."} />
     </div>
+  {:else}
+    <div class={buildImgClass()} bind:this={imgDiv}>
+      <img
+        src={imgSrc}
+        alt={filename}
+        class="max-w-full h-full object-contain"
+      />
+    </div>
+    {#if showMenu}
+      <div class="absolute top-0 left-0 z-10 w-full h-full">
+        {#if fullscreen}
+          <div class="absolute top-2 right-2 xl:top-8 xl:right-8">
+            <Icon
+              type={EIconType.closecircle}
+              color={EIconColor.gray}
+              size="large"
+              className="cursor-pointer"
+              onClick={toggleFullScreen}
+            />
+          </div>
+        {:else}
+          <div class="absolute bottom-2 right-2 xl:bottom-8 xl:right-8">
+            <Icon
+              type={EIconType.expand}
+              color={EIconColor.gray}
+              size="large"
+              className="cursor-pointer"
+              onClick={toggleFullScreen}
+            />
+          </div>
+        {/if}
+        <div
+          class="w-full h-full px-2 xl:px-8 flex flex-row justify-between items-center my-auto"
+        >
+          <Icon
+            type={EIconType.back}
+            color={EIconColor.gray}
+            size="large"
+            className="cursor-pointer"
+            onClick={() => changeImage(-1)}
+          />
+          <Icon
+            type={EIconType.forward}
+            color={EIconColor.gray}
+            size="large"
+            className="cursor-pointer"
+            onClick={() => changeImage(1)}
+          />
+        </div>
+      </div>
+    {/if}
   {/if}
 </div>
 

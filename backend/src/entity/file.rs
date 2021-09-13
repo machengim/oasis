@@ -10,7 +10,7 @@ pub struct File {
     pub size: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, PartialEq)]
 #[serde(crate = "rocket::serde")]
 pub enum FileType {
     Dir,
