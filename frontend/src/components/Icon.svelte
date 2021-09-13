@@ -1,38 +1,21 @@
 <script lang="ts">
-  export let type:
-    | "success"
-    | "error"
-    | "profile"
-    | "add"
-    | "close"
-    | "up"
-    | "down"
-    | "folder"
-    | "code"
-    | "image"
-    | "text"
-    | "music"
-    | "video"
-    | "back"
-    | "forward"
-    | "expand"
-    | "unknown";
-  export let color:
-    | "green"
-    | "yellow"
-    | "red"
-    | "pink"
-    | "gray"
-    | "black"
-    | "white"
-    | "blue" = "black";
+  import type { EIconType } from "../utils/types";
+  import { EIconColor } from "../utils/types";
+
+  export let type: EIconType;
+  export let color: EIconColor = EIconColor.gray;
   export let size: "small" | "tiny" | "default" | "large" = "default";
   export let className: string = "";
   export let onClick: () => void = null;
   let iconColor = "#000";
+  let iconHtml: string = null;
 
   $: if (color) {
-    iconColor = convertColor();
+    iconColor = convertColor(color);
+  }
+
+  $: if (iconColor) {
+    iconHtml = getIcon();
   }
 
   const buildStyle = () => {
@@ -58,7 +41,7 @@
     return style;
   };
 
-  const convertColor = () => {
+  const convertColor = (color: EIconColor) => {
     switch (color) {
       case "green":
         return "#34D399";
@@ -113,6 +96,14 @@
         return `<polyline points="184 112 328 256 184 400" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>`;
       case "expand":
         return `<polyline points="432 320 432 432 320 432" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="421.8" y1="421.77" x2="304" y2="304" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="80 192 80 80 192 80" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="90.2" y1="90.23" x2="208" y2="208" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="320 80 432 80 432 192" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="421.77" y1="90.2" x2="304" y2="208" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="192 432 80 432 80 320" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="90.23" y1="421.8" x2="208" y2="304" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+      case "shuffle":
+        return `<polyline points="400 304 448 352 400 400" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="400 112 448 160 400 208" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M64,352h85.19a80,80,0,0,0,66.56-35.62L256,256" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M64,160h85.19a80,80,0,0,1,66.56,35.62l80.5,120.76A80,80,0,0,0,362.81,352H416" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M416,160H362.81a80,80,0,0,0-66.56,35.62L288,208" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+      case "loop":
+        return `<polyline points="320 120 368 168 320 216" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M352,168H144a80.24,80.24,0,0,0-80,80v16" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><polyline points="192 392 144 344 192 296" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M160,344H368a80.24,80.24,0,0,0,80-80V248" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
+      case "repeat":
+        return `<path d="M256,256s-48-96-126-96c-54.12,0-98,43-98,96s43.88,96,98,96c37.51,0,71-22.41,94-48" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><path d="M256,256s48,96,126,96c54.12,0,98-43,98-96s-43.88-96-98-96c-37.51,0-71,22.41-94,48" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/>`;
+      case "closecircle":
+        return `<path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/><line x1="320" y1="320" x2="192" y2="192" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="192" y1="320" x2="320" y2="192" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
       default:
         return null;
     }
@@ -125,7 +116,7 @@
     class={buildStyle()}
     viewBox="0 0 512 512"
   >
-    {@html getIcon()}
+    {@html iconHtml}
   </svg>
 </span>
 

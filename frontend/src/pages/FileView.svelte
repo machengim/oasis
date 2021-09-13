@@ -1,33 +1,40 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { useNavigate } from "svelte-navigator";
   import {
     dirsStore,
     filesStore,
     setNotification,
-    autoPlayStore,
+    loopStore,
   } from "../utils/store";
-  import type { IFile, IFileOrder } from "../utils/types";
-  import { FileType } from "../utils/types";
+  import { EIconColor, ELoopMethod, FileType, EIconType } from "../utils/types";
+  import type { IFile, IFileOrder, ILoopIcon } from "../utils/types";
   import Spinner from "../components/Spinner.svelte";
-  import Switch from "../components/Switch.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
   import MediaPlayer from "../players/MediaPlayer.svelte";
   import { inferFileType, compareArray, compareFile } from "../utils/util";
   import * as api from "../utils/api";
   import TextViewer from "../players/TextViewer.svelte";
   import ImageViewer from "../players/ImageViewer.svelte";
+  import Icon from "../components/Icon.svelte";
 
   const navigate = useNavigate();
   export let dirs: Array<string>;
   export let filename: string;
+  let filePath: string;
+  let trackPath: string = null;
   let siblings: Array<IFile>;
   let filesInStore: Array<IFile>;
   let isLoading = false;
   let fileType: FileType;
+  let loopIcons: Array<ILoopIcon> = [];
 
   const unsubscribeFiles = filesStore.subscribe((files) => {
     filesInStore = files;
+  });
+
+  onMount(() => {
+    initLoopIcons();
   });
 
   onDestroy(() => {
@@ -35,7 +42,12 @@
   });
 
   $: if (filename) {
-    extractFileType(filename);
+    fileType = extractFileType();
+    filePath = buildFilePath();
+
+    if (fileType === FileType.Video) {
+      trackPath = buildTrackPath();
+    }
   }
 
   $: if (fileType && filesInStore) {
@@ -48,6 +60,21 @@
       fetchDirContent(dirs);
     }
   }
+
+  const initLoopIcons = () => {
+    const icons = [
+      { type: ELoopMethod.repeat, selected: false },
+      { type: ELoopMethod.shuffle, selected: false },
+      { type: ELoopMethod.loop, selected: false },
+    ];
+
+    if ($loopStore) {
+      const icon = icons.find((icon) => icon.type === $loopStore);
+      icon.selected = true;
+    }
+
+    loopIcons = icons;
+  };
 
   const fetchDirContent = async (dirs: Array<string>) => {
     let endpoint = "/api/dir";
@@ -68,7 +95,26 @@
     isLoading = false;
   };
 
-  const extractFileType = (filename: string) => {
+  const buildFilePath = () => {
+    const dir = dirs.join("/");
+    const path = dir ? dir + "/" + filename : filename;
+
+    return "/api/file?path=" + encodeURIComponent(path);
+  };
+
+  const buildTrackPath = () => {
+    const splits = filename.split(".");
+    if (splits.length <= 1) return null;
+
+    splits.pop();
+    const trackFilename = splits.join("") + ".vtt";
+    let dir = dirs.join("/");
+    let filePath = dir ? dir + "/" + trackFilename : trackFilename;
+
+    return "/api/file/track?path=" + encodeURIComponent(filePath);
+  };
+
+  const extractFileType = () => {
     const splits = filename.split(".");
     let file_ext: string;
 
@@ -78,7 +124,7 @@
       file_ext = splits.slice(-1)[0].toLowerCase();
     }
 
-    fileType = inferFileType(file_ext);
+    return inferFileType(file_ext);
   };
 
   const selectSibling = (index: number) => {
@@ -95,21 +141,25 @@
     navigate(targetPath);
   };
 
-  const toggleAutoPlay = (autoPlay: boolean) => {
-    autoPlayStore.set(autoPlay);
-  };
-
   const onMediaComplete = () => {
-    if (!$autoPlayStore) return;
+    const loop = $loopStore;
+    if (!loop || loop === ELoopMethod.repeat) return;
 
     moveNext();
   };
 
   const moveNext = () => {
-    let currentIndex = siblings.findIndex((s) => s.filename === filename);
-    if (currentIndex + 1 < siblings.length) {
-      selectSibling(currentIndex + 1);
+    const currentIndex = siblings.findIndex((s) => s.filename === filename);
+    const size = siblings.length;
+    let nextIndex: number;
+
+    if ($loopStore === ELoopMethod.shuffle) {
+      nextIndex = getRandom(size, currentIndex);
+    } else {
+      nextIndex = (currentIndex + 1) % size;
     }
+
+    selectSibling(nextIndex);
   };
 
   const moveBack = () => {
@@ -117,6 +167,46 @@
     if (currentIndex - 1 >= 0) {
       selectSibling(currentIndex - 1);
     }
+  };
+
+  const getRandom = (size: number, exclude: number) => {
+    let random: number;
+
+    do {
+      random = Math.floor(Math.random() * size);
+    } while (random === exclude);
+
+    return random;
+  };
+
+  const getIconType = (loopIcon: ILoopIcon) => {
+    switch (loopIcon.type) {
+      case ELoopMethod.repeat:
+        return EIconType.repeat;
+      case ELoopMethod.shuffle:
+        return EIconType.shuffle;
+      case ELoopMethod.loop:
+        return EIconType.loop;
+      default:
+        return null;
+    }
+  };
+
+  const getIconColor = (loopIcon: ILoopIcon) => {
+    return loopIcon.selected ? EIconColor.black : EIconColor.gray;
+  };
+
+  const selectLoopMethod = (index: number) => {
+    const currentIndex = loopIcons.findIndex((i) => i.selected);
+    if (currentIndex >= 0) loopIcons[currentIndex].selected = false;
+    if (index === currentIndex) {
+      loopStore.set(null);
+    } else {
+      loopIcons[index].selected = true;
+      loopStore.set(loopIcons[index].type);
+    }
+
+    loopIcons = loopIcons;
   };
 </script>
 
@@ -130,16 +220,16 @@
         <div class="w-full lg:w-3/4">
           {#if fileType === FileType.Video || fileType === FileType.Music}
             <MediaPlayer
-              {dirs}
-              {filename}
+              {filePath}
               {fileType}
+              {trackPath}
               onComplete={onMediaComplete}
             />
           {:else if fileType === FileType.Text || fileType === FileType.Code}
             <TextViewer {dirs} {filename} {fileType} />
           {:else if fileType === FileType.Image}
             <ImageViewer
-              {dirs}
+              {filePath}
               {filename}
               {onMediaComplete}
               {moveBack}
@@ -152,15 +242,21 @@
         <div
           class="flex flex-col h-80 w-full lg:w-1/5 lg:ml-6 mt-4 lg:mt-0 p-1 bg-gray-100"
         >
-          <div class="flex flex-row items-center justify-between px-2 py-1">
+          <div
+            class="flex flex-row items-center justify-between px-2 py-1 mb-2 border-b"
+          >
             <div class="text-xl">File list</div>
             {#if fileType === FileType.Video || fileType === FileType.Music || fileType === FileType.Image}
               <div class="flex flex-row items-center">
-                <span class="mr-2">Auto play</span>
-                <Switch
-                  toggleCheck={toggleAutoPlay}
-                  defaultCheck={$autoPlayStore}
-                />
+                {#each loopIcons as icon, i}
+                  <Icon
+                    type={getIconType(icon)}
+                    color={getIconColor(icon)}
+                    size="small"
+                    className="ml-2 cursor-pointer"
+                    onClick={() => selectLoopMethod(i)}
+                  />
+                {/each}
               </div>
             {/if}
           </div>

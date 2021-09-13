@@ -2,6 +2,7 @@
   import { useNavigate } from "svelte-navigator";
   import { setNotification, dirsStore, filesStore } from "../utils/store";
   import type { IFile, IFileOrder } from "../utils/types";
+  import { EIconType } from "../utils/types";
   import * as api from "../utils/api";
   import Icon from "../components/Icon.svelte";
   import Spinner from "../components/Spinner.svelte";
@@ -99,9 +100,9 @@
             on:click={() => changeOrder("name")}>Filename</span
           >
           {#if order.key === "name" && order.asc}
-            <Icon type="up" size="tiny" color="gray" className="ml-2" />
+            <Icon type={EIconType.up} size="tiny" className="ml-2" />
           {:else if order.key === "name"}
-            <Icon type="down" size="tiny" color="gray" className="ml-2" />
+            <Icon type={EIconType.down} size="tiny" className="ml-2" />
           {/if}
         </div>
         <div class="px-2  flex flex-row items-center">
@@ -110,9 +111,9 @@
             on:click={() => changeOrder("type")}>Type</span
           >
           {#if order.key === "type" && order.asc}
-            <Icon type="up" size="tiny" color="gray" className="ml-2" />
+            <Icon type={EIconType.up} size="tiny" className="ml-2" />
           {:else if order.key === "type"}
-            <Icon type="down" size="tiny" color="gray" className="ml-2" />
+            <Icon type={EIconType.down} size="tiny" className="ml-2" />
           {/if}
         </div>
         <div class="px-2  flex flex-row items-center">
@@ -122,9 +123,9 @@
             >Size
           </span>
           {#if order.key === "size" && order.asc}
-            <Icon type="up" size="tiny" color="gray" className="ml-2" />
+            <Icon type={EIconType.up} size="tiny" className="ml-2" />
           {:else if order.key === "size"}
-            <Icon type="down" size="tiny" color="gray" className="ml-2" />
+            <Icon type={EIconType.down} size="tiny" className="ml-2" />
           {/if}
         </div>
       </div>
@@ -145,7 +146,7 @@
           on:click={() => selectFile(file)}
         >
           <div class="col-span-3 px-2 flex flex-row items-center">
-            <FileIcon file_type={file.file_type} />
+            <FileIcon {file} />
             <span class="ml-2">
               {file.filename}
             </span>

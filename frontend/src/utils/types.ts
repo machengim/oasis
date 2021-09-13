@@ -33,6 +33,11 @@ export interface IPartialBlob {
   type: string,
 }
 
+export interface ILoopIcon {
+  type: ELoopMethod;
+  selected: boolean;
+}
+
 export enum FileType {
   Code = "Code",
   Dir = "Dir",
@@ -44,7 +49,7 @@ export enum FileType {
   Unknown = "Unknown",
 }
 
-export enum IconType {
+export enum EIconType {
   success = "success",
   error = "error",
   profile = "profile",
@@ -53,4 +58,34 @@ export enum IconType {
   up = "up",
   down = "down",
   folder = "folder",
+  code = "code",
+  image = "image",
+  text = "text",
+  music = "music",
+  video = "video",
+  back = "back",
+  forward = "forward",
+  expand = "expand",
+  shuffle = "shuffle",
+  loop = "loop",
+  repeat = "repeat",
+  unknown = "unknown",
+  closecircle = "closecircle"
+}
+
+export enum EIconColor {
+  green = "green",
+  red = "red",
+  gray = "gray",
+  black = "black",
+  white = "white",
+  blue = "blue",
+  yellow = "yellow",
+  pink = "pink"
+}
+
+export enum ELoopMethod {
+  repeat = "repeat",  // repeat single file
+  shuffle = "shuffle",  // random shuffle play list
+  loop = "loop"     // loop play list in sequence
 }

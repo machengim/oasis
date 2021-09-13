@@ -3,6 +3,7 @@
   import { sectionStore } from "../utils/store";
   import Icon from "../components/Icon.svelte";
   import Title from "./Title.svelte";
+  import { EIconType } from "../utils/types";
 
   let section: string;
 
@@ -22,7 +23,7 @@
     <Title {section} />
     {#if section === "files"}
       <div class="flex flex-row">
-        <Icon type="profile" color="gray" />
+        <Icon type={EIconType.profile} />
       </div>
     {/if}
   </div>

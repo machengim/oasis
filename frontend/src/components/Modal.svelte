@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from "./Icon.svelte";
+  import { EIconColor, EIconType } from "../utils/types";
 
   export let size: "small" | "normal" | "big" = "normal";
   export let clickOutToClose = false;
@@ -21,8 +22,8 @@
     <div class="border-b border-gray-200 p-4 flex flex-row justify-between">
       <div class="text-lg text-black">{title}</div>
       <Icon
-        type="close"
-        color="gray"
+        type={EIconType.close}
+        color={EIconColor.gray}
         size="small"
         className="cursor-pointer"
         onClick={onClose}

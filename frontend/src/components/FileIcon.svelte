@@ -1,55 +1,44 @@
 <script lang="ts">
-  import { FileType } from "../utils/types";
+  import type { IFile } from "../utils/types";
+  import { FileType, EIconColor, EIconType } from "../utils/types";
   import Icon from "./Icon.svelte";
 
-  export let file_type: FileType;
-  let icon_type:
-    | "folder"
-    | "code"
-    | "image"
-    | "text"
-    | "music"
-    | "video"
-    | "unknown";
-  let color:
-    | "green"
-    | "yellow"
-    | "red"
-    | "pink"
-    | "gray"
-    | "black"
-    | "white"
-    | "blue";
+  export let file: IFile;
+  let file_type: FileType;
+  let icon_type: EIconType;
+  let color: EIconColor;
 
-  switch (file_type) {
+  $: file_type = file.file_type;
+
+  $: switch (file_type) {
     case FileType.Dir:
-      icon_type = "folder";
-      color = "blue";
+      icon_type = EIconType.folder;
+      color = EIconColor.blue;
       break;
     case FileType.Image:
-      icon_type = "image";
-      color = "red";
+      icon_type = EIconType.image;
+      color = EIconColor.red;
       break;
     case FileType.Code:
-      icon_type = "code";
-      color = "pink";
+      icon_type = EIconType.code;
+      color = EIconColor.pink;
       break;
     case FileType.Text:
     case FileType.Pdf:
-      icon_type = "text";
-      color = "black";
+      icon_type = EIconType.text;
+      color = EIconColor.black;
       break;
     case FileType.Video:
-      icon_type = "video";
-      color = "yellow";
+      icon_type = EIconType.video;
+      color = EIconColor.yellow;
       break;
     case FileType.Music:
-      icon_type = "music";
-      color = "green";
+      icon_type = EIconType.music;
+      color = EIconColor.green;
       break;
     default:
-      icon_type = "unknown";
-      color = "gray";
+      icon_type = EIconType.unknown;
+      color = EIconColor.gray;
       break;
   }
 </script>

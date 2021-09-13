@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { notificationStore } from "../utils/store";
+  import { EIconType, EIconColor } from "../utils/types";
   import type { INotification } from "../utils/types";
   import { upperFirstChar } from "../utils/util";
   import Icon from "../components/Icon.svelte";
@@ -9,7 +10,7 @@
   let isShowNotification = false;
   let isManulClosed = false;
   let currentNotification: INotification;
-  let type: "success" | "error" = "success";
+  let type: "success" | "error";
   let msg = "";
   let timeout: NodeJS.Timeout;
 
@@ -88,7 +89,10 @@
     <div class={buildStyle()}>
       <div class="flex flex-row items-center">
         <div class="mr-2">
-          <Icon {type} color={type === "success" ? "green" : "red"} />
+          <Icon
+            type={type === "success" ? EIconType.success : EIconType.error}
+            color={type === "success" ? EIconColor.green : EIconColor.red}
+          />
         </div>
         <div class="flex flex-col">
           <div class="text-gray-700 font-bold">{upperFirstChar(type)}</div>

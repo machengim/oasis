@@ -1,7 +1,6 @@
 import { Writable, writable } from 'svelte/store';
-import type { IFile, INotification } from './types';
+import type { IFile, INotification, ELoopMethod } from './types';
 
-// Notification store
 export const notificationStore: Writable<INotification> = writable(null);
 
 export function setNotification(type: 'success' | 'error', msg: string) {
@@ -15,4 +14,4 @@ export const dirsStore: Writable<Array<string>> = writable([]);
 
 export const filesStore: Writable<Array<IFile>> = writable([]);
 
-export const autoPlayStore: Writable<boolean> = writable(false);
+export const loopStore: Writable<ELoopMethod> = writable(null);

@@ -1,13 +1,14 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { autoPlayStore } from "../utils/store";
+  import { loopStore } from "../utils/store";
   import Plyr from "plyr";
-  import { FileType } from "../utils/types";
+  import { ELoopMethod, FileType } from "../utils/types";
 
-  export let dirs: Array<string>;
-  export let filename: string;
+  export let filePath: string;
+  export let trackPath: string = null;
   export let fileType: FileType;
   export let onComplete: () => void;
+
   let player: Plyr;
   let isLoop = false;
 
@@ -15,19 +16,23 @@
     player = initPlayer();
 
     player.on("ready", (_) => {
-      if ($autoPlayStore) {
+      if ($loopStore) {
         player.play();
       }
     });
 
     player.on("ended", (_) => {
-      onComplete();
+      if ($loopStore === ELoopMethod.repeat) {
+        player.currentTime = 0;
+      } else {
+        onComplete();
+      }
     });
   });
 
-  $: if (dirs && filename && player) {
+  $: if (filePath && player) {
     const mediaType = getMediaType();
-    const trackSrc = mediaType === "video" ? buildTrackPath() : "";
+    const trackSrc = mediaType === "video" ? trackPath : "";
 
     player.source = {
       type: mediaType,
@@ -77,29 +82,10 @@
     const mediaSrcType = getMediaType() === "video" ? "video/mp4" : "audio/mp3";
     return [
       {
-        src: buildMediaPath(),
+        src: filePath,
         type: mediaSrcType,
       },
     ];
-  };
-
-  const buildMediaPath = () => {
-    let dir = dirs.join("/");
-    let filePath = dir ? dir + "/" + filename : filename;
-
-    return "/api/file?path=" + encodeURIComponent(filePath);
-  };
-
-  const buildTrackPath = () => {
-    const splits = filename.split(".");
-    if (splits.length <= 1) return null;
-
-    splits.pop();
-    const trackFilename = splits.join("") + ".vtt";
-    let dir = dirs.join("/");
-    let filePath = dir ? dir + "/" + trackFilename : trackFilename;
-
-    return "/api/file/track?path=" + encodeURIComponent(filePath);
   };
 </script>
 
@@ -117,7 +103,7 @@
     </video>
   {:else}
     <div
-      class="mt-36 xl:w-2/3 mx-auto p-2 border-2 rounded border-blue-400 shadow"
+      class="mt-4 xl:mt-36 xl:w-2/3 mx-auto p-2 border-2 rounded border-blue-400 shadow"
     >
       <audio class="player" controls>
         <source type="audio/mp3" />

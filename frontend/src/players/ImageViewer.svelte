@@ -1,20 +1,21 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { autoPlayStore } from "../utils/store";
+  import { loopStore } from "../utils/store";
   import { getRange } from "../utils/api";
   import Icon from "../components/Icon.svelte";
   import Spinner from "../components/Spinner.svelte";
   import type { IPartialBlob } from "../utils/types";
   import { checkMobile } from "../utils/util";
+  import { EIconType, EIconColor, ELoopMethod } from "../utils/types";
 
-  export let dirs: Array<string>;
   export let filename: string;
+  export let filePath: string;
   export let onMediaComplete: () => void;
   export let moveNext: () => void;
   export let moveBack: () => void;
 
   let player: HTMLElement;
-  let imagePath: string;
+  let imgDiv: HTMLElement;
   let imageType: string;
   let start: number = 0;
   let imgSrc: string = null;
@@ -24,11 +25,12 @@
   let touchPointX = -1;
   let loaded = false;
   let loadTime = 0;
+  let fullscreen = false;
   let autoPlayTimeout: NodeJS.Timeout;
   let menuTimeout: NodeJS.Timeout;
 
-  const onAutoPlay = (isAutoPlay: boolean) => {
-    if (isAutoPlay) {
+  const onAutoPlay = (loopMethod: ELoopMethod) => {
+    if (loopMethod) {
       autoPlayTimeout = setTimeout(() => {
         onMediaComplete();
       }, 5000);
@@ -37,27 +39,39 @@
     }
   };
 
-  const unsubscribeAutoPlay = autoPlayStore.subscribe((autoPlay) => {
-    onAutoPlay(autoPlay);
+  const unsubscribeAutoPlay = loopStore.subscribe((value) => {
+    if (value && value !== ELoopMethod.repeat) {
+      onAutoPlay(value);
+    } else if (autoPlayTimeout) {
+      clearTimeout(autoPlayTimeout);
+    }
   });
 
   onMount(() => {
-    onAutoPlay($autoPlayStore);
+    onAutoPlay($loopStore);
 
     player.addEventListener("touchstart", onTouchStart, true);
     player.addEventListener("touchmove", onTouchMove, true);
+    document.addEventListener("fullscreenchange", onFullScreenChange, true);
   });
 
   onDestroy(() => {
     unsubscribeAutoPlay();
+
+    if (autoPlayTimeout) {
+      clearTimeout(autoPlayTimeout);
+    }
+    if (menuTimeout) {
+      clearTimeout(menuTimeout);
+    }
+
+    player.removeEventListener("touchstart", onTouchStart);
+    player.removeEventListener("touchmove", onTouchMove);
+    document.removeEventListener("fullscreenchange", onFullScreenChange);
   });
 
-  $: if (dirs && filename) {
+  $: if (filePath) {
     reset();
-    imagePath = buildMediaPath();
-  }
-
-  $: if (imagePath) {
     isLoading = true;
     fetchImage(0);
   }
@@ -68,12 +82,17 @@
 
   $: if (blobs.length > 0) {
     const current = +new Date();
-    if (loaded || current - loadTime > 700) {
-      const imageBlob = new Blob(blobs, { type: imageType });
+    if (loaded || current - loadTime > 600) {
+      let imageBlob = new Blob(blobs, { type: imageType });
+      const prevSrc = imgSrc;
       imgSrc = URL.createObjectURL(imageBlob);
       loadTime = current;
+
       if (isLoading) {
         isLoading = false;
+      }
+      if (prevSrc) {
+        URL.revokeObjectURL(prevSrc);
       }
     }
   }
@@ -85,6 +104,10 @@
   }
 
   const reset = () => {
+    if (imgSrc) {
+      URL.revokeObjectURL(imgSrc);
+    }
+
     touchPointX = -1;
     start = 0;
     imgSrc = null;
@@ -105,18 +128,16 @@
       clearTimeout(autoPlayTimeout);
     }
 
-    onAutoPlay($autoPlayStore);
-  };
-
-  const buildMediaPath = () => {
-    let dir = dirs.join("/");
-    let filePath = dir ? dir + "/" + filename : filename;
-
-    return "/api/file?path=" + encodeURIComponent(filePath);
+    onAutoPlay($loopStore);
   };
 
   const fetchImage = async (startFrom: number) => {
-    const partialBlob: IPartialBlob = await getRange(imagePath, startFrom);
+    const currentPath = filePath;
+    let partialBlob: IPartialBlob = await getRange(filePath, startFrom);
+    if (currentPath !== filePath) {
+      return;
+    }
+
     if (!imageType) {
       imageType = partialBlob.type;
     }
@@ -131,7 +152,7 @@
   };
 
   const toggleFullScreen = async () => {
-    if (player && !document.fullscreenElement) {
+    if (player && !fullscreen) {
       try {
         await player.requestFullscreen();
       } catch (e) {
@@ -143,6 +164,7 @@
       }
     } else {
       await document.exitFullscreen();
+
       if (checkMobile()) {
         window.screen.orientation.unlock();
       }
@@ -170,6 +192,7 @@
         break;
       case "ArrowRight":
         changeImage(1);
+        break;
       default:
         break;
     }
@@ -184,10 +207,37 @@
 
     const newPointX = event.changedTouches[0].clientX;
 
-    if (newPointX - touchPointX > 5) {
+    if (newPointX - touchPointX > 60) {
       moveBack();
-    } else if (newPointX - touchPointX < -5) {
+    } else if (newPointX - touchPointX < -60) {
       moveNext();
+    }
+  };
+
+  const onFullScreenChange = () => {
+    fullscreen = !!document.fullscreenElement;
+    toggleImgClass();
+  };
+
+  const buildImgClass = () => {
+    let className = "w-full flex flex-row justify-center items-center";
+    className += fullscreen ? " h-full" : " img-height";
+
+    return className;
+  };
+
+  const toggleImgClass = () => {
+    if (!imgDiv) return;
+
+    const imgHeight = "img-height";
+    const hFull = "h-full";
+
+    if (fullscreen) {
+      imgDiv.classList.remove(imgHeight);
+      imgDiv.classList.add(hFull);
+    } else {
+      imgDiv.classList.remove(hFull);
+      imgDiv.classList.add(imgHeight);
     }
   };
 </script>
@@ -197,38 +247,59 @@
 <div
   class="relative w-full h-full bg-black"
   bind:this={player}
+  on:dblclick={toggleFullScreen}
   on:mousemove={onMoveInImage}
 >
   {#if isLoading}
-    <div class="w-full h-full flex flex-row justify-center items-center">
-      <Spinner />
+    <div
+      class="w-full img-height py-6 flex flex-row justify-center items-center"
+    >
+      <Spinner text={"Loading " + filename + "..."} />
     </div>
   {:else}
-    <div class="w-full h-full flex flex-row justify-center items-center">
-      <img src={imgSrc} alt={filename} class="max-w-full max-h-full" />
+    <div class={buildImgClass()} bind:this={imgDiv}>
+      <img
+        src={imgSrc}
+        alt={filename}
+        class="max-w-full h-full object-contain"
+      />
     </div>
     {#if showMenu}
       <div class="absolute top-0 left-0 z-10 w-full h-full">
+        {#if fullscreen}
+          <div class="absolute top-2 right-2 xl:top-8 xl:right-8">
+            <Icon
+              type={EIconType.closecircle}
+              color={EIconColor.gray}
+              size="large"
+              className="cursor-pointer"
+              onClick={toggleFullScreen}
+            />
+          </div>
+        {:else}
+          <div class="absolute bottom-2 right-2 xl:bottom-8 xl:right-8">
+            <Icon
+              type={EIconType.expand}
+              color={EIconColor.gray}
+              size="large"
+              className="cursor-pointer"
+              onClick={toggleFullScreen}
+            />
+          </div>
+        {/if}
         <div
-          class="w-full h-full flex flex-row justify-between items-center my-auto"
+          class="w-full h-full px-2 xl:px-8 flex flex-row justify-between items-center my-auto"
         >
           <Icon
-            type="back"
-            color="gray"
+            type={EIconType.back}
+            color={EIconColor.gray}
             size="large"
             className="cursor-pointer"
             onClick={() => changeImage(-1)}
           />
           <Icon
-            type="expand"
-            color="gray"
-            size="large"
-            className="cursor-pointer"
-            onClick={toggleFullScreen}
-          />
-          <Icon
-            type="forward"
-            color="gray"
+            type={EIconType.forward}
+            color={EIconColor.gray}
             size="large"
             className="cursor-pointer"
             onClick={() => changeImage(1)}
@@ -238,3 +309,17 @@
     {/if}
   {/if}
 </div>
+
+<style>
+  @media only screen and (min-width: 600px) {
+    .img-height {
+      height: 60vh;
+    }
+  }
+
+  @media only screen and (min-width: 1024px) {
+    .img-height {
+      height: 80vh;
+    }
+  }
+</style>
