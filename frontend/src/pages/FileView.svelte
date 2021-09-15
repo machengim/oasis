@@ -16,6 +16,7 @@
   import * as api from "../utils/api";
   import TextViewer from "../players/TextViewer.svelte";
   import ImageViewer from "../players/ImageViewer.svelte";
+  import PdfViewer from "../players/PdfViewer.svelte";
   import Icon from "../components/Icon.svelte";
 
   const navigate = useNavigate();
@@ -227,6 +228,8 @@
             />
           {:else if fileType === FileType.Text || fileType === FileType.Code}
             <TextViewer {dirs} {filename} {fileType} />
+          {:else if fileType === FileType.Pdf}
+            <PdfViewer {filePath} />
           {:else if fileType === FileType.Image}
             <ImageViewer
               {filePath}
