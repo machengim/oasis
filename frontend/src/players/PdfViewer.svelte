@@ -1,14 +1,12 @@
 <script lang="ts">
-  import pdfjs from "pdfjs-dist";
-  import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
   import Spinner from "../components/Spinner.svelte";
-  import type { PDFDocumentProxy } from "pdfjs-dist/types/display/api";
+  const pdfjs = window["pdfjs-dist/build/pdf"];
 
   export let filePath: string;
   let isLoading = false;
   let pageNumber = 1;
   let canvas: HTMLCanvasElement;
-  let pdf: PDFDocumentProxy;
+  let pdf: any;
 
   $: if (filePath) {
     reset();
@@ -26,10 +24,10 @@
   };
 
   const loadPdf = async () => {
+    pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.js";
+
     isLoading = true;
     const currentPath = filePath;
-    pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
     try {
       const result = await pdfjs.getDocument(filePath).promise;
       isLoading = false;
