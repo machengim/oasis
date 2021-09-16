@@ -3,6 +3,7 @@
   import { loopStore } from "../utils/store";
   import Plyr from "plyr";
   import { ELoopMethod, FileType } from "../utils/types";
+  import { checkMobile } from "../utils/util";
 
   export let filePath: string;
   export let trackPath: string = null;
@@ -28,6 +29,8 @@
         onComplete();
       }
     });
+
+    document.addEventListener("fullscreenchange", onFullScreen, true);
   });
 
   $: if (filePath && player) {
@@ -86,6 +89,20 @@
         type: mediaSrcType,
       },
     ];
+  };
+
+  const onFullScreen = async () => {
+    if (!checkMobile()) return;
+    const fullscreen = !!document.fullscreenElement;
+    if (fullscreen) {
+      try {
+        await window.screen.orientation.lock("landscape");
+      } catch (e) {
+        console.error("Unable to lock orientation: ", e);
+      }
+    } else {
+      window.screen.orientation.unlock();
+    }
   };
 </script>
 
