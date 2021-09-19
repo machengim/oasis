@@ -4,7 +4,7 @@
   import Icon from "../components/Icon.svelte";
   import { checkMobile } from "../utils/util";
   import { EIconType, EIconColor, ELoopMethod } from "../utils/types";
-  import Spinner from '../components/Spinner.svelte';
+  import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
 
   export let filename: string;
@@ -179,7 +179,7 @@
 
   const buildImgClass = () => {
     let className = "w-full flex flex-row justify-center items-center";
-    className += fullscreen ? " h-full" : " img-height";
+    className += fullscreen ? " h-full" : " viewer-height";
 
     return className;
   };
@@ -187,7 +187,7 @@
   const toggleImgClass = () => {
     if (!imgDiv) return;
 
-    const imgHeight = "img-height";
+    const imgHeight = "viewer-height";
     const hFull = "h-full";
 
     if (fullscreen) {
@@ -208,76 +208,62 @@
   on:dblclick={toggleFullScreen}
   on:mousemove={onMoveInImage}
 >
-{#if isLoading}
+  {#if isLoading}
     <div
-      class="w-full img-height py-6 flex flex-row justify-center items-center"
+      class="w-full viewer-height py-6 flex flex-row justify-center items-center"
     >
       <Spinner text={"Loading " + filename + "..."} />
     </div>
   {:else}
-  <div class={buildImgClass()} bind:this={imgDiv}>
-    <img
-      src={imgSrc}
-      alt={filename}
-      class="max-w-full h-full object-contain"
-    />
-  </div>
-  {#if showMenu}
-    <div class="absolute top-0 left-0 z-10 w-full h-full">
-      {#if fullscreen}
-        <div class="absolute top-2 right-2 xl:top-8 xl:right-8">
-          <Icon
-            type={EIconType.closecircle}
-            color={EIconColor.gray}
-            size="large"
-            className="cursor-pointer"
-            onClick={toggleFullScreen}
-          />
-        </div>
-      {:else}
-        <div class="absolute bottom-2 right-2 xl:bottom-8 xl:right-8">
-          <Icon
-            type={EIconType.expand}
-            color={EIconColor.gray}
-            size="large"
-            className="cursor-pointer"
-            onClick={toggleFullScreen}
-          />
-        </div>
-      {/if}
-      <div
-        class="w-full h-full px-2 xl:px-8 flex flex-row justify-between items-center my-auto"
-      >
-        <Icon
-          type={EIconType.back}
-          color={EIconColor.gray}
-          size="large"
-          className="cursor-pointer"
-          onClick={() => changeImage(-1)}
-        />
-        <Icon
-          type={EIconType.forward}
-          color={EIconColor.gray}
-          size="large"
-          className="cursor-pointer"
-          onClick={() => changeImage(1)}
-        />
-      </div>
+    <div class={buildImgClass()} bind:this={imgDiv}>
+      <img
+        src={imgSrc}
+        alt={filename}
+        class="max-w-full h-full object-contain"
+      />
     </div>
+    {#if showMenu}
+      <div class="absolute top-0 left-0 z-10 w-full h-full">
+        {#if fullscreen}
+          <div class="absolute top-2 right-2 xl:top-8 xl:right-8">
+            <Icon
+              type={EIconType.closecircle}
+              color={EIconColor.gray}
+              size="large"
+              className="cursor-pointer"
+              onClick={toggleFullScreen}
+            />
+          </div>
+        {:else}
+          <div class="absolute bottom-2 right-2 xl:bottom-8 xl:right-8">
+            <Icon
+              type={EIconType.expand}
+              color={EIconColor.gray}
+              size="large"
+              className="cursor-pointer"
+              onClick={toggleFullScreen}
+            />
+          </div>
+        {/if}
+        <div
+          class="w-full h-full px-2 xl:px-8 flex flex-row justify-between items-center my-auto"
+        >
+          <Icon
+            type={EIconType.back}
+            color={EIconColor.gray}
+            size="large"
+            className="cursor-pointer"
+            onClick={() => changeImage(-1)}
+          />
+          <Icon
+            type={EIconType.forward}
+            color={EIconColor.gray}
+            size="large"
+            className="cursor-pointer"
+            onClick={() => changeImage(1)}
+          />
+        </div>
+      </div>
     {/if}
   {/if}
 </div>
-
-<style>
-  @media only screen and (min-width: 600px) {
-    .img-height {
-      height: 60vh;
-    }
-  }
-
-  @media only screen and (min-width: 1024px) {
-    .img-height {
-      height: 80vh;
-    }
-  }
-</style>

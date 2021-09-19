@@ -27,3 +27,15 @@ input:disabled {
   --plyr-font-size-large: 1.6rem;
   --plyr-font-size-xlarge: 2rem;
 }
+
+@media only screen and (min-width: 320px) {
+  .viewer-height {
+    height: 60vh;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .viewer-height {
+    height: 80vh;
+  }
+}
