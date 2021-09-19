@@ -26,7 +26,7 @@
 </script>
 
 <div
-  class="mx-2 p-2 w-full viewer-height overflow-y-auto"
+  class="p-2 w-full viewer-height overflow-y-auto"
   id="container"
   bind:this={container}
 />

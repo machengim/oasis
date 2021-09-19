@@ -40,7 +40,7 @@
   <Spinner />
 {:else}
   <div
-    class="mx-2 p-2 text-viewer-height overflow-y-auto border-2 border-gray-500 shadow"
+    class="p-2 text-viewer-height overflow-y-auto border-2 border-gray-500 shadow"
   >
     {#if fileType === FileType.Text}
       <pre class="text-lg">

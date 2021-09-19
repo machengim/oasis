@@ -89,7 +89,7 @@
 
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
-    <BreadCrum {dirs} className="px-1 py-2" />
+    <BreadCrum {dirs} className="py-1" />
     {#if isLoading}
       <Spinner />
     {:else}

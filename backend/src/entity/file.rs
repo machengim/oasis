@@ -31,7 +31,7 @@ impl FileType {
             "mp3" | "flac" | "aac" | "ogg" => Self::Music,
             "pdf" => Self::Pdf,
             "mp4" | "mov" | "avi" | "mkv" | "webm" | "flv" => Self::Video,
-            "txt" | "srt" | "vtt" => Self::Text,
+            "txt" | "md" | "srt" | "vtt" => Self::Text,
             _ => Self::Unknown,
         }
     }

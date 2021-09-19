@@ -213,7 +213,7 @@
 
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
-    <BreadCrum {dirs} {filename} className="px-1 py-2" />
+    <BreadCrum {dirs} {filename} className="py-1" />
     {#if isLoading}
       <Spinner />
     {:else}
@@ -242,49 +242,63 @@
             <div>Cannot display this file.</div>
           {/if}
         </div>
-        <div
-          class="flex flex-col h-80 w-full lg:w-1/5 lg:ml-6 mt-4 lg:mt-0 p-1 bg-gray-100"
-        >
-          <div
-            class="flex flex-row items-center justify-between px-2 py-1 mb-2 border-b"
-          >
-            <div class="text-xl">File list</div>
-            {#if fileType === FileType.Video || fileType === FileType.Music || fileType === FileType.Image}
-              <div class="flex flex-row items-center">
-                {#each loopIcons as icon, i}
-                  <Icon
-                    type={getIconType(icon)}
-                    color={getIconColor(icon)}
-                    size="small"
-                    className="ml-2 cursor-pointer"
-                    onClick={() => selectLoopMethod(i)}
-                  />
-                {/each}
-              </div>
-            {/if}
-          </div>
-          <div class="overflow-y-auto flex-grow">
-            {#each siblings as sibling, i}
-              {#if filename === sibling.filename}
-                <div class="bg-blue-400 text-white rounded">
-                  <span class="px-2 py-1">
-                    {sibling.filename}
-                  </span>
-                </div>
-              {:else}
-                <div
-                  class="rounded cursor-pointer hover:bg-blue-400 hover:text-white"
-                  on:click={() => selectSibling(i)}
-                >
-                  <span class="px-2 py-1">
-                    {sibling.filename}
-                  </span>
+        <div class="flex flex-col w-full lg:w-1/4 lg:pl-8 mt-4 lg:mt-0">
+          <div class="bg-gray-100 rounded-lg">
+            <div
+              class="flex flex-row items-center justify-between px-2 py-1 mb-2 border-b"
+            >
+              <div class="text-xl">File list</div>
+              {#if fileType === FileType.Video || fileType === FileType.Music || fileType === FileType.Image}
+                <div class="flex flex-row items-center">
+                  {#each loopIcons as icon, i}
+                    <Icon
+                      type={getIconType(icon)}
+                      color={getIconColor(icon)}
+                      size="small"
+                      className="ml-2 cursor-pointer"
+                      onClick={() => selectLoopMethod(i)}
+                    />
+                  {/each}
                 </div>
               {/if}
-            {/each}
+            </div>
+            <div class="filelist-height overflow-y-auto flex-grow px-1">
+              {#each siblings as sibling, i}
+                {#if filename === sibling.filename}
+                  <div class="bg-blue-400 text-white rounded mb-1">
+                    <span class="px-2 py-1">
+                      {sibling.filename}
+                    </span>
+                  </div>
+                {:else}
+                  <div
+                    class="rounded cursor-pointer hover:bg-blue-400 hover:text-white mb-1"
+                    on:click={() => selectSibling(i)}
+                  >
+                    <span class="px-2 py-1">
+                      {sibling.filename}
+                    </span>
+                  </div>
+                {/if}
+              {/each}
+            </div>
           </div>
         </div>
       </div>
     {/if}
   </div>
 </div>
+
+<style>
+  @media only screen and (min-width: 320px) {
+    .filelist-height {
+      height: 12rem;
+    }
+  }
+
+  @media only screen and (min-width: 1024px) {
+    .filelist-height {
+      height: 20rem;
+    }
+  }
+</style>
