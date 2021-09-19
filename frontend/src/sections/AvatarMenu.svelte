@@ -6,7 +6,7 @@
   const username = readCookie("uname") || "";
   export let onSignOut: () => void;
 
-  const toPage = (page: "setup" | "login") => {
+  const toPage = (page: "profile" | "setting" | "login") => {
     navigate("/" + page);
   };
 
@@ -24,7 +24,13 @@
     <hr />
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
-      on:click={() => toPage("setup")}
+      on:click={() => toPage("profile")}
+    >
+      Profile
+    </div>
+    <div
+      class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
+      on:click={() => toPage("setting")}
     >
       Setting
     </div>

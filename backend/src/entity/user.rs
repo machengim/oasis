@@ -73,6 +73,6 @@ impl User {
     }
 
     pub fn generate_token(&self) -> Token {
-        Token::new(self.user_id, &self.username, self.permission)
+        Token::new(self.user_id, self.permission)
     }
 }

@@ -35,8 +35,11 @@ async fn login() -> Option<NamedFile> {
 }
 
 #[get("/setup")]
-async fn setup() -> Option<NamedFile> {
-    open_index_page().await
+async fn setup(state: &State<AppState>) -> Result<Option<NamedFile>, Error> {
+    match state.get_first_run() {
+        true => Ok(open_index_page().await),
+        false => Err(Error::Forbidden),
+    }
 }
 
 #[get("/files")]

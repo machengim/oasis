@@ -12,25 +12,23 @@ use rocket::{
 pub struct Token {
     pub exp: usize,
     pub uid: i64,
-    pub username: String,
     pub permission: i8,
 }
 
 impl Token {
-    pub fn new(uid: i64, username: &str, permission: i8) -> Self {
+    pub fn new(uid: i64, permission: i8) -> Self {
         let token_expire_days: i64 = 7;
         let expire_time = chrono::Utc::now().timestamp() + token_expire_days * 24 * 60 * 60;
 
         Token {
             exp: expire_time as usize,
             uid,
-            username: username.to_string(),
             permission,
         }
     }
 
     pub fn default() -> Self {
-        Token::new(-1, "", -1)
+        Token::new(-1, -1)
     }
 
     pub fn encode(&self, secret: &str) -> AnyResult<String> {
@@ -80,7 +78,7 @@ mod tests {
     #[test]
     fn test_token_should_work() {
         let secret = "mySitePassword";
-        let claim = Token::new(1, "", 9);
+        let claim = Token::new(1, 9);
         let token = claim.encode(secret).unwrap();
         let validate = Token::decode(&token, secret).unwrap();
         assert_eq!(validate.permission, 9);
@@ -89,7 +87,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_token_should_panic() {
-        let mut claim = Token::new(1, "", 9);
+        let mut claim = Token::new(1, 9);
         claim.exp -= 7 as usize * 24 * 60 * 60 + 1;
         let token = claim.encode("secret").unwrap();
         let validate = Token::decode(&token, "secret").unwrap();
