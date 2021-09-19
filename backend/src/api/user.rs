@@ -1,5 +1,6 @@
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
+use crate::service::auth::AuthUser;
 use crate::service::error::Error;
 use rocket::http::{Cookie, CookieJar};
 use rocket::serde::{json::Json, Deserialize};
@@ -13,7 +14,7 @@ pub struct LoginRequest {
 }
 
 pub fn route() -> Vec<Route> {
-    routes![login]
+    routes![login, signout]
 }
 
 #[post("/login", data = "<req_body>")]
@@ -31,13 +32,27 @@ async fn login(
     let secret = state.get_secret()?;
     let token_str = user.generate_token().encode(&secret)?;
 
-    let cookie = Cookie::build("token", token_str)
+    let cookie_token = Cookie::build("token", token_str)
         .path("/")
         .http_only(true)
         .max_age(time::Duration::days(7))
         .finish();
 
-    jar.add(cookie);
+    let cookie_uname = Cookie::build("uname", user.username)
+        .path("/")
+        .max_age(time::Duration::days(7))
+        .finish();
+
+    jar.add(cookie_token);
+    jar.add(cookie_uname);
+
+    Ok(())
+}
+
+#[get("/signout")]
+async fn signout(_user: AuthUser, jar: &CookieJar<'_>) -> Result<(), Error> {
+    jar.remove(Cookie::named("token"));
+    jar.remove(Cookie::named("uname"));
 
     Ok(())
 }

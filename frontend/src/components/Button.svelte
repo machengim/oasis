@@ -30,7 +30,7 @@
         style += " bg-blue-400 hover:bg-blue-500 text-white";
         break;
       case "white":
-        style += " bg-white hover:bg-gray-100 text-black";
+        style += " bg-white hover:bg-gray-200 text-black";
         break;
       case "gray":
         style += " bg-gray-100 hover:bg-blue-200";

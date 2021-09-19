@@ -42,6 +42,8 @@ pub async fn execute<'r>(query: Query<'r>, tx: &mut Transaction<'_, Sqlite>) -> 
     let stmt = prepare_exec_sql(query.sql, &query.args);
     if query.sql.to_lowercase().starts_with("insert") {
         row_id = stmt.execute(&mut *tx).await?.last_insert_rowid();
+    } else {
+        stmt.execute(&mut *tx).await?;
     }
 
     Ok(row_id)

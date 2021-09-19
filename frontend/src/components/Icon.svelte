@@ -6,7 +6,7 @@
   export let color: EIconColor = EIconColor.gray;
   export let size: "small" | "tiny" | "default" | "large" = "default";
   export let className: string = "";
-  export let onClick: () => void = null;
+  export let onClick: (e) => void = null;
   let iconColor = "#000";
   let iconHtml: string = null;
 

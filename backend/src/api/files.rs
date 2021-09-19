@@ -1,8 +1,8 @@
 use crate::entity::file::{File, FileType};
 use crate::service::app_state::AppState;
+use crate::service::auth::AuthUser;
 use crate::service::error::Error;
 use crate::service::range::RangedFile;
-use crate::service::token::Token;
 use crate::service::track;
 use crate::util::{self, file_system};
 use rocket::tokio::fs;
@@ -17,13 +17,9 @@ pub fn route() -> Vec<Route> {
 #[get("/dir?<path>")]
 async fn dir_content(
     path: Option<&str>,
-    token: Token,
+    _user: AuthUser,
     state: &State<AppState>,
 ) -> Result<Json<Vec<File>>, Error> {
-    if token.uid <= 0 || token.permission <= 0 {
-        return Err(Error::Unauthorized);
-    }
-
     let storage = state.get_site()?.storage.clone();
     let target_path = match path {
         Some(dir) => PathBuf::from(storage).join(&util::parse_encoded_url(dir)?),
@@ -48,13 +44,9 @@ async fn dir_content(
 #[get("/file/<path>")]
 async fn file_content(
     path: &str,
-    token: Token,
+    _user: AuthUser,
     state: &State<AppState>,
 ) -> Result<Either<RangedFile, NamedFile>, Error> {
-    if token.uid <= 0 || token.permission <= 0 {
-        return Err(Error::Unauthorized);
-    }
-
     let storage = state.get_site()?.storage.clone();
     let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
 
@@ -72,11 +64,11 @@ async fn file_content(
 }
 
 #[get("/file/track?<path>")]
-async fn video_track(path: &str, token: Token, state: &State<AppState>) -> Result<String, Error> {
-    if token.uid <= 0 || token.permission <= 0 {
-        return Err(Error::Unauthorized);
-    }
-
+async fn video_track(
+    path: &str,
+    _user: AuthUser,
+    state: &State<AppState>,
+) -> Result<String, Error> {
     let storage = state.get_site()?.storage.clone();
     let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
 
@@ -94,13 +86,9 @@ async fn video_track(path: &str, token: Token, state: &State<AppState>) -> Resul
 #[get("/file/text?<path>")]
 async fn text_file_content(
     path: &str,
-    token: Token,
+    _user: AuthUser,
     state: &State<AppState>,
 ) -> Result<String, Error> {
-    if token.uid <= 0 || token.permission <= 0 {
-        return Err(Error::Unauthorized);
-    }
-
     let storage = state.get_site()?.storage.clone();
     let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
 

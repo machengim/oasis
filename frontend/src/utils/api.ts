@@ -1,6 +1,6 @@
 import type { IPartialBlob } from '../utils/types';
 
-export async function get<T>(url: string, dataType: "json" | "text" | "blob" = "json"): Promise<T> {
+export async function get<T>(url: string, dataType: "json" | "text" | "blob" | "raw" = "json"): Promise<T> {
   let response: Response;
   try {
     response = await fetch(url);
@@ -12,7 +12,7 @@ export async function get<T>(url: string, dataType: "json" | "text" | "blob" = "
     throw new Error(response.status.toString());
   }
 
-  return dataType === "json" ? await response.json() : dataType === "text" ? await response.text() : await response.blob();
+  return dataType === "json" ? await response.json() : dataType === "text" ? await response.text() : dataType === "blob" ? await response.blob() : response;
 }
 
 export async function getRange(url: string, start: number, end: number = 0): Promise<IPartialBlob> {
