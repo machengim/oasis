@@ -52,7 +52,7 @@
     class="w-11/12 lg:w-4/5 h-full flex flex-row justify-between items-center mx-auto"
   >
     <Title {section} />
-    {#if section === "files" || section === "settings"}
+    {#if section === "files" || section === "settings" || section === "profile"}
       <div class="relative">
         <Icon
           type={EIconType.profile}

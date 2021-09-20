@@ -20,6 +20,10 @@
       icon_type = EIconType.code;
       color = EIconColor.pink;
       break;
+    case FileType.Pdf:
+      icon_type = EIconType.pdf;
+      color = EIconColor.red;
+      break;
     case FileType.Text:
     case FileType.Pdf:
       icon_type = EIconType.text;

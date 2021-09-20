@@ -1,10 +1,4 @@
-use crate::{
-    api::{sys::SetupRequest, user::LoginRequest},
-    args,
-    service::token::Token,
-    util::db,
-    util::db::Query,
-};
+use crate::{api::sys::SetupRequest, args, service::token::Token, util::db, util::db::Query};
 use anyhow::Result as AnyResult;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use sqlx::{pool::PoolConnection, FromRow, Sqlite, Transaction};
@@ -49,6 +43,27 @@ impl User {
         Ok(uid)
     }
 
+    pub async fn update(&self, tx: &mut Transaction<'_, Sqlite>) -> AnyResult<i64> {
+        let encrypt_password = hash(&self.password, DEFAULT_COST)?;
+
+        let sql =
+            "update USER set username = ?1, password = ?2, permission = ?3, created_at = ?4 where user_id = ?5";
+        let query = Query::new(
+            sql,
+            args![
+                &self.username,
+                &encrypt_password,
+                self.permission,
+                self.created_at,
+                self.user_id
+            ],
+        );
+
+        let uid = db::execute(query, tx).await?;
+
+        Ok(uid)
+    }
+
     pub async fn find_user_by_name(
         username: &str,
         conn: &mut PoolConnection<Sqlite>,
@@ -59,13 +74,17 @@ impl User {
         Ok(db::fetch_single(query, conn).await?)
     }
 
-    pub async fn login(req: &LoginRequest, conn: &mut PoolConnection<Sqlite>) -> AnyResult<Self> {
-        let user = match Self::find_user_by_name(&req.username, conn).await? {
+    pub async fn login(
+        username: &str,
+        password: &str,
+        conn: &mut PoolConnection<Sqlite>,
+    ) -> AnyResult<Self> {
+        let user = match Self::find_user_by_name(username, conn).await? {
             Some(u) => u,
             _ => return Err(anyhow::anyhow!("No such username in db")),
         };
 
-        if !verify(&req.password, &user.password)? {
+        if !verify(password, &user.password)? {
             return Err(anyhow::anyhow!("Invalid password to login"));
         }
 

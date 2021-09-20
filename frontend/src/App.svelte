@@ -10,6 +10,7 @@
   import Home from "./pages/Home.svelte";
   import Files from "./pages/Files.svelte";
   import Settings from "./pages/Settings.svelte";
+  import Profile from "./pages/Profile.svelte";
   import * as api from "./utils/api";
   import type { ISiteBrief } from "./utils/types";
   import Spinner from "./components/Spinner.svelte";
@@ -51,6 +52,7 @@
       <Route path="/files" component={Files} />
       <Route path="/files/*" component={Files} />
       <Route path="/settings" component={Settings} />
+      <Route path="/profile" component={Profile} />
       <Route path="/" component={Home} />
     </Router>
   </main>

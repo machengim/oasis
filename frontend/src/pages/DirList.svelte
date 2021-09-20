@@ -150,12 +150,14 @@
         >
           <div class="col-span-3 px-2 flex flex-row items-center">
             <FileIcon {file} />
-            <span class="ml-2">
+            <span class="ml-2 break-all">
               {file.filename}
             </span>
           </div>
-          <div class="px-2">{$t("filetype." + file.file_type)}</div>
-          <div class="px-2">{formatSize(file.size)}</div>
+          <div class="px-2 my-auto">
+            {$t("filetype." + file.file_type)}
+          </div>
+          <div class="px-2 my-auto">{formatSize(file.size)}</div>
         </div>
       {/each}
     {/if}

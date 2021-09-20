@@ -110,7 +110,7 @@
   {/if}
   <form on:submit={onConfirm} bind:this={form}>
     <div
-      class="w-96 mx-auto mt-28 bg-gray-50 shadow rounded-lg flex flex-col items-center p-8"
+      class="panel-width mx-auto mt-20 bg-gray-50 shadow rounded-lg flex flex-col items-center p-2 md:p-8"
     >
       <div class="text-xl font-bold mb-8 text-gray-700">
         {$t("component.settings.title")}
@@ -151,7 +151,7 @@
           </select>
         </div>
       </div>
-      <div class="w-full grid grid-cols-4 mb-12">
+      <div class="w-full grid grid-cols-4 mb-8">
         <div>{$t("form.storage")}:</div>
         <div class="col-span-3 pl-2">
           {#if selectedDir}
@@ -188,3 +188,10 @@
     </div>
   </form>
 </div>
+
+<style>
+  .panel-width {
+    width: 24rem;
+    max-width: 90vw;
+  }
+</style>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
+  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
   import { useNavigate } from "svelte-navigator";
   import {
     dirsStore,
@@ -239,7 +240,7 @@
               {moveNext}
             />
           {:else}
-            <div>Cannot display this file.</div>
+            <div class="text-lg my-4">Cannot display this file.</div>
           {/if}
         </div>
         <div class="flex flex-col w-full lg:w-1/4 lg:pl-8 mt-4 lg:mt-0">
@@ -247,7 +248,7 @@
             <div
               class="flex flex-row items-center justify-between px-2 py-1 mb-2 border-b"
             >
-              <div class="text-xl">File list</div>
+              <div class="text-xl">{$t("component.file_view.filelist")}</div>
               {#if fileType === FileType.Video || fileType === FileType.Music || fileType === FileType.Image}
                 <div class="flex flex-row items-center">
                   {#each loopIcons as icon, i}

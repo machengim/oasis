@@ -21,6 +21,12 @@ export interface IUpdateConfigRequest {
   update_freq: string;
 }
 
+export interface IChangePasswordRequest {
+  username: string;
+  old_password: string;
+  new_password: string
+}
+
 export interface IFile {
   filename: string,
   file_type: FileType,
@@ -80,6 +86,7 @@ export enum EIconType {
   down = "down",
   folder = "folder",
   code = "code",
+  pdf = "pdf",
   image = "image",
   text = "text",
   music = "music",

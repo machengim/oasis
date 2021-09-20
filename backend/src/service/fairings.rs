@@ -1,6 +1,6 @@
-use rocket::{Request, Data, Response};
 use rocket::fairing::{Fairing, Info, Kind};
-use rocket::http::{Method, ContentType, Status};
+use rocket::http::{Method, Status};
+use rocket::{Request, Response};
 
 pub struct CacheFairing;
 
@@ -9,7 +9,7 @@ impl Fairing for CacheFairing {
     fn info(&self) -> Info {
         Info {
             name: "GET Cache",
-            kind: Kind::Response
+            kind: Kind::Response,
         }
     }
 

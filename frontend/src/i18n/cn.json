@@ -3,16 +3,20 @@
     "files": "文件",
     "setup": "设置",
     "login": "登录",
-    "settings": "网站设置"
+    "settings": "网站设置",
+    "profile": "用户资料"
   },
   "form": {
     "username": "用户名",
     "password": "密码",
     "storage": "存储",
-    "language": "语言"
+    "language": "语言",
+    "old_password": "旧密码",
+    "new_password": "新密码"
   },
   "button": {
     "confirm": "确认",
+    "confirming": "确认中...",
     "cancel": "取消",
     "launch": "启动",
     "launching": "启动中...",
@@ -52,6 +56,9 @@
       "monthly": "每月",
       "never": "从不"
     },
+    "profile": {
+      "title": "用户资料"
+    },
     "dir_list": {
       "filename": "文件名",
       "type": "类型",
@@ -72,7 +79,8 @@
   },
   "message": {
     "error": {
-      "no_storage": "请选择存储位置"
+      "no_storage": "请选择存储位置",
+      "miss_password": "请输入新旧密码以修改"
     }
   }
 }

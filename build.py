@@ -10,9 +10,10 @@ def main():
 
     os.mkdir("release")
     filename = "oasis.exe" if os.name == "nt" else "oasis"
-    shellEnable = True if os.name == "nt" else False   
-    
+    shellEnable = True if os.name == "nt" else False
+
     os.chdir("frontend")
+    subprocess.run(["npm", "i"], shell=shellEnable)
     subprocess.run(["npm", "run", "build"], shell=shellEnable)
     shutil.copytree("public", "../release/public")
 

@@ -5,6 +5,7 @@ use crate::service::error::Error;
 use rocket::http::{Cookie, CookieJar};
 use rocket::serde::{json::Json, Deserialize};
 use rocket::{Route, State};
+use sqlx::Connection;
 
 #[derive(Deserialize, Debug)]
 #[serde(crate = "rocket::serde")]
@@ -13,8 +14,16 @@ pub struct LoginRequest {
     pub password: String,
 }
 
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct ChangePasswordRequest {
+    pub username: String,
+    pub old_password: String,
+    pub new_password: String,
+}
+
 pub fn route() -> Vec<Route> {
-    routes![login, signout]
+    routes![login, signout, change_password]
 }
 
 #[post("/login", data = "<req_body>")]
@@ -28,7 +37,7 @@ async fn login(
     }
 
     let mut conn = state.get_pool_conn().await?;
-    let user = User::login(&req_body, &mut conn).await?;
+    let user = User::login(&req_body.username, &req_body.password, &mut conn).await?;
     let secret = state.get_secret()?;
     let token_str = user.generate_token().encode(&secret)?;
 
@@ -45,6 +54,27 @@ async fn login(
 
     jar.add(cookie_token);
     jar.add(cookie_uname);
+
+    Ok(())
+}
+
+#[put("/user/password", data = "<req_body>")]
+async fn change_password(
+    state: &State<AppState>,
+    _user: AuthUser,
+    req_body: Json<ChangePasswordRequest>,
+    jar: &CookieJar<'_>,
+) -> Result<(), Error> {
+    let mut conn = state.get_pool_conn().await?;
+    let mut user = User::login(&req_body.username, &req_body.old_password, &mut conn).await?;
+    user.password = req_body.new_password.clone();
+
+    let mut tx = conn.begin().await?;
+    user.update(&mut tx).await?;
+    tx.commit().await?;
+
+    jar.remove(Cookie::named("token"));
+    jar.remove(Cookie::named("uname"));
 
     Ok(())
 }

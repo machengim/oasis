@@ -3,16 +3,20 @@
     "files": "Files",
     "setup": "Setup",
     "login": "Login",
-    "settings": "Settings"
+    "settings": "Settings",
+    "profile": "Profile"
   },
   "form": {
     "username": "Username",
     "password": "Password",
     "storage": "Storage",
-    "language": "Language"
+    "language": "Language",
+    "old_password": "Old password",
+    "new_password": "New password"
   },
   "button": {
     "confirm": "Confirm",
+    "confirming": "Confirming...",
     "cancel": "Cancel",
     "launch": "Launch",
     "launching": "Launching...",
@@ -52,6 +56,9 @@
       "monthly": "Montly",
       "never": "Never"
     },
+    "profile": {
+      "title": "User profile"
+    },
     "dir_list": {
       "filename": "Filename",
       "type": "Type",
@@ -72,7 +79,8 @@
   },
   "message": {
     "error": {
-      "no_storage": "Please choose a storage"
+      "no_storage": "Please choose a storage",
+      "miss_password": "Please fill in both fields to change password"
     }
   }
 }

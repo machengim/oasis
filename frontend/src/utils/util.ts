@@ -88,6 +88,7 @@ export function inferFileType(ext: string) {
     case "srt":
     case "vtt":
     case "md":
+    case "json":
       return FileType.Text;
     default:
       return FileType.Unknown;

@@ -1,6 +1,7 @@
 use super::error::Error;
 use super::token::Token;
 use crate::service::app_state::AppState;
+use crate::service::auth::AuthUser;
 use crate::util;
 use rocket::fs::NamedFile;
 use rocket::response::Redirect;
@@ -8,7 +9,7 @@ use rocket::{Either, Route, Shutdown, State};
 use std::path::PathBuf;
 
 pub fn serve() -> Vec<Route> {
-    routes![index, index_html, shutdown, login, setup, files, files_all, settings]
+    routes![index, index_html, shutdown, login, setup, files, files_all, settings, profile]
 }
 
 #[get("/")]
@@ -67,6 +68,11 @@ async fn settings(token: Token) -> Result<Option<NamedFile>, Error> {
     }
 
     Ok(open_index_page().await)
+}
+
+#[get("/profile")]
+async fn profile(_user: AuthUser) -> Option<NamedFile> {
+    open_index_page().await
 }
 
 #[get("/shutdown")]
