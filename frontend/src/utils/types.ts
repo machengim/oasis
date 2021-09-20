@@ -15,6 +15,12 @@ export interface ILoginRequest {
   password: string;
 }
 
+export interface IUpdateConfigRequest {
+  language: string;
+  storage: string;
+  update_freq: string;
+}
+
 export interface IFile {
   filename: string,
   file_type: FileType,
@@ -39,9 +45,18 @@ export interface ILoopIcon {
   selected: boolean;
 }
 
-export interface ISiteBasic {
+export interface ISiteBrief {
   version: string,
-  language: string
+  language: string,
+}
+
+export interface ISiteFull {
+  version: string,
+  language: string,
+  storage: string,
+  update_freq: string,
+  created_at: number,
+  updated_at: number,
 }
 
 export enum FileType {

@@ -52,7 +52,7 @@
     class="w-11/12 lg:w-4/5 h-full flex flex-row justify-between items-center mx-auto"
   >
     <Title {section} />
-    {#if section === "files"}
+    {#if section === "files" || section === "settings"}
       <div class="relative">
         <Icon
           type={EIconType.profile}
@@ -60,7 +60,7 @@
           className="cursor-pointer"
         />
         {#if showMenu}
-          <AvatarMenu onSignOut={signOut} />
+          <AvatarMenu onClose={closeAvatarMenu} onSignOut={signOut} />
         {/if}
       </div>
     {/if}

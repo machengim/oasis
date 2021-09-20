@@ -9,8 +9,9 @@
   import Setup from "./pages/Setup.svelte";
   import Home from "./pages/Home.svelte";
   import Files from "./pages/Files.svelte";
+  import Settings from "./pages/Settings.svelte";
   import * as api from "./utils/api";
-  import type { ISiteBasic } from "./utils/types";
+  import type { ISiteBrief } from "./utils/types";
   import Spinner from "./components/Spinner.svelte";
   import { setNotification } from "./utils/store";
 
@@ -23,8 +24,11 @@
     });
 
     try {
-      const site: ISiteBasic = await api.get("/api/site/basic", "json");
-      locale.set(site.language);
+      const endpoint = "/api/sys/config?mode=brief";
+      const site: ISiteBrief = await api.get(endpoint, "json");
+      if (site.language) {
+        locale.set(site.language);
+      }
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read site info");
@@ -46,6 +50,7 @@
       <Route path="/setup" component={Setup} />
       <Route path="/files" component={Files} />
       <Route path="/files/*" component={Files} />
+      <Route path="/settings" component={Settings} />
       <Route path="/" component={Home} />
     </Router>
   </main>

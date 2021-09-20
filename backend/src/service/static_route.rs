@@ -8,7 +8,7 @@ use rocket::{Either, Route, Shutdown, State};
 use std::path::PathBuf;
 
 pub fn serve() -> Vec<Route> {
-    routes![index, index_html, shutdown, login, setup, files, files_all]
+    routes![index, index_html, shutdown, login, setup, files, files_all, settings]
 }
 
 #[get("/")]
@@ -58,6 +58,15 @@ async fn handle_files(token: Token) -> Either<Option<NamedFile>, Redirect> {
     } else {
         Either::Right(Redirect::temporary(uri!("/login")))
     }
+}
+
+#[get("/settings")]
+async fn settings(token: Token) -> Result<Option<NamedFile>, Error> {
+    if token.uid <= 0 || token.permission != 9 {
+        return Err(Error::Unauthorized);
+    }
+
+    Ok(open_index_page().await)
 }
 
 #[get("/shutdown")]

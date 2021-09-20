@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS site (
   	storage TEXT,
 	secret TEXT,
 	language TEXT NOT NULL,
+	update_freq TEXT NOT NULL,
+	updated_at INTEGER,
 	created_at INTEGER NOT NULL
 );
 

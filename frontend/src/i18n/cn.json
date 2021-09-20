@@ -2,7 +2,8 @@
   "section": {
     "files": "文件",
     "setup": "设置",
-    "login": "登录"
+    "login": "登录",
+    "settings": "网站设置"
   },
   "form": {
     "username": "用户名",
@@ -39,7 +40,17 @@
       "selected_dir": "当前选择位置"
     },
     "setup": {
-      "title": "服务器设置"
+      "title": "网站设置"
+    },
+    "settings": {
+      "title": "网站设置",
+      "version": "版本",
+      "language": "语言",
+      "update": "检查更新",
+      "daily": "每日",
+      "weekly": "每周",
+      "monthly": "每月",
+      "never": "从不"
     },
     "dir_list": {
       "filename": "文件名",

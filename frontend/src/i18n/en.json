@@ -2,13 +2,14 @@
   "section": {
     "files": "Files",
     "setup": "Setup",
-    "login": "Login"
+    "login": "Login",
+    "settings": "Settings"
   },
   "form": {
-    "username": "username",
-    "password": "password",
-    "storage": "storage",
-    "language": "language"
+    "username": "Username",
+    "password": "Password",
+    "storage": "Storage",
+    "language": "Language"
   },
   "button": {
     "confirm": "Confirm",
@@ -35,11 +36,21 @@
   "component": {
     "dir_browser": {
       "title": "Directory Browser",
-      "volumes": "volumes",
+      "volumes": "Volumes",
       "selected_dir": "Selected directory"
     },
     "setup": {
-      "title": "Setup"
+      "title": "Site setup"
+    },
+    "settings": {
+      "title": "Update settings",
+      "version": "Version",
+      "language": "Language",
+      "update": "Update",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Montly",
+      "never": "Never"
     },
     "dir_list": {
       "filename": "Filename",

@@ -35,3 +35,7 @@ pub fn get_frontend_path() -> PathBuf {
 pub fn get_version() -> String {
     std::env::var("VERSION").unwrap_or("0.1".to_string())
 }
+
+pub fn get_update_freq() -> String {
+    std::env::var("DEFAULT_UPDATE_FREQ").unwrap_or("never".to_string())
+}

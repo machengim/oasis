@@ -6,9 +6,11 @@
   const navigate = useNavigate();
   const username = readCookie("uname") || "";
   export let onSignOut: () => void;
+  export let onClose: () => void;
 
-  const toPage = (page: "profile" | "setting" | "login") => {
+  const toPage = (page: "profile" | "settings" | "login") => {
     navigate("/" + page);
+    onClose();
   };
 
   const clickInside = (e: MouseEvent) => {
@@ -31,7 +33,7 @@
     </div>
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
-      on:click={() => toPage("setting")}
+      on:click={() => toPage("settings")}
     >
       {$t("component.avatar_menu.settings")}
     </div>

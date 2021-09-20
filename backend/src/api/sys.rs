@@ -1,7 +1,8 @@
-use crate::entity::site::{Site, SiteBasic};
+use crate::entity::site::{Site, SiteResponse};
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::error::Error;
+use crate::service::token::Token;
 use crate::util::{self, file_system};
 use rocket::serde::{json::Json, Deserialize};
 use rocket::{Route, State};
@@ -17,8 +18,16 @@ pub struct SetupRequest {
     pub language: String,
 }
 
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct UpdateRequest {
+    pub storage: String,
+    pub language: String,
+    pub update_freq: String,
+}
+
 pub fn route() -> Vec<Route> {
-    routes![system_dirs, sys_volumes, setup, site_basic]
+    routes![system_dirs, sys_volumes, setup, config, update_site]
 }
 
 #[post("/sys/setup", data = "<req_body>")]
@@ -59,8 +68,8 @@ async fn setup(state: &State<AppState>, req_body: Json<SetupRequest>) -> Result<
 }
 
 #[get("/sys/volumes")]
-fn sys_volumes(state: &State<AppState>) -> Result<Json<Vec<String>>, Error> {
-    if !state.get_first_run() {
+fn sys_volumes(state: &State<AppState>, token: Token) -> Result<Json<Vec<String>>, Error> {
+    if !state.get_first_run() && token.permission != 9 {
         return Err(Error::Unauthorized);
     }
 
@@ -70,9 +79,13 @@ fn sys_volumes(state: &State<AppState>) -> Result<Json<Vec<String>>, Error> {
 }
 
 #[get("/sys/dirs/<dir_str>")]
-async fn system_dirs(state: &State<AppState>, dir_str: &str) -> Result<Json<Vec<PathBuf>>, Error> {
-    if !state.get_first_run() {
-        return Err(Error::Forbidden);
+async fn system_dirs(
+    state: &State<AppState>,
+    token: Token,
+    dir_str: &str,
+) -> Result<Json<Vec<PathBuf>>, Error> {
+    if !state.get_first_run() && token.permission != 9 {
+        return Err(Error::Unauthorized);
     }
 
     let dir = util::parse_encoded_url(dir_str)?;
@@ -81,10 +94,56 @@ async fn system_dirs(state: &State<AppState>, dir_str: &str) -> Result<Json<Vec<
     Ok(Json(sub_dirs))
 }
 
-#[get("/site/basic")]
-async fn site_basic(state: &State<AppState>) -> Result<Json<SiteBasic>, Error> {
-    let site = state.get_site()?;
-    let site_basic = SiteBasic::new(&site.language, &site.version);
+#[get("/sys/config?<mode>")]
+async fn config(
+    state: &State<AppState>,
+    mode: String,
+    token: Token,
+) -> Result<Json<SiteResponse>, Error> {
+    if mode != "brief" && mode != "full" {
+        return Err(Error::BadRequest);
+    }
 
-    Ok(Json(site_basic))
+    if mode == "full" && token.permission != 9 {
+        return Err(Error::Unauthorized);
+    }
+
+    if state.get_first_run() {
+        return Ok(Json(SiteResponse::default()));
+    }
+
+    let site = state.get_site()?;
+    Ok(Json(SiteResponse::from_site(&site, &mode)?))
+}
+
+#[put("/sys/config", data = "<req_body>")]
+async fn update_site(
+    state: &State<AppState>,
+    token: Token,
+    req_body: Json<UpdateRequest>,
+) -> Result<(), Error> {
+    if token.permission != 9 {
+        return Err(Error::Unauthorized);
+    }
+
+    let storage = util::parse_encoded_url(&req_body.storage)?;
+    if !storage.exists() || !storage.is_dir() {
+        return Err(Error::BadRequest);
+    }
+
+    let storage_str = storage.to_str().unwrap().to_owned();
+
+    let mut conn = state.get_pool_conn().await?;
+    let mut site = Site::read(&mut conn).await?.unwrap();
+    site.language = req_body.language.clone();
+    site.update_freq = req_body.update_freq.clone();
+    site.storage = storage_str;
+
+    let mut tx = conn.begin().await?;
+    site.update(&mut tx).await?;
+    tx.commit().await?;
+
+    state.set_site(site)?;
+
+    Ok(())
 }
