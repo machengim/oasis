@@ -6,6 +6,7 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
+import json from '@rollup/plugin-json';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -60,6 +61,7 @@ export default {
 			dedupe: ['svelte']
 		}),
 		commonjs(),
+		json(),
 		typescript({
 			sourceMap: !production,
 			inlineSources: !production
@@ -79,5 +81,6 @@ export default {
 	],
 	watch: {
 		clearScreen: false
-	}
+	},
+	inlineDynamicImports: true
 };

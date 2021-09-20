@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS site (
 	site_id INTEGER PRIMARY KEY,
-	version REAL NOT NULL,
+	version TEXT NOT NULL,
   	storage TEXT,
 	secret TEXT,
+	language TEXT NOT NULL,
 	created_at INTEGER NOT NULL
 );
 

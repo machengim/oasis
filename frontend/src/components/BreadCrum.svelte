@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Link } from "svelte-navigator";
+  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
   import { sectionStore } from "../utils/store";
   import { captilizeFirst } from "../utils/util";
 
@@ -29,7 +30,7 @@
   <Link
     to={"/" + $sectionStore}
     class="hover:bg-blue-400 hover:text-white px-1 rounded whitespace-nowrap overflow-ellipsis"
-    >{captilizeFirst($sectionStore)}</Link
+    >{$t("section." + $sectionStore)}</Link
   >
   {#each dirs as dir, i}
     <span>/</span>

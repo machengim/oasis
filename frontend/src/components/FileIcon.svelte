@@ -4,13 +4,10 @@
   import Icon from "./Icon.svelte";
 
   export let file: IFile;
-  let file_type: FileType;
   let icon_type: EIconType;
   let color: EIconColor;
 
-  $: file_type = file.file_type;
-
-  $: switch (file_type) {
+  $: switch (file.file_type) {
     case FileType.Dir:
       icon_type = EIconType.folder;
       color = EIconColor.blue;

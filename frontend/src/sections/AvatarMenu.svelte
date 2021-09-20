@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
   import { useNavigate } from "svelte-navigator";
   import { readCookie } from "../utils/util";
 
@@ -26,27 +27,27 @@
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={() => toPage("profile")}
     >
-      Profile
+      {$t("component.avatar_menu.profile")}
     </div>
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={() => toPage("setting")}
     >
-      Setting
+      {$t("component.avatar_menu.settings")}
     </div>
     <hr />
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={onSignOut}
     >
-      Sign out
+      {$t("component.avatar_menu.signout")}
     </div>
   {:else}
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={() => toPage("login")}
     >
-      Login
+      {$t("component.avatar_menu.login")}
     </div>
   {/if}
 </div>

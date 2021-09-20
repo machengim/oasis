@@ -1,0 +1,67 @@
+{
+  "section": {
+    "files": "文件",
+    "setup": "设置",
+    "login": "登录"
+  },
+  "form": {
+    "username": "用户名",
+    "password": "密码",
+    "storage": "存储",
+    "language": "语言"
+  },
+  "button": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "launch": "启动",
+    "launching": "启动中...",
+    "change": "修改",
+    "changing": "修改中...",
+    "back": "后退",
+    "select": "选择",
+    "login": "登录",
+    "logging": "登录中..."
+  },
+  "filetype": {
+    "Code": "代码",
+    "Dir": "文件夹",
+    "Image": "图片",
+    "Pdf": "PDF",
+    "Music": "音频",
+    "Text": "文本",
+    "Video": "视频",
+    "Unknown": "未知"
+  },
+  "component": {
+    "dir_browser": {
+      "title": "目录浏览器",
+      "volumes": "分区",
+      "selected_dir": "当前选择位置"
+    },
+    "setup": {
+      "title": "服务器设置"
+    },
+    "dir_list": {
+      "filename": "文件名",
+      "type": "类型",
+      "size": "大小"
+    },
+    "file_view": {
+      "filelist": "文件列表"
+    },
+    "avatar_menu": {
+      "profile": "用户资料",
+      "settings": "网站设定",
+      "signout": "退出",
+      "login": "登录"
+    },
+    "login": {
+      "title": "用户登录"
+    }
+  },
+  "message": {
+    "error": {
+      "no_storage": "请选择存储位置"
+    }
+  }
+}

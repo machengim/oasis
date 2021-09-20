@@ -1,0 +1,67 @@
+{
+  "section": {
+    "files": "Files",
+    "setup": "Setup",
+    "login": "Login"
+  },
+  "form": {
+    "username": "username",
+    "password": "password",
+    "storage": "storage",
+    "language": "language"
+  },
+  "button": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "launch": "Launch",
+    "launching": "Launching...",
+    "change": "Change",
+    "changing": "Changing...",
+    "back": "Back",
+    "select": "Select",
+    "login": "Login",
+    "logging": "Logging in..."
+  },
+  "filetype": {
+    "Code": "Code",
+    "Dir": "Dir",
+    "Image": "Image",
+    "Pdf": "PDF",
+    "Music": "Music",
+    "Text": "Text",
+    "Video": "Video",
+    "Unknown": "Unknown"
+  },
+  "component": {
+    "dir_browser": {
+      "title": "Directory Browser",
+      "volumes": "volumes",
+      "selected_dir": "Selected directory"
+    },
+    "setup": {
+      "title": "Setup"
+    },
+    "dir_list": {
+      "filename": "Filename",
+      "type": "Type",
+      "size": "Size"
+    },
+    "file_view": {
+      "filelist": "File list"
+    },
+    "avatar_menu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "signout": "Sign out",
+      "login": "Login"
+    },
+    "login": {
+      "title": "Login"
+    }
+  },
+  "message": {
+    "error": {
+      "no_storage": "Please choose a storage"
+    }
+  }
+}

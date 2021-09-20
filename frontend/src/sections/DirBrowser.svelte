@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
@@ -83,10 +84,12 @@
   <div
     class="bg-white w-96 mt-20 mx-auto p-4 border rounded-lg border-gray-50 flex flex-col"
   >
-    <div class="mb-4 text-xl mx-auto text-gray-700">Directory Browser</div>
+    <div class="mb-4 text-xl mx-auto text-gray-700">
+      {$t("component.dir_browser.title")}
+    </div>
     <!-- Volume selector -->
     <div class="mb-4 flex flex-row items-center">
-      <span class="mr-4">Volumes:</span>
+      <span class="mr-4">{$t("component.dir_browser.volumes")}:</span>
       <select
         class="px-2 border bg-gray-50 max-w-10"
         on:change={selectVolume}
@@ -102,7 +105,7 @@
     <hr />
 
     <!-- Selected directory -->
-    <div class="mt-2">Selected Directory:</div>
+    <div class="mt-2">{$t("component.dir_browser.selected_dir")}:</div>
     <div class="text-gray-700 font-bold break-words mb-2">{currentDir}</div>
 
     <!-- Sub directory list -->
@@ -135,7 +138,7 @@
     <!-- footer buttons -->
     <div class="mx-auto my-4 flex flex-row">
       <Button
-        value="Confirm"
+        value={$t("button.confirm")}
         className="mr-4"
         disabled={!currentDir}
         onClick={() => {
@@ -143,7 +146,7 @@
           onClose();
         }}
       />
-      <Button value="Cancel" onClick={onClose} />
+      <Button value={$t("button.cancel")} onClick={onClose} />
     </div>
   </div>
 </div>

@@ -31,3 +31,7 @@ pub fn get_frontend_path() -> PathBuf {
 
     path
 }
+
+pub fn get_version() -> String {
+    std::env::var("VERSION").unwrap_or("0.1".to_string())
+}

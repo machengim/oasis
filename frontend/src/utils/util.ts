@@ -1,3 +1,4 @@
+import { getLocaleFromNavigator } from 'svelte-i18n';
 import { FileType, IFile, IFileOrder } from './types';
 
 export function upperFirstChar(input: string) {
@@ -131,4 +132,10 @@ export function readCookie(name: string) {
   }
 
   return null;
+}
+
+export function getLocale() {
+  let browserLocale = getLocaleFromNavigator();
+
+  return browserLocale.startsWith("cn") ? "cn" : "en";
 }

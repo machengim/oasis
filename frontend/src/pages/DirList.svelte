@@ -1,5 +1,6 @@
 <script lang="ts">
   import { useNavigate } from "svelte-navigator";
+  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
   import { setNotification, dirsStore, filesStore } from "../utils/store";
   import type { IFile, IFileOrder } from "../utils/types";
   import { EIconType } from "../utils/types";
@@ -97,7 +98,8 @@
         <div class="col-span-3 px-2 flex flex-row items-center">
           <span
             class="cursor-pointer hover:text-gray-400"
-            on:click={() => changeOrder("name")}>Filename</span
+            on:click={() => changeOrder("name")}
+            >{$t("component.dir_list.filename")}</span
           >
           {#if order.key === "name" && order.asc}
             <Icon type={EIconType.up} size="tiny" className="ml-2" />
@@ -108,7 +110,8 @@
         <div class="px-2  flex flex-row items-center">
           <span
             class="cursor-pointer hover:text-gray-400"
-            on:click={() => changeOrder("type")}>Type</span
+            on:click={() => changeOrder("type")}
+            >{$t("component.dir_list.type")}</span
           >
           {#if order.key === "type" && order.asc}
             <Icon type={EIconType.up} size="tiny" className="ml-2" />
@@ -120,7 +123,7 @@
           <span
             class="cursor-pointer hover:text-gray-400"
             on:click={() => changeOrder("size")}
-            >Size
+            >{$t("component.dir_list.size")}
           </span>
           {#if order.key === "size" && order.asc}
             <Icon type={EIconType.up} size="tiny" className="ml-2" />
@@ -151,7 +154,7 @@
               {file.filename}
             </span>
           </div>
-          <div class="px-2">{file.file_type}</div>
+          <div class="px-2">{$t("filetype." + file.file_type)}</div>
           <div class="px-2">{formatSize(file.size)}</div>
         </div>
       {/each}

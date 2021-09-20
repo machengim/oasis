@@ -7,6 +7,7 @@ export interface ISetupRequest {
   username: string;
   password: string;
   storage: string;
+  language: string;
 }
 
 export interface ILoginRequest {
@@ -36,6 +37,11 @@ export interface IPartialBlob {
 export interface ILoopIcon {
   type: ELoopMethod;
   selected: boolean;
+}
+
+export interface ISiteBasic {
+  version: string,
+  language: string
 }
 
 export enum FileType {

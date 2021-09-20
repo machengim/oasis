@@ -1,4 +1,4 @@
-use crate::entity::site::Site;
+use crate::entity::site::{Site, SiteBasic};
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::error::Error;
@@ -14,10 +14,11 @@ pub struct SetupRequest {
     pub username: String,
     pub password: String,
     pub storage: String,
+    pub language: String,
 }
 
 pub fn route() -> Vec<Route> {
-    routes![system_dirs, sys_volumes, setup]
+    routes![system_dirs, sys_volumes, setup, site_basic]
 }
 
 #[post("/sys/setup", data = "<req_body>")]
@@ -44,7 +45,7 @@ async fn setup(state: &State<AppState>, req_body: Json<SetupRequest>) -> Result<
         .insert_query(&mut tx)
         .await?;
 
-    Site::new(&storage, current_timestamp)
+    Site::new(&storage, &req_body.language, current_timestamp)
         .insert_query(&mut tx)
         .await?;
 
@@ -78,4 +79,12 @@ async fn system_dirs(state: &State<AppState>, dir_str: &str) -> Result<Json<Vec<
     let sub_dirs = file_system::get_sub_dirs(&dir).await?;
 
     Ok(Json(sub_dirs))
+}
+
+#[get("/site/basic")]
+async fn site_basic(state: &State<AppState>) -> Result<Json<SiteBasic>, Error> {
+    let site = state.get_site()?;
+    let site_basic = SiteBasic::new(&site.language, &site.version);
+
+    Ok(Json(site_basic))
 }
