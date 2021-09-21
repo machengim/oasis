@@ -6,10 +6,12 @@
   import Title from "./Title.svelte";
   import { EIconType } from "../utils/types";
   import SignOutModal from "../modals/SignOutModal.svelte";
+  import ShutdownModal from "../modals/ShutdownModal.svelte";
 
   let section: string;
   let showMenu = false;
   let showSignOutModal = false;
+  let showShutdownModal = false;
 
   const unsubscribeSection = sectionStore.subscribe((newSection) => {
     if (newSection) section = newSection;
@@ -39,13 +41,24 @@
     showSignOutModal = true;
   };
 
+  const shutdown = () => {
+    showShutdownModal = true;
+  };
+
   const closeSignOutModal = () => {
     showSignOutModal = false;
+  };
+
+  const clostShutdownModal = () => {
+    showShutdownModal = false;
   };
 </script>
 
 {#if showSignOutModal}
   <SignOutModal onClose={closeSignOutModal} />
+{/if}
+{#if showShutdownModal}
+  <ShutdownModal onClose={clostShutdownModal} />
 {/if}
 <div class="w-full h-14 bg-gray-50 shadow">
   <div
@@ -60,7 +73,11 @@
           className="cursor-pointer"
         />
         {#if showMenu}
-          <AvatarMenu onClose={closeAvatarMenu} onSignOut={signOut} />
+          <AvatarMenu
+            onClose={closeAvatarMenu}
+            onSignOut={signOut}
+            onShutdown={shutdown}
+          />
         {/if}
       </div>
     {/if}

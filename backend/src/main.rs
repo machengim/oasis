@@ -5,37 +5,37 @@ mod entity;
 mod service;
 mod util;
 use entity::site::Site;
+use local_ip_address;
 use rocket::fs::FileServer;
 use service::app_state::AppState;
-use service::fairings::CacheFairing;
+use service::fairings::StaticFileCache;
 use util::init;
 
 #[tokio::main]
-async fn main() -> Result<(), sqlx::Error> {
+async fn main() -> Result<(), anyhow::Error> {
     dotenv::dotenv().ok();
-
     if !init::check_db_file() {
         init::create_db().await?;
     }
 
     let pool = init::get_db_pool().await?;
     let mut conn = pool.acquire().await?;
+    let site_op = Site::read(&mut conn).await?;
+    let state = AppState::new(site_op, pool);
 
-    let state = match Site::read(&mut conn).await? {
-        Some(site) => AppState::new_with_site(site, pool),
-        None => AppState::new_without_site(pool),
-    };
-
-    let server = rocket::build()
+    let rocket = rocket::build()
         .manage(state)
-        .attach(CacheFairing)
+        .attach(StaticFileCache)
         .mount("/api", api::serve())
         .mount("/", service::static_route::serve())
         .mount("/", FileServer::from(util::get_frontend_path()))
-        .launch()
-        .await;
+        .ignite()
+        .await?;
 
-    server.expect("server failed unexpectedly");
+    let ip = local_ip_address::local_ip()?;
+    println!("Server running on {}:{}", ip, rocket.config().port);
+
+    rocket.launch().await?;
 
     Ok(())
 }

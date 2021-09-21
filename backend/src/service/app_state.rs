@@ -11,18 +11,16 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new_with_site(site: Site, pool: Pool<Sqlite>) -> Self {
-        Self {
-            first_run: AtomicBool::new(false),
-            site: Arc::new(Mutex::new(site)),
-            pool,
-        }
-    }
+    pub fn new(site_op: Option<Site>, pool: Pool<Sqlite>) -> Self {
+        let first_run = site_op.is_none();
+        let site = match site_op {
+            Some(site) => site,
+            None => Site::default(),
+        };
 
-    pub fn new_without_site(pool: Pool<Sqlite>) -> Self {
         Self {
-            first_run: AtomicBool::new(true),
-            site: Arc::new(Mutex::new(Site::default())),
+            first_run: AtomicBool::new(first_run),
+            site: Arc::new(Mutex::new(site)),
             pool,
         }
     }

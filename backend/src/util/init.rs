@@ -1,7 +1,7 @@
 use sqlx::{
     migrate::Migrator, sqlite::SqliteConnectOptions, ConnectOptions, Connection, SqlitePool,
 };
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub fn check_db_file() -> bool {
     get_db_file_location().exists()
@@ -15,8 +15,8 @@ pub async fn create_db() -> Result<(), sqlx::Error> {
         .connect()
         .await?;
 
-    let migration_dir = "./migrations";
-    let migrator = Migrator::new(Path::new(&migration_dir)).await?;
+    let migration_dir = "./assets/migrations";
+    let migrator = Migrator::new(PathBuf::from(&migration_dir)).await?;
     migrator.run(&mut conn).await?;
     conn.close();
 

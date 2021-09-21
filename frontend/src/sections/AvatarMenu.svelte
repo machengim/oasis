@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
+  import { t, isLoading as isLoadingI18N } from "svelte-i18n";
   import { useNavigate } from "svelte-navigator";
   import { readCookie } from "../utils/util";
 
   const navigate = useNavigate();
   const username = readCookie("uname") || "";
   export let onSignOut: () => void;
+  export let onShutdown: () => void;
   export let onClose: () => void;
 
   const toPage = (page: "profile" | "settings" | "login") => {
@@ -38,6 +39,12 @@
       {$t("component.avatar_menu.settings")}
     </div>
     <hr />
+    <div
+      class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
+      on:click={onShutdown}
+    >
+      Shut down
+    </div>
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={onSignOut}

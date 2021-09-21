@@ -76,13 +76,15 @@ async fn profile(_user: AuthUser) -> Option<NamedFile> {
 }
 
 #[get("/shutdown")]
-fn shutdown(shutdown: Shutdown, token: Token) -> Result<&'static str, Error> {
-    if token.uid <= 0 || token.permission < 9 {
+fn shutdown(shutdown: Shutdown, token: Token) -> Result<(), Error> {
+    if token.uid <= 0 || token.permission != 9 {
         return Err(Error::Forbidden);
     }
 
+    println!("Server shut down as user required");
     shutdown.notify();
-    Ok("The server is shutting down...")
+
+    Ok(())
 }
 
 async fn open_index_page() -> Option<NamedFile> {

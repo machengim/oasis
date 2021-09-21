@@ -10,29 +10,30 @@
   export let onClose = () => {};
   let isLoading = false;
 
-  const signOut = async () => {
+  const shutdown = async () => {
     isLoading = true;
     try {
-      await api.get("/api/signout", "raw");
-      setNotification("success", "Sign out successfully,");
+      await api.get("/shutdown", "raw");
+      setNotification("success", "Goodbye!");
       onClose();
       navigate("/login");
     } catch (e) {
       console.error(e);
+      setNotification("error", "Shutdown server failed");
     }
 
     isLoading = false;
   };
 </script>
 
-<Modal {onClose} title="Sign Out">
+<Modal {onClose} title="Shutdown">
   {#if isLoading}
     <Spinner />
   {:else}
-    <div class="p-4 text-lg">Are you sure you want to sign out?</div>
+    <div class="p-4 text-lg">Are you sure you want to shutdown the server?</div>
     <div class="w-full p-4 flex flex-row justify-end">
       <Button
-        onClick={signOut}
+        onClick={shutdown}
         color="blue"
         value="Confirm"
         className="mr-4"

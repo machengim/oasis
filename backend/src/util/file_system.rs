@@ -80,7 +80,7 @@ mod tests {
     #[test]
     fn test_get_file_encoding() {
         let pwd = std::env::current_dir().unwrap();
-        let path = pwd.join("resources/tests/01.srt");
+        let path = pwd.join("assets/tests/01.srt");
         let rt = rocket::tokio::runtime::Runtime::new().unwrap();
         let decoded_str = rt.block_on(read_text_file(path)).unwrap();
         println!("Decoded string: {}", &decoded_str);

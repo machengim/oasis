@@ -2,10 +2,10 @@ use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{Method, Status};
 use rocket::{Request, Response};
 
-pub struct CacheFairing;
+pub struct StaticFileCache;
 
 #[rocket::async_trait]
-impl Fairing for CacheFairing {
+impl Fairing for StaticFileCache {
     fn info(&self) -> Info {
         Info {
             name: "GET Cache",
