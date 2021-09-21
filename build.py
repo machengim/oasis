@@ -20,7 +20,6 @@ def main():
     os.chdir("../backend")
     subprocess.run(["cargo", "build", "--release"], shell=shellEnable)
     shutil.copyfile("target/release/" + filename, "../release/" + filename)
-    shutil.copytree("assets", "../release/assets")
     shutil.copyfile(".env-release", "../release/.env")
 
     os.chdir("../release")

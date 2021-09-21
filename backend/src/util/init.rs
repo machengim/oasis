@@ -1,3 +1,7 @@
+use crate::service::migrate_dir::MigrationDir;
+use anyhow::Result as AnyResult;
+use include_dir::{include_dir, Dir};
+use rocket::tokio::fs;
 use sqlx::{
     migrate::Migrator, sqlite::SqliteConnectOptions, ConnectOptions, Connection, SqlitePool,
 };
@@ -7,16 +11,22 @@ pub fn check_db_file() -> bool {
     get_db_file_location().exists()
 }
 
-pub async fn create_db() -> Result<(), sqlx::Error> {
+pub async fn create_db() -> AnyResult<()> {
     let db_file = get_db_file_location();
+    let db_dir = db_file.parent().unwrap();
+    if !db_dir.exists() {
+        fs::create_dir_all(db_dir).await?;
+    }
+
     let mut conn = SqliteConnectOptions::new()
         .filename(db_file)
         .create_if_missing(true)
         .connect()
         .await?;
 
-    let migration_dir = "./assets/migrations";
-    let migrator = Migrator::new(PathBuf::from(&migration_dir)).await?;
+    const ASSETS: Dir = include_dir!("./assets");
+    let migration_dir = ASSETS.get_dir("migrations").unwrap();
+    let migrator = Migrator::new(MigrationDir::new(migration_dir)).await?;
     migrator.run(&mut conn).await?;
     conn.close();
 
@@ -33,5 +43,5 @@ pub async fn get_db_pool() -> Result<SqlitePool, sqlx::Error> {
 
 fn get_db_file_location() -> PathBuf {
     let pwd = std::env::current_dir().expect("Cannot get app directory");
-    pwd.join("main.db")
+    pwd.join("db").join("main.db")
 }
