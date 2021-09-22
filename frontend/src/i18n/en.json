@@ -18,6 +18,7 @@
   "button": {
     "confirm": "Confirm",
     "confirming": "Confirming...",
+    "close": "Close",
     "cancel": "Cancel",
     "launch": "Launch",
     "launching": "Launching...",
@@ -26,7 +27,9 @@
     "back": "Back",
     "select": "Select",
     "login": "Login",
-    "logging": "Logging in..."
+    "logging": "Logging in...",
+    "check_update": "Check update",
+    "check_updating": "Checking..."
   },
   "filetype": {
     "Code": "Code",
@@ -48,7 +51,7 @@
       "title": "Site setup"
     },
     "settings": {
-      "title": "Update settings",
+      "title": "Site settings",
       "version": "Version",
       "language": "Language",
       "update": "Update",
@@ -71,12 +74,30 @@
     "avatar_menu": {
       "profile": "Profile",
       "settings": "Settings",
+      "about": "About",
       "shutdown": "Shut down",
       "signout": "Sign out",
       "login": "Login"
     },
     "login": {
       "title": "Login"
+    }
+  },
+  "modal": {
+    "about": {
+      "title": "About Oasis",
+      "version": "Version",
+      "website": "Website",
+      "repo": "Repository",
+      "thanks": "Thanks to the open source community"
+    },
+    "shutdown": {
+      "title": "Shutdown",
+      "notice": "Are you sure you want to shutdown the server?"
+    },
+    "signout": {
+      "title": "Sign out",
+      "notice": "Are you sure you want to sign out?"
     }
   },
   "message": {

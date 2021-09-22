@@ -7,12 +7,14 @@
   import { EIconType } from "../utils/types";
   import SignOutModal from "../modals/SignOutModal.svelte";
   import ShutdownModal from "../modals/ShutdownModal.svelte";
+  import AboutModal from "../modals/AboutModal.svelte";
 
   let sitename = getSitename();
   let section: string;
   let showMenu = false;
   let showSignOutModal = false;
   let showShutdownModal = false;
+  let showAboutModal = false;
 
   const unsubscribeSection = sectionStore.subscribe((newSection) => {
     if (newSection) section = newSection;
@@ -40,16 +42,35 @@
     showMenu = true;
   };
 
+  const openModal = (name: string) => {
+    showMenu = false;
+    switch (name) {
+      case "signout":
+        showSignOutModal = true;
+        break;
+      case "shutdown":
+        showShutdownModal = true;
+        break;
+      case "about":
+        showAboutModal = true;
+        break;
+      default:
+        break;
+    }
+  };
+
   const closeAvatarMenu = () => {
     showMenu = false;
   };
 
-  const signOut = () => {
+  const openSingoutModal = () => {
     showMenu = false;
     showSignOutModal = true;
   };
 
-  const shutdown = () => {
+  const openShutdownModal = () => {
+    showMenu = false;
+
     showShutdownModal = true;
   };
 
@@ -60,6 +81,15 @@
   const clostShutdownModal = () => {
     showShutdownModal = false;
   };
+
+  const openAboutModal = () => {
+    showMenu = false;
+    showAboutModal = true;
+  };
+
+  const closeAboutModal = () => {
+    showAboutModal = false;
+  };
 </script>
 
 {#if showSignOutModal}
@@ -67,6 +97,9 @@
 {/if}
 {#if showShutdownModal}
   <ShutdownModal onClose={clostShutdownModal} />
+{/if}
+{#if showAboutModal}
+  <AboutModal onClose={closeAboutModal} />
 {/if}
 <div class="w-full h-14 bg-gray-50 shadow">
   <div
@@ -81,11 +114,7 @@
           className="cursor-pointer"
         />
         {#if showMenu}
-          <AvatarMenu
-            onClose={closeAvatarMenu}
-            onSignOut={signOut}
-            onShutdown={shutdown}
-          />
+          <AvatarMenu onClose={closeAvatarMenu} onOpenModal={openModal} />
         {/if}
       </div>
     {/if}

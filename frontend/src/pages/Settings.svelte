@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
-  import { useNavigate } from "svelte-navigator";
+  import { useNavigate, useFocus } from "svelte-navigator";
   import Spinner from "../components/Spinner.svelte";
   import Button from "../components/Button.svelte";
   import DirBrowser from "../sections/DirBrowser.svelte";
@@ -16,6 +16,7 @@
   import type { ISiteFull, IUpdateConfigRequest } from "../utils/types";
 
   const navigate = useNavigate();
+  const focus = useFocus();
   let isLoading = false;
   let form: HTMLFormElement;
   let isOpenDirBrowser = false;
@@ -154,7 +155,11 @@
         <div>{$t("component.settings.language")}:</div>
         <div class="col-span-3">
           <!-- svelte-ignore a11y-no-onchange -->
-          <select class="ml-2 px-2 border bg-gray-50" on:change={setLang}>
+          <select
+            class="ml-2 px-2 border bg-gray-50"
+            on:change={setLang}
+            use:focus
+          >
             <option value="en" selected={language === "en"}>English</option>
             <option value="cn" selected={language === "cn"}>中文</option>
           </select>

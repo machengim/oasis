@@ -18,6 +18,7 @@
   "button": {
     "confirm": "确认",
     "confirming": "确认中...",
+    "close": "关闭",
     "cancel": "取消",
     "launch": "启动",
     "launching": "启动中...",
@@ -26,7 +27,9 @@
     "back": "后退",
     "select": "选择",
     "login": "登录",
-    "logging": "登录中..."
+    "logging": "登录中...",
+    "check_update": "检查更新",
+    "check_updating": "检查中..."
   },
   "filetype": {
     "Code": "代码",
@@ -71,12 +74,30 @@
     "avatar_menu": {
       "profile": "用户资料",
       "settings": "网站设定",
+      "about": "关于",
       "shutdown": "关闭服务",
       "signout": "退出",
       "login": "登录"
     },
     "login": {
       "title": "用户登录"
+    }
+  },
+  "modal": {
+    "about": {
+      "title": "关于 Oasis",
+      "version": "版本",
+      "website": "网站",
+      "repo": "代码",
+      "thanks": "感谢开源社区"
+    },
+    "shutdown": {
+      "title": "关闭服务",
+      "notice": "确定要关闭服务器?"
+    },
+    "signout": {
+      "title": "退出登录",
+      "notice": "确定要退出登录?"
     }
   },
   "message": {

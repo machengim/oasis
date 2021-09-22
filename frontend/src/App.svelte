@@ -72,11 +72,11 @@
 
       <Route path="/login" component={Login} />
       <Route path="/setup" component={Setup} />
-      <Route path="/files" component={Files} />
-      <Route path="/files/*" component={Files} />
+      <Route path="/files" component={Files} primary={false} />
+      <Route path="/files/*" component={Files} primary={false} />
       <Route path="/settings" component={Settings} />
       <Route path="/profile" component={Profile} />
-      <Route path="/" component={Home} />
+      <Route path="/" component={Home} primary={false} />
     </Router>
   </main>
 {/if}

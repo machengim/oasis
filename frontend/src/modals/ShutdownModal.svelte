@@ -1,5 +1,6 @@
 <script lang="ts">
   import { useNavigate } from "svelte-navigator";
+  import { t } from "svelte-i18n";
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
@@ -26,20 +27,20 @@
   };
 </script>
 
-<Modal {onClose} title="Shutdown">
+<Modal {onClose} title={$t("modal.shutdown.title")}>
   {#if isLoading}
     <Spinner />
   {:else}
-    <div class="p-4 text-lg">Are you sure you want to shutdown the server?</div>
+    <div class="p-4 text-lg">{$t("modal.shutdown.notice")}</div>
     <div class="w-full p-4 flex flex-row justify-end">
       <Button
         onClick={shutdown}
         color="blue"
-        value="Confirm"
+        value={isLoading ? $t("button.confirming") : $t("button.confirm")}
         className="mr-4"
         disabled={isLoading}
       />
-      <Button onClick={onClose} value="Cancel" />
+      <Button onClick={onClose} value={$t("button.cancel")} />
     </div>
   {/if}
 </Modal>

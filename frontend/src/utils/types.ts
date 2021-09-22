@@ -68,6 +68,11 @@ export interface ISiteFull {
   update_freq: string,
 }
 
+export interface ILink {
+  name: string,
+  url: string,
+}
+
 export enum FileType {
   Code = "Code",
   Dir = "Dir",

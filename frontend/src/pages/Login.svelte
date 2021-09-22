@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
+  import { t, isLoading as isLoadingI18N } from "svelte-i18n";
+  import { useFocus } from "svelte-navigator";
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
   import { setNotification, sectionStore } from "../utils/store";
@@ -9,6 +10,7 @@
   import Spinner from "../components/Spinner.svelte";
 
   const navigate = useNavigate();
+  const focus = useFocus();
   let username = "";
   let password = "";
   let isLoading = false;
@@ -65,6 +67,7 @@
               maxLength={16}
               class="ml-2 w-40 border rounded focus:outline-none px-2"
               bind:value={username}
+              use:focus
             />
           </div>
         </div>

@@ -1,8 +1,7 @@
 <script lang="ts">
   import { Link } from "svelte-navigator";
-  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
+  import { t } from "svelte-i18n";
   import { sectionStore } from "../utils/store";
-  import { captilizeFirst } from "../utils/util";
 
   export let dirs: Array<string>;
   export let filename = "";

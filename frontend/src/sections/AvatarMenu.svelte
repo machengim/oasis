@@ -5,8 +5,7 @@
 
   const navigate = useNavigate();
   const username = readCookie("uname") || "";
-  export let onSignOut: () => void;
-  export let onShutdown: () => void;
+  export let onOpenModal: (name: string) => void;
   export let onClose: () => void;
 
   const toPage = (page: "profile" | "settings" | "login") => {
@@ -38,16 +37,22 @@
     >
       {$t("component.avatar_menu.settings")}
     </div>
+    <div
+      class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
+      on:click={() => onOpenModal("about")}
+    >
+      {$t("component.avatar_menu.about")}
+    </div>
     <hr />
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
-      on:click={onShutdown}
+      on:click={() => onOpenModal("shutdown")}
     >
       {$t("component.avatar_menu.shutdown")}
     </div>
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
-      on:click={onSignOut}
+      on:click={() => onOpenModal("signout")}
     >
       {$t("component.avatar_menu.signout")}
     </div>
