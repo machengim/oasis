@@ -9,6 +9,7 @@
   export let onClick: (e) => void = null;
   let iconColor = "#000";
   let iconHtml: string = null;
+  let svgClass = "";
 
   $: if (color) {
     iconColor = convertColor(color);
@@ -16,6 +17,10 @@
 
   $: if (iconColor) {
     iconHtml = getIcon();
+  }
+
+  $: if (type) {
+    svgClass = buildStyle();
   }
 
   const buildStyle = () => {
@@ -115,7 +120,7 @@
 <span class={className} on:click={onClick}>
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    class={buildStyle()}
+    class={svgClass}
     viewBox="0 0 512 512"
   >
     {@html iconHtml}
