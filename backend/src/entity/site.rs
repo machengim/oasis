@@ -12,6 +12,7 @@ use std::path::PathBuf;
 #[derive(FromRow, Default, Debug)]
 pub struct Site {
     pub site_id: i64,
+    pub name: String,
     pub version: String,
     pub storage: String,
     pub secret: String,
@@ -21,25 +22,34 @@ pub struct Site {
     pub updated_at: i64,
 }
 
-#[derive(Serialize, Debug, Default)]
+#[derive(Serialize, Debug)]
 #[serde(crate = "rocket::serde")]
-pub struct SiteResponse {
-    pub version: Option<String>,
-    pub storage: Option<String>,
-    pub language: Option<String>,
-    pub update_freq: Option<String>,
-    pub created_at: Option<i64>,
-    pub updated_at: Option<i64>,
+pub struct SiteBriefResponse {
+    pub name: String,
+    pub version: String,
+    pub language: String,
+    pub update_freq: String,
+}
+
+#[derive(Serialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct SiteFullResponse {
+    pub name: String,
+    pub version: String,
+    pub language: String,
+    pub update_freq: String,
+    pub storage: String,
 }
 
 impl Site {
-    pub fn new(storage: &PathBuf, language: &str, created_at: i64) -> Self {
+    pub fn new(name: &str, storage: &PathBuf, language: &str, created_at: i64) -> Self {
         let secret = util::generate_secret_key();
         let version = util::get_version();
         let storage_str = storage.to_str().unwrap().to_owned();
         let update_freq = util::get_update_freq();
 
         Self {
+            name: name.to_string(),
             site_id: 0,
             version,
             storage: storage_str,
@@ -61,11 +71,12 @@ impl Site {
         }
     }
 
-    pub async fn insert_query(&self, tx: &mut Transaction<'_, Sqlite>) -> anyhow::Result<i64> {
-        let sql = "insert into SITE (version, storage, secret, created_at, language, update_freq, updated_at) values (?1, ?2, ?3, ?4, ?5, ?6, ?7)";
+    pub async fn insert(&self, tx: &mut Transaction<'_, Sqlite>) -> anyhow::Result<i64> {
+        let sql = "insert into SITE (name, version, storage, secret, created_at, language, update_freq, updated_at) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)";
         let query = Query::new(
             sql,
             args![
+                &self.name,
                 self.version,
                 &self.storage,
                 &self.secret,
@@ -82,10 +93,11 @@ impl Site {
     }
 
     pub async fn update(&self, tx: &mut Transaction<'_, Sqlite>) -> AnyResult<i64> {
-        let sql = "update SITE set version = ?1, storage = ?2, secret = ?3, created_at = ?4, language = ?5, update_freq = ?6, updated_at = ?7";
+        let sql = "update SITE set name = ?1, version = ?2, storage = ?3, secret = ?4, created_at = ?5, language = ?6, update_freq = ?7, updated_at = ?8";
         let query = Query::new(
             sql,
             args![
+                &self.name,
                 self.version,
                 &self.storage,
                 &self.secret,
@@ -100,32 +112,48 @@ impl Site {
     }
 }
 
-impl SiteResponse {
-    pub fn from_site(site: &Site, mode: &str) -> AnyResult<Self> {
-        match mode {
-            "brief" => Ok(Self::from_site_brief(site)),
-            "full" => Ok(Self::from_site_full(site)),
-            _ => Err(anyhow::anyhow!("Unknown mode to convert site response")),
+impl From<Site> for SiteBriefResponse {
+    fn from(s: Site) -> Self {
+        Self {
+            name: s.name,
+            version: s.version,
+            language: s.language,
+            update_freq: s.update_freq,
         }
     }
+}
 
-    fn from_site_brief(site: &Site) -> Self {
-        let mut site_res = SiteResponse::default();
-        site_res.version = Some(site.version.clone());
-        site_res.language = Some(site.language.clone());
-
-        site_res
+impl Default for SiteBriefResponse {
+    fn default() -> Self {
+        Self {
+            name: "Oasis".to_owned(),
+            version: "0.1".to_owned(),
+            language: "en".to_owned(),
+            update_freq: "monthly".to_owned(),
+        }
     }
+}
 
-    fn from_site_full(site: &Site) -> Self {
-        let mut site_res = SiteResponse::default();
-        site_res.version = Some(site.version.clone());
-        site_res.language = Some(site.language.clone());
-        site_res.storage = Some(site.storage.clone());
-        site_res.created_at = Some(site.created_at);
-        site_res.update_freq = Some(site.update_freq.clone());
-        site_res.updated_at = Some(site.updated_at);
+impl From<Site> for SiteFullResponse {
+    fn from(s: Site) -> Self {
+        Self {
+            name: s.name,
+            version: s.version,
+            language: s.language,
+            storage: s.storage,
+            update_freq: s.update_freq,
+        }
+    }
+}
 
-        site_res
+impl Default for SiteFullResponse {
+    fn default() -> Self {
+        Self {
+            name: "Oasis".to_owned(),
+            version: "0.1".to_owned(),
+            language: "en".to_owned(),
+            storage: String::new(),
+            update_freq: "monthly".to_owned(),
+        }
     }
 }

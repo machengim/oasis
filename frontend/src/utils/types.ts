@@ -4,6 +4,7 @@ export interface INotification {
 }
 
 export interface ISetupRequest {
+  sitename: string;
   username: string;
   password: string;
   storage: string;
@@ -16,6 +17,7 @@ export interface ILoginRequest {
 }
 
 export interface IUpdateConfigRequest {
+  sitename: string,
   language: string;
   storage: string;
   update_freq: string;
@@ -52,17 +54,18 @@ export interface ILoopIcon {
 }
 
 export interface ISiteBrief {
+  name: string,
   version: string,
   language: string,
+  update_freq: string,
 }
 
 export interface ISiteFull {
+  name: string,
   version: string,
   language: string,
   storage: string,
   update_freq: string,
-  created_at: number,
-  updated_at: number,
 }
 
 export enum FileType {

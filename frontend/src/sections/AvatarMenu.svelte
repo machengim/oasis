@@ -43,7 +43,7 @@
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={onShutdown}
     >
-      Shut down
+      {$t("component.avatar_menu.shutdown")}
     </div>
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"

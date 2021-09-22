@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { sectionStore } from "../utils/store";
+  import { siteStore, sectionStore, getSitename } from "../utils/store";
   import AvatarMenu from "./AvatarMenu.svelte";
   import Icon from "../components/Icon.svelte";
   import Title from "./Title.svelte";
@@ -8,6 +8,7 @@
   import SignOutModal from "../modals/SignOutModal.svelte";
   import ShutdownModal from "../modals/ShutdownModal.svelte";
 
+  let sitename = getSitename();
   let section: string;
   let showMenu = false;
   let showSignOutModal = false;
@@ -17,8 +18,15 @@
     if (newSection) section = newSection;
   });
 
+  const unsubscribeSite = siteStore.subscribe((newSite) => {
+    if (newSite && newSite.name !== sitename) {
+      sitename = newSite.name;
+    }
+  });
+
   onDestroy(() => {
     unsubscribeSection();
+    unsubscribeSite();
   });
 
   $: if (showMenu) {
@@ -64,7 +72,7 @@
   <div
     class="w-11/12 lg:w-4/5 h-full flex flex-row justify-between items-center mx-auto"
   >
-    <Title {section} />
+    <Title {sitename} {section} />
     {#if section === "files" || section === "settings" || section === "profile"}
       <div class="relative">
         <Icon

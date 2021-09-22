@@ -1,12 +1,18 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
   import { useNavigate } from "svelte-navigator";
   import Spinner from "../components/Spinner.svelte";
   import Button from "../components/Button.svelte";
   import DirBrowser from "../sections/DirBrowser.svelte";
   import * as api from "../utils/api";
-  import { setNotification, sectionStore } from "../utils/store";
+  import {
+    siteStore,
+    setNotification,
+    sectionStore,
+    getSitename,
+    getLang,
+  } from "../utils/store";
   import type { ISiteFull, IUpdateConfigRequest } from "../utils/types";
 
   const navigate = useNavigate();
@@ -15,12 +21,26 @@
   let isOpenDirBrowser = false;
   let selectedDir = null;
   let isNoStorageError = false;
+  let sitename = getSitename();
   let language: string;
   let update_freq: string;
 
   sectionStore.set("settings");
 
+  const unsubscribeSite = siteStore.subscribe((site) => {
+    if (site) {
+      sitename = site.name;
+      language = site.language;
+      selectedDir = site.storage;
+      update_freq = site.update_freq;
+    }
+  });
+
   onMount(() => fetchConfig());
+
+  onDestroy(() => {
+    unsubscribeSite();
+  });
 
   $: if (language) {
     locale.set(language);
@@ -31,9 +51,7 @@
     const endpoint = "/api/sys/config?mode=full";
     try {
       const site: ISiteFull = await api.get(endpoint, "json");
-      language = site.language;
-      update_freq = site.update_freq;
-      selectedDir = site.storage;
+      siteStore.set(site);
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read site info");
@@ -72,6 +90,7 @@
 
   const sendUpdateConfigRequest = async () => {
     const payload: IUpdateConfigRequest = {
+      sitename,
       language,
       storage: encodeURIComponent(selectedDir),
       update_freq,
@@ -80,6 +99,7 @@
     const endpoint = "/api/sys/config";
     try {
       await api.put(endpoint, payload, false);
+      updateSiteStore();
     } catch (e) {
       throw e;
     }
@@ -94,7 +114,22 @@
   };
 
   const onCancel = () => {
+    resetLang();
     navigate(-1);
+  };
+
+  const updateSiteStore = () => {
+    const site = $siteStore;
+    site.name = sitename;
+    site.language = language;
+    site.update_freq = update_freq;
+    siteStore.set(site);
+  };
+
+  const resetLang = () => {
+    if (language !== getLang()) {
+      locale.set(getLang());
+    }
   };
 </script>
 
@@ -116,12 +151,6 @@
         {$t("component.settings.title")}
       </div>
       <div class="w-full grid grid-cols-4 mb-4">
-        <div>{$t("component.settings.version")}:</div>
-        <div class="col-span-3">
-          <span class="ml-2 px-2">0.1</span>
-        </div>
-      </div>
-      <div class="w-full grid grid-cols-4 mb-4">
         <div>{$t("component.settings.language")}:</div>
         <div class="col-span-3">
           <!-- svelte-ignore a11y-no-onchange -->
@@ -129,6 +158,18 @@
             <option value="en" selected={language === "en"}>English</option>
             <option value="cn" selected={language === "cn"}>中文</option>
           </select>
+        </div>
+      </div>
+      <div class="w-full grid grid-cols-4 mb-4">
+        <div>{$t("form.sitename")}:</div>
+        <div class="col-span-3">
+          <input
+            required
+            minLength={1}
+            maxLength={16}
+            class="ml-2 w-40 border rounded focus:outline-none px-2"
+            bind:value={sitename}
+          />
         </div>
       </div>
       <div class="w-full grid grid-cols-4 mb-4">

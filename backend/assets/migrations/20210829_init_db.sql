@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS site (
 	site_id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL,
 	version TEXT NOT NULL,
   	storage TEXT,
 	secret TEXT,

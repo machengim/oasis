@@ -1,17 +1,18 @@
-use crate::entity::site::{Site, SiteResponse};
+use crate::entity::site::{Site, SiteBriefResponse, SiteFullResponse};
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::error::Error;
 use crate::service::token::Token;
 use crate::util::{self, file_system};
 use rocket::serde::{json::Json, Deserialize};
-use rocket::{Route, State};
+use rocket::{Either, Route, State};
 use sqlx::Connection;
 use std::path::PathBuf;
 
 #[derive(Deserialize, Debug)]
 #[serde(crate = "rocket::serde")]
 pub struct SetupRequest {
+    pub sitename: String,
     pub username: String,
     pub password: String,
     pub storage: String,
@@ -20,7 +21,8 @@ pub struct SetupRequest {
 
 #[derive(Deserialize, Debug)]
 #[serde(crate = "rocket::serde")]
-pub struct UpdateRequest {
+pub struct UpdateSiteRequest {
+    pub sitename: String,
     pub storage: String,
     pub language: String,
     pub update_freq: String,
@@ -38,7 +40,8 @@ async fn setup(state: &State<AppState>, req_body: Json<SetupRequest>) -> Result<
 
     let storage = util::parse_encoded_url(&req_body.storage)?;
 
-    if req_body.username.len() < 2
+    if req_body.sitename.len() == 0
+        || req_body.username.len() < 2
         || req_body.password.len() < 6
         || !storage.exists()
         || !storage.is_dir()
@@ -54,9 +57,14 @@ async fn setup(state: &State<AppState>, req_body: Json<SetupRequest>) -> Result<
         .insert_query(&mut tx)
         .await?;
 
-    Site::new(&storage, &req_body.language, current_timestamp)
-        .insert_query(&mut tx)
-        .await?;
+    Site::new(
+        &req_body.sitename,
+        &storage,
+        &req_body.language,
+        current_timestamp,
+    )
+    .insert(&mut tx)
+    .await?;
 
     tx.commit().await?;
 
@@ -99,28 +107,32 @@ async fn config(
     state: &State<AppState>,
     mode: String,
     token: Token,
-) -> Result<Json<SiteResponse>, Error> {
+) -> Result<Either<Json<SiteBriefResponse>, Json<SiteFullResponse>>, Error> {
     if mode != "brief" && mode != "full" {
         return Err(Error::BadRequest);
     }
 
-    if mode == "full" && token.permission != 9 {
-        return Err(Error::Unauthorized);
-    }
+    let mut conn = state.get_pool_conn().await?;
+    let site_op = Site::read(&mut conn).await?;
 
-    if state.get_first_run() {
-        return Ok(Json(SiteResponse::default()));
+    match (mode.as_str(), token.permission, site_op.is_some()) {
+        ("brief", _, true) => Ok(Either::Left(Json(SiteBriefResponse::from(
+            site_op.unwrap(),
+        )))),
+        ("brief", _, false) => Ok(Either::Left(Json(SiteBriefResponse::default()))),
+        ("full", 9, true) => Ok(Either::Right(Json(SiteFullResponse::from(
+            site_op.unwrap(),
+        )))),
+        ("full", 9, false) => Ok(Either::Right(Json(SiteFullResponse::default()))),
+        (_, _, _) => Err(Error::Unauthorized),
     }
-
-    let site = state.get_site()?;
-    Ok(Json(SiteResponse::from_site(&site, &mode)?))
 }
 
 #[put("/sys/config", data = "<req_body>")]
 async fn update_site(
     state: &State<AppState>,
     token: Token,
-    req_body: Json<UpdateRequest>,
+    req_body: Json<UpdateSiteRequest>,
 ) -> Result<(), Error> {
     if token.permission != 9 {
         return Err(Error::Unauthorized);
@@ -135,8 +147,9 @@ async fn update_site(
 
     let mut conn = state.get_pool_conn().await?;
     let mut site = Site::read(&mut conn).await?.unwrap();
-    site.language = req_body.language.clone();
-    site.update_freq = req_body.update_freq.clone();
+    site.name = req_body.sitename.to_owned();
+    site.language = req_body.language.to_owned();
+    site.update_freq = req_body.update_freq.to_owned();
     site.storage = storage_str;
 
     let mut tx = conn.begin().await?;

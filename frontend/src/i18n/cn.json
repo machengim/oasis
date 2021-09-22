@@ -7,6 +7,7 @@
     "profile": "用户资料"
   },
   "form": {
+    "sitename": "网站名",
     "username": "用户名",
     "password": "密码",
     "storage": "存储",
@@ -70,6 +71,7 @@
     "avatar_menu": {
       "profile": "用户资料",
       "settings": "网站设定",
+      "shutdown": "关闭服务",
       "signout": "退出",
       "login": "登录"
     },

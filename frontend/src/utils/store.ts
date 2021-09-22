@@ -1,5 +1,17 @@
-import { Writable, writable } from 'svelte/store';
-import type { IFile, INotification, ELoopMethod } from './types';
+import { get, Writable, writable } from 'svelte/store';
+import type { IFile, INotification, ELoopMethod, ISiteFull } from './types';
+
+export const siteStore: Writable<ISiteFull> = writable(null);
+
+export function getSitename() {
+    let site = get(siteStore);
+    return (site && site.name) || "Oasis";
+}
+
+export function getLang() {
+    let site = get(siteStore);
+    return (site && site.language) || "en";
+}
 
 export const notificationStore: Writable<INotification> = writable(null);
 

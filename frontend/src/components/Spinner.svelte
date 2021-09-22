@@ -3,7 +3,7 @@
 </script>
 
 <div
-  class="transition ease-in-out duration-150 flex flex-row items-center justify-center"
+  class="mt-20 transition ease-in-out duration-150 flex flex-row items-center justify-center"
 >
   <svg
     class="animate-spin mr-3"

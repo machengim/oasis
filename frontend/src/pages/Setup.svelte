@@ -6,14 +6,20 @@
   import DirBrowser from "../sections/DirBrowser.svelte";
   import * as api from "../utils/api";
   import type { ISetupRequest } from "../utils/types";
-  import { setNotification, sectionStore } from "../utils/store";
-  import { getLocale } from "../utils/util";
+  import {
+    getSitename,
+    getLang,
+    siteStore,
+    setNotification,
+    sectionStore,
+  } from "../utils/store";
 
   const navigate = useNavigate();
+  let sitename = getSitename();
+  let language = getLang();
   let username = "";
   let password = "";
   let selectedDir = "";
-  let language = getLocale();
   let form: HTMLFormElement;
   let isLoading = false;
   let isNoStorageError = false;
@@ -59,6 +65,7 @@
 
   const sendSetupRequest = async (): Promise<boolean> => {
     const payload: ISetupRequest = {
+      sitename,
       username,
       password,
       language,
@@ -67,6 +74,7 @@
 
     try {
       await api.post("/api/sys/setup", payload, false);
+      updateSiteStore();
       setNotification("success", "Launched successfully.");
     } catch (e) {
       console.error(e);
@@ -79,6 +87,13 @@
     }
 
     return true;
+  };
+
+  const updateSiteStore = () => {
+    const site = $siteStore;
+    site.language = language;
+    site.name = sitename;
+    siteStore.set(site);
   };
 </script>
 
@@ -110,6 +125,18 @@
               <option value="en" selected={language === "en"}>English</option>
               <option value="cn" selected={language === "cn"}>中文</option>
             </select>
+          </div>
+        </div>
+        <div class="w-full grid grid-cols-4 mb-4">
+          <div>{$t("form.sitename")}:</div>
+          <div class="col-span-3">
+            <input
+              required
+              minLength={1}
+              maxLength={16}
+              class="ml-2 w-40 border rounded focus:outline-none px-2"
+              bind:value={sitename}
+            />
           </div>
         </div>
         <div class="w-full grid grid-cols-4 mb-4">
