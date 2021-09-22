@@ -1,12 +1,23 @@
 <script lang="ts">
-  import { t, isLoading as isLoadingI18N } from "svelte-i18n";
+  import { onDestroy } from "svelte";
+  import { t } from "svelte-i18n";
   import { useNavigate } from "svelte-navigator";
-  import { readCookie } from "../utils/util";
+  import { userStore } from "../utils/store";
 
   const navigate = useNavigate();
-  const username = readCookie("uname") || "";
+  let user = $userStore;
   export let onOpenModal: (name: string) => void;
   export let onClose: () => void;
+
+  const unsubscribeUser = userStore.subscribe((newUser) => {
+    if (newUser) {
+      user = newUser;
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribeUser();
+  });
 
   const toPage = (page: "profile" | "settings" | "login") => {
     navigate("/" + page);
@@ -22,8 +33,8 @@
   class="absolute top-10 right-1 z-10 text-lg menu-width border rounded bg-white"
   on:click={clickInside}
 >
-  {#if username.length > 0}
-    <div class="px-4 my-1 font-bold">{username}</div>
+  {#if user}
+    <div class="px-4 my-1 font-bold">{user.username}</div>
     <hr />
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"

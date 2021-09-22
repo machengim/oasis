@@ -1,5 +1,5 @@
 import { getLocaleFromNavigator } from 'svelte-i18n';
-import { FileType, IFile, IFileOrder } from './types';
+import { FileType, IFile, IFileOrder, IUser } from './types';
 
 export function upperFirstChar(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
@@ -139,4 +139,12 @@ export function getLocale() {
   let browserLocale = getLocaleFromNavigator();
 
   return browserLocale.startsWith("cn") ? "cn" : "en";
+}
+
+export function readUserLocal(): IUser {
+  const userLocal = localStorage.getItem("oa_user");
+  if (!userLocal) return null;
+  const user: IUser = JSON.parse(userLocal);
+
+  return user;
 }

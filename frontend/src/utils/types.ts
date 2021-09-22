@@ -73,6 +73,11 @@ export interface ILink {
   url: string,
 }
 
+export interface IUser {
+  username: string;
+  permission: number;
+}
+
 export enum FileType {
   Code = "Code",
   Dir = "Dir",

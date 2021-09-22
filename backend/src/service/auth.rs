@@ -1,4 +1,5 @@
-use super::{app_state::AppState, error::Error, token::Token};
+use super::{app_state::AppState, error::Error, token::AccessToken, token::Token};
+use crate::util::constants::ACCESS_TOKEN;
 use rocket::{
     http::Status,
     request::{FromRequest, Outcome},
@@ -13,10 +14,10 @@ impl<'r> FromRequest<'r> for AuthUser {
     type Error = Error;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-        if let Some(token_str) = req.cookies().get("token") {
+        if let Some(token_str) = req.cookies().get(ACCESS_TOKEN) {
             if let Some(state) = req.rocket().state::<AppState>() {
                 if let Ok(secret) = state.get_secret() {
-                    if let Ok(token) = Token::decode(token_str.value(), &secret) {
+                    if let Ok(token) = AccessToken::decode(token_str.value(), &secret) {
                         if token.uid > 0 && token.permission > 0 {
                             return Outcome::Success(AuthUser::default());
                         } else {

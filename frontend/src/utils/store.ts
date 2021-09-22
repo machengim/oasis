@@ -1,5 +1,5 @@
 import { get, Writable, writable } from 'svelte/store';
-import type { IFile, INotification, ELoopMethod, ISiteFull } from './types';
+import type { IFile, INotification, ELoopMethod, ISiteFull, IUser } from './types';
 
 export const siteStore: Writable<ISiteFull> = writable(null);
 
@@ -11,6 +11,13 @@ export function getSitename() {
 export function getLang() {
     let site = get(siteStore);
     return (site && site.language) || "en";
+}
+
+export const userStore: Writable<IUser> = writable(null);
+
+export function getUsername() {
+    let user = get(userStore);
+    return (user && user.username) || "";
 }
 
 export const notificationStore: Writable<INotification> = writable(null);

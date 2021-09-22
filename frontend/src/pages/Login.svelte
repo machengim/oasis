@@ -3,10 +3,10 @@
   import { useFocus } from "svelte-navigator";
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification, sectionStore } from "../utils/store";
+  import { setNotification, sectionStore, userStore } from "../utils/store";
   import { useNavigate } from "svelte-navigator";
   import { validateForm } from "../utils/util";
-  import type { ILoginRequest } from "../utils/types";
+  import type { ILoginRequest, IUser } from "../utils/types";
   import Spinner from "../components/Spinner.svelte";
 
   const navigate = useNavigate();
@@ -36,7 +36,9 @@
 
     isLoading = true;
     try {
-      await api.post("/api/login", payload, false);
+      const user: IUser = await api.post("/api/login", payload, true);
+      userStore.set(user);
+      localStorage.setItem("oa_user", JSON.stringify(user));
       setNotification("success", "Login successfully");
       navigate("/files");
     } catch (e) {

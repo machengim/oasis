@@ -1,4 +1,5 @@
 use super::{app_state::AppState, error::Error};
+use crate::util::constants::ACCESS_TOKEN;
 use anyhow::Result as AnyResult;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use rocket::{
@@ -7,31 +8,11 @@ use rocket::{
     Request,
 };
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(crate = "rocket::serde")]
-pub struct Token {
-    pub exp: usize,
-    pub uid: i64,
-    pub permission: i8,
-}
-
-impl Token {
-    pub fn new(uid: i64, permission: i8) -> Self {
-        let token_expire_days: i64 = 7;
-        let expire_time = chrono::Utc::now().timestamp() + token_expire_days * 24 * 60 * 60;
-
-        Token {
-            exp: expire_time as usize,
-            uid,
-            permission,
-        }
-    }
-
-    pub fn default() -> Self {
-        Token::new(-1, -1)
-    }
-
-    pub fn encode(&self, secret: &str) -> AnyResult<String> {
+pub trait Token {
+    fn encode(&self, secret: &str) -> AnyResult<String>
+    where
+        Self: Serialize,
+    {
         let token_string = encode(
             &Header::default(),
             &self,
@@ -41,8 +22,12 @@ impl Token {
         Ok(token_string)
     }
 
-    pub fn decode(token: &str, secret: &str) -> AnyResult<Token> {
-        let token = decode::<Token>(
+    fn decode(token: &str, secret: &str) -> AnyResult<Self>
+    where
+        Self: Sized,
+        for<'de> Self: Deserialize<'de>,
+    {
+        let token = decode::<Self>(
             token,
             &DecodingKey::from_secret(secret.as_bytes()),
             &Validation::default(),
@@ -52,22 +37,45 @@ impl Token {
     }
 }
 
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[serde(crate = "rocket::serde")]
+pub struct AccessToken {
+    pub exp: usize,
+    pub uid: i64,
+    pub permission: i8,
+}
+
+impl Token for AccessToken {}
+
+impl AccessToken {
+    pub fn new(uid: i64, permission: i8) -> Self {
+        let token_expire_days: i64 = 7;
+        let expire_time = chrono::Utc::now().timestamp() + token_expire_days * 24 * 60 * 60;
+
+        AccessToken {
+            exp: expire_time as usize,
+            uid,
+            permission,
+        }
+    }
+}
+
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for Token {
+impl<'r> FromRequest<'r> for AccessToken {
     type Error = Error;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-        if let Some(token_str) = req.cookies().get("token") {
+        if let Some(token_str) = req.cookies().get(ACCESS_TOKEN) {
             if let Some(state) = req.rocket().state::<AppState>() {
                 if let Ok(secret) = state.get_secret() {
-                    if let Ok(token) = Token::decode(token_str.value(), &secret) {
+                    if let Ok(token) = AccessToken::decode(token_str.value(), &secret) {
                         return Outcome::Success(token);
                     }
                 }
             }
         }
 
-        Outcome::Success(Token::default())
+        Outcome::Success(AccessToken::default())
     }
 }
 
@@ -78,19 +86,19 @@ mod tests {
     #[test]
     fn test_token_should_work() {
         let secret = "mySitePassword";
-        let claim = Token::new(1, 9);
+        let claim = AccessToken::new(1, 9);
         let token = claim.encode(secret).unwrap();
-        let validate = Token::decode(&token, secret).unwrap();
+        let validate = AccessToken::decode(&token, secret).unwrap();
         assert_eq!(validate.permission, 9);
     }
 
     #[test]
     #[should_panic]
     fn test_token_should_panic() {
-        let mut claim = Token::new(1, 9);
+        let mut claim = AccessToken::new(1, 9);
         claim.exp -= 7 as usize * 24 * 60 * 60 + 1;
         let token = claim.encode("secret").unwrap();
-        let validate = Token::decode(&token, "secret").unwrap();
+        let validate = AccessToken::decode(&token, "secret").unwrap();
         assert_eq!(validate.permission, 9);
     }
 }

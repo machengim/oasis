@@ -15,8 +15,8 @@
   import * as api from "./utils/api";
   import type { ISiteBrief } from "./utils/types";
   import Spinner from "./components/Spinner.svelte";
-  import { siteStore, setNotification } from "./utils/store";
-  import { getLocale } from "./utils/util";
+  import { siteStore, setNotification, userStore } from "./utils/store";
+  import { getLocale, readUserLocal } from "./utils/util";
 
   let isLoading = true;
   let language = "";
@@ -42,6 +42,11 @@
   $: document.title = sitename;
 
   const initApp = async () => {
+    let user = readUserLocal();
+    if (user) {
+      userStore.set(user);
+    }
+
     init({
       fallbackLocale: "en",
       initialLocale: getLocale(),

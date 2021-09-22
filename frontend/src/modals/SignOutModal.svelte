@@ -15,6 +15,7 @@
     isLoading = true;
     try {
       await api.get("/api/signout", "raw");
+      localStorage.removeItem("oa_user");
       setNotification("success", "Sign out successfully,");
       onClose();
       navigate("/login");

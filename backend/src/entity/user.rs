@@ -1,4 +1,4 @@
-use crate::{api::sys::SetupRequest, args, service::token::Token, util::db, util::db::Query};
+use crate::{api::sys::SetupRequest, args, service::token::AccessToken, util::db, util::db::Query};
 use anyhow::Result as AnyResult;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use sqlx::{pool::PoolConnection, FromRow, Sqlite, Transaction};
@@ -91,7 +91,7 @@ impl User {
         Ok(user)
     }
 
-    pub fn generate_token(&self) -> Token {
-        Token::new(self.user_id, self.permission)
+    pub fn generate_token(&self) -> AccessToken {
+        AccessToken::new(self.user_id, self.permission)
     }
 }

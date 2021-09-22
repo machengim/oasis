@@ -2,7 +2,7 @@ use crate::entity::site::{Site, SiteBriefResponse, SiteFullResponse};
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::error::Error;
-use crate::service::token::Token;
+use crate::service::token::AccessToken;
 use crate::util::{self, file_system};
 use rocket::serde::{json::Json, Deserialize};
 use rocket::{Either, Route, State};
@@ -76,7 +76,7 @@ async fn setup(state: &State<AppState>, req_body: Json<SetupRequest>) -> Result<
 }
 
 #[get("/sys/volumes")]
-fn sys_volumes(state: &State<AppState>, token: Token) -> Result<Json<Vec<String>>, Error> {
+fn sys_volumes(state: &State<AppState>, token: AccessToken) -> Result<Json<Vec<String>>, Error> {
     if !state.get_first_run() && token.permission != 9 {
         return Err(Error::Unauthorized);
     }
@@ -89,7 +89,7 @@ fn sys_volumes(state: &State<AppState>, token: Token) -> Result<Json<Vec<String>
 #[get("/sys/dirs/<dir_str>")]
 async fn system_dirs(
     state: &State<AppState>,
-    token: Token,
+    token: AccessToken,
     dir_str: &str,
 ) -> Result<Json<Vec<PathBuf>>, Error> {
     if !state.get_first_run() && token.permission != 9 {
@@ -106,7 +106,7 @@ async fn system_dirs(
 async fn config(
     state: &State<AppState>,
     mode: String,
-    token: Token,
+    token: AccessToken,
 ) -> Result<Either<Json<SiteBriefResponse>, Json<SiteFullResponse>>, Error> {
     if mode != "brief" && mode != "full" {
         return Err(Error::BadRequest);
@@ -131,7 +131,7 @@ async fn config(
 #[put("/sys/config", data = "<req_body>")]
 async fn update_site(
     state: &State<AppState>,
-    token: Token,
+    token: AccessToken,
     req_body: Json<UpdateSiteRequest>,
 ) -> Result<(), Error> {
     if token.permission != 9 {

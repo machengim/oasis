@@ -63,28 +63,12 @@
     showMenu = false;
   };
 
-  const openSingoutModal = () => {
-    showMenu = false;
-    showSignOutModal = true;
-  };
-
-  const openShutdownModal = () => {
-    showMenu = false;
-
-    showShutdownModal = true;
-  };
-
   const closeSignOutModal = () => {
     showSignOutModal = false;
   };
 
   const clostShutdownModal = () => {
     showShutdownModal = false;
-  };
-
-  const openAboutModal = () => {
-    showMenu = false;
-    showAboutModal = true;
   };
 
   const closeAboutModal = () => {

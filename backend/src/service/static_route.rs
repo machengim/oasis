@@ -1,5 +1,5 @@
 use super::error::Error;
-use super::token::Token;
+use super::token::AccessToken;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
 use crate::util;
@@ -44,16 +44,16 @@ async fn setup(state: &State<AppState>) -> Result<Option<NamedFile>, Error> {
 }
 
 #[get("/files")]
-async fn files(token: Token) -> Either<Option<NamedFile>, Redirect> {
+async fn files(token: AccessToken) -> Either<Option<NamedFile>, Redirect> {
     handle_files(token).await
 }
 
 #[get("/files/<_dirs..>")]
-async fn files_all(token: Token, _dirs: PathBuf) -> Either<Option<NamedFile>, Redirect> {
+async fn files_all(token: AccessToken, _dirs: PathBuf) -> Either<Option<NamedFile>, Redirect> {
     handle_files(token).await
 }
 
-async fn handle_files(token: Token) -> Either<Option<NamedFile>, Redirect> {
+async fn handle_files(token: AccessToken) -> Either<Option<NamedFile>, Redirect> {
     if token.uid > 0 && token.permission > 0 {
         Either::Left(open_index_page().await)
     } else {
@@ -62,7 +62,7 @@ async fn handle_files(token: Token) -> Either<Option<NamedFile>, Redirect> {
 }
 
 #[get("/settings")]
-async fn settings(token: Token) -> Result<Option<NamedFile>, Error> {
+async fn settings(token: AccessToken) -> Result<Option<NamedFile>, Error> {
     if token.uid <= 0 || token.permission != 9 {
         return Err(Error::Unauthorized);
     }
@@ -76,7 +76,7 @@ async fn profile(_user: AuthUser) -> Option<NamedFile> {
 }
 
 #[get("/shutdown")]
-fn shutdown(shutdown: Shutdown, token: Token) -> Result<(), Error> {
+fn shutdown(shutdown: Shutdown, token: AccessToken) -> Result<(), Error> {
     if token.uid <= 0 || token.permission != 9 {
         return Err(Error::Forbidden);
     }

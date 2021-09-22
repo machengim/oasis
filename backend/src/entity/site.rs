@@ -1,6 +1,7 @@
 use crate::args;
 use crate::util::{
     self,
+    constants::DEFAULT_UPDATE_FREQ,
     db::{self, fetch_single, Query},
 };
 use anyhow::Result as AnyResult;
@@ -46,7 +47,7 @@ impl Site {
         let secret = util::generate_secret_key();
         let version = util::get_version();
         let storage_str = storage.to_str().unwrap().to_owned();
-        let update_freq = util::get_update_freq();
+        let update_freq = DEFAULT_UPDATE_FREQ.to_owned();
 
         Self {
             name: name.to_string(),

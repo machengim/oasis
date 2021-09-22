@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { useNavigate } from "svelte-navigator";
-  import { t, isLoading as isLoadingI18N } from "svelte-i18n";
-  import { setNotification, sectionStore } from "../utils/store";
+  import { useNavigate, useFocus } from "svelte-navigator";
+  import { t } from "svelte-i18n";
+  import { setNotification, sectionStore, getUsername } from "../utils/store";
   import Button from "../components/Button.svelte";
-  import { readCookie } from "../utils/util";
   import * as api from "../utils/api";
   import type { IChangePasswordRequest } from "../utils/types";
 
   const navigate = useNavigate();
+  const focus = useFocus();
+  let username = getUsername();
   let isLoading = false;
-  let username = readCookie("uname") || "";
   let old_password = "";
   let new_password = "";
   let form: HTMLFormElement;
@@ -98,6 +98,7 @@
             maxLength={16}
             class="ml-4 w-40 border rounded focus:outline-none px-2"
             bind:value={old_password}
+            use:focus
           />
         </div>
       </div>
