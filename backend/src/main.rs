@@ -9,11 +9,10 @@ use local_ip_address;
 use rocket::fs::FileServer;
 use service::app_state::AppState;
 use service::fairings::StaticFileCache;
-use util::init;
+use util::{init, rocket_env::RocketEnv};
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    dotenv::dotenv().ok();
     if !init::check_db_file() {
         init::create_db().await?;
     }
@@ -22,6 +21,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let mut conn = pool.acquire().await?;
     let site_op = Site::read(&mut conn).await?;
     let state = AppState::new(site_op, pool);
+    RocketEnv::new().setup();
 
     let rocket = rocket::build()
         .manage(state)

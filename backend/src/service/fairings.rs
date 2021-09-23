@@ -2,13 +2,15 @@ use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{Method, Status};
 use rocket::{Request, Response};
 
+use crate::util::constants;
+
 pub struct StaticFileCache;
 
 #[rocket::async_trait]
 impl Fairing for StaticFileCache {
     fn info(&self) -> Info {
         Info {
-            name: "GET Cache",
+            name: "Static file cache",
             kind: Kind::Response,
         }
     }
@@ -19,7 +21,7 @@ impl Fairing for StaticFileCache {
         }
 
         if request.method() == Method::Get && request.uri().path().starts_with("/api/file/") {
-            let content = format!("private, max-age={}", 3600 * 24 * 3);
+            let content = format!("private, max-age={}", constants::CACHE_MAX_AGE);
             response.set_raw_header("Cache-Control", content);
         }
     }

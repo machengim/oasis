@@ -45,7 +45,7 @@ pub struct SiteFullResponse {
 impl Site {
     pub fn new(name: &str, storage: &PathBuf, language: &str, created_at: i64) -> Self {
         let secret = util::generate_secret_key();
-        let version = util::get_version();
+        let version = util::get_version_constant();
         let storage_str = storage.to_str().unwrap().to_owned();
         let update_freq = DEFAULT_UPDATE_FREQ.to_owned();
 

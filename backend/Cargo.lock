@@ -1011,7 +1011,6 @@ dependencies = [
  "bcrypt",
  "chardetng",
  "chrono",
- "dotenv",
  "encoding_rs",
  "include_dir",
  "jsonwebtoken",

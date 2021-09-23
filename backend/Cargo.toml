@@ -11,7 +11,6 @@ rocket = {version = "0.5.0-rc.1", features = ["json"]}
 anyhow = "1.0"
 chardetng = "0.1.14"
 chrono = "0.4"
-dotenv = "0.15.0"
 bcrypt = "0.10"
 encoding_rs = "0.8.28"
 include_dir = "0.6.2"
