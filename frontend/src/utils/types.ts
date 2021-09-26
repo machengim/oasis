@@ -112,7 +112,8 @@ export enum EIconType {
   loop = "loop",
   repeat = "repeat",
   unknown = "unknown",
-  closecircle = "closecircle"
+  closecircle = "closecircle",
+  link = "link"
 }
 
 export enum EIconColor {

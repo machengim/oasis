@@ -1,17 +1,31 @@
-use crate::entity::file::{File, FileType};
+use crate::entity::file::File;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
 use crate::service::error::Error;
 use crate::service::range::RangedFile;
 use crate::service::track;
 use crate::util::{self, file_system};
+use rocket::fs::NamedFile;
+use rocket::serde::{json::Json, Deserialize};
 use rocket::tokio::fs;
-use rocket::{fs::NamedFile, serde::json::Json, Either};
 use rocket::{Route, State};
 use std::path::PathBuf;
 
 pub fn route() -> Vec<Route> {
-    routes![dir_content, file_content, video_track, text_file_content]
+    routes![
+        dir_content,
+        file_binary,
+        file_range,
+        video_track,
+        text_file_content
+    ]
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct GenerateLinkRequest {
+    pub path: String,
+    pub expire: i64,
 }
 
 #[get("/dir?<path>")]
@@ -41,12 +55,12 @@ async fn dir_content(
     Ok(Json(content))
 }
 
-#[get("/file/<path>")]
-async fn file_content(
+#[get("/file/range/<path>")]
+async fn file_range(
     path: &str,
     _user: AuthUser,
     state: &State<AppState>,
-) -> Result<Either<RangedFile, NamedFile>, Error> {
+) -> Result<RangedFile, Error> {
     let storage = state.get_site()?.storage.clone();
     let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
 
@@ -55,15 +69,27 @@ async fn file_content(
         return Err(Error::BadRequest);
     }
 
-    let file_type = FileType::get_file_type(&target_path);
-    if file_type == FileType::Video || file_type == FileType::Music {
-        return Ok(Either::Left(RangedFile { path: target_path }));
-    } else {
-        return Ok(Either::Right(NamedFile::open(target_path).await?));
-    }
+    Ok(RangedFile { path: target_path })
 }
 
-#[get("/file/track?<path>")]
+#[get("/file/binary/<path>")]
+async fn file_binary(
+    path: &str,
+    _user: AuthUser,
+    state: &State<AppState>,
+) -> Result<NamedFile, Error> {
+    let storage = state.get_site()?.storage.clone();
+    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+
+    if !target_path.exists() || !target_path.is_file() {
+        eprintln!("Invalid file path: {:?}", &target_path);
+        return Err(Error::BadRequest);
+    }
+
+    Ok(NamedFile::open(target_path).await?)
+}
+
+#[get("/file/track/<path>")]
 async fn video_track(
     path: &str,
     _user: AuthUser,
@@ -83,7 +109,7 @@ async fn video_track(
     Ok(track_str)
 }
 
-#[get("/file/text?<path>")]
+#[get("/file/text/<path>")]
 async fn text_file_content(
     path: &str,
     _user: AuthUser,
@@ -98,4 +124,15 @@ async fn text_file_content(
     }
 
     Ok(file_system::read_text_file(target_path).await?)
+}
+
+#[post("/file/share", data = "<req_body>")]
+async fn generate_share_link(
+    state: &State<AppState>,
+    req_body: Json<GenerateLinkRequest>,
+    _user: AuthUser,
+) -> Result<(), Error> {
+    let secret = state.get_secret()?;
+
+    Ok(())
 }

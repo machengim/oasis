@@ -19,6 +19,7 @@
   import ImageViewer from "../players/ImageViewer.svelte";
   import PdfViewer from "../players/PdfViewer.svelte";
   import Icon from "../components/Icon.svelte";
+  import FileLinkModal from "../modals/FileLinkModal.svelte";
 
   const navigate = useNavigate();
   export let dirs: Array<string>;
@@ -30,6 +31,7 @@
   let isLoading = false;
   let fileType: FileType;
   let loopIcons: Array<ILoopIcon> = [];
+  let showFileLinkModal = false;
 
   const unsubscribeFiles = filesStore.subscribe((files) => {
     filesInStore = files;
@@ -101,7 +103,11 @@
     const dir = dirs.join("/");
     const path = dir ? dir + "/" + filename : filename;
 
-    return "/api/file/" + encodeURIComponent(path);
+    if (fileType === FileType.Video || fileType === FileType.Music) {
+      return "/api/file/range/" + encodeURIComponent(path);
+    } else {
+      return "/api/file/binary/" + encodeURIComponent(path);
+    }
   };
 
   const buildTrackPath = () => {
@@ -113,7 +119,7 @@
     let dir = dirs.join("/");
     let filePath = dir ? dir + "/" + trackFilename : trackFilename;
 
-    return "/api/file/track?path=" + encodeURIComponent(filePath);
+    return "/api/file/track/" + encodeURIComponent(filePath);
   };
 
   const extractFileType = () => {
@@ -210,11 +216,31 @@
 
     loopIcons = loopIcons;
   };
+
+  const openFileLinkModal = () => {
+    showFileLinkModal = true;
+  };
+
+  const closeFileLinkModal = () => {
+    showFileLinkModal = false;
+  };
 </script>
 
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
-    <BreadCrum {dirs} {filename} className="py-1" />
+    {#if showFileLinkModal}
+      <FileLinkModal {filename} {filePath} onClose={closeFileLinkModal} />
+    {/if}
+    <div class="flex flex-row items-center">
+      <BreadCrum {dirs} {filename} className="py-1 mr-2" />
+      <Icon
+        type={EIconType.link}
+        size="small"
+        color={EIconColor.black}
+        className="transform -rotate-45 cursor-pointer"
+        onClick={openFileLinkModal}
+      />
+    </div>
     {#if isLoading}
       <Spinner />
     {:else}

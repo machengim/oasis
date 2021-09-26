@@ -3,7 +3,7 @@
   export let onClick: (e) => void;
   export let type: "button" | "submit" = "button";
   export let size: "big" | "normal" | "small" = "normal";
-  export let color: "blue" | "white" | "gray" = "white";
+  export let color: "blue" | "white" | "gray" | "green" = "white";
   export let className: string = "";
   export let disabled: boolean = false;
 
@@ -37,6 +37,9 @@
         break;
       case "white":
         style += " border-gray-500";
+        break;
+      case "green":
+        style += " bg-green-400 text-white";
         break;
       default:
         break;
