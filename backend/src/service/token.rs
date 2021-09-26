@@ -1,8 +1,9 @@
 use super::{app_state::AppState, error::Error};
-use crate::util::constants::ACCESS_TOKEN;
+use crate::util::constants::{ACCESS_TOKEN, ACCESS_TOKEN_MINS, REFRESH_TOKEN, REFRESH_TOKEN_DAYS};
 use anyhow::Result as AnyResult;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use rocket::{
+    http::Status,
     request::{FromRequest, Outcome},
     serde::{Deserialize, Serialize},
     Request,
@@ -49,8 +50,7 @@ impl Token for AccessToken {}
 
 impl AccessToken {
     pub fn new(uid: i64, permission: i8) -> Self {
-        let token_expire_days: i64 = 7;
-        let expire_time = chrono::Utc::now().timestamp() + token_expire_days * 24 * 60 * 60;
+        let expire_time = chrono::Utc::now().timestamp() + ACCESS_TOKEN_MINS * 60;
 
         AccessToken {
             exp: expire_time as usize,
@@ -76,6 +76,45 @@ impl<'r> FromRequest<'r> for AccessToken {
         }
 
         Outcome::Success(AccessToken::default())
+    }
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[serde(crate = "rocket::serde")]
+pub struct RefreshToken {
+    pub exp: usize,
+    pub uid: i64,
+}
+
+impl Token for RefreshToken {}
+
+impl RefreshToken {
+    pub fn new(uid: i64) -> Self {
+        let expire_time = chrono::Utc::now().timestamp() + REFRESH_TOKEN_DAYS * 24 * 60 * 60;
+
+        RefreshToken {
+            exp: expire_time as usize,
+            uid,
+        }
+    }
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for RefreshToken {
+    type Error = Error;
+
+    async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        if let Some(token_str) = req.cookies().get(REFRESH_TOKEN) {
+            if let Some(state) = req.rocket().state::<AppState>() {
+                if let Ok(secret) = state.get_secret() {
+                    if let Ok(token) = RefreshToken::decode(token_str.value(), &secret) {
+                        return Outcome::Success(token);
+                    }
+                }
+            }
+        }
+
+        Outcome::Failure((Status::BadRequest, Error::BadRequest))
     }
 }
 

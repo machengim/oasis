@@ -4,7 +4,7 @@
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification } from "../utils/store";
+  import { setNotification, userStore } from "../utils/store";
   import Spinner from "../components/Spinner.svelte";
 
   const navigate = useNavigate();
@@ -14,8 +14,8 @@
   const signOut = async () => {
     isLoading = true;
     try {
-      await api.get("/api/signout", "raw");
-      localStorage.removeItem("oa_user");
+      await api.get("/api/user/signout", "raw");
+      userStore.set(null);
       setNotification("success", "Sign out successfully,");
       onClose();
       navigate("/login");

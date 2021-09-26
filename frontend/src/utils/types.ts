@@ -76,6 +76,7 @@ export interface ILink {
 export interface IUser {
   username: string;
   permission: number;
+  expire: number;
 }
 
 export enum FileType {

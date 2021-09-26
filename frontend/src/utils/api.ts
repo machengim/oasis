@@ -1,4 +1,5 @@
-import type { IPartialBlob } from '../utils/types';
+import type { IPartialBlob, IUser } from '../utils/types';
+import { userStore } from './store';
 
 export async function get<T>(url: string, dataType: "json" | "text" | "blob" | "raw" = "json"): Promise<T> {
   let response: Response;
@@ -85,6 +86,16 @@ export async function remove<T, S>(url: string, payload: T, jsonResponse: boolea
   }
 
   return jsonResponse ? await response.json() : await response.text();
+}
+
+export async function refresh_token() {
+  try {
+    const response = await fetch("/api/user/refresh");
+    const user: IUser = await response.json();
+    userStore.set(user);
+  } catch (e) {
+    userStore.set(null);
+  }
 }
 
 async function parseRangeResponse(response: Response): Promise<IPartialBlob> {

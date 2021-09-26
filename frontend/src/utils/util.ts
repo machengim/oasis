@@ -140,11 +140,3 @@ export function getLocale() {
 
   return browserLocale.startsWith("cn") ? "cn" : "en";
 }
-
-export function readUserLocal(): IUser {
-  const userLocal = localStorage.getItem("oa_user");
-  if (!userLocal) return null;
-  const user: IUser = JSON.parse(userLocal);
-
-  return user;
-}

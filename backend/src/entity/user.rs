@@ -1,4 +1,10 @@
-use crate::{api::sys::SetupRequest, args, service::token::AccessToken, util::db, util::db::Query};
+use crate::{
+    api::sys::SetupRequest,
+    args,
+    service::token::{AccessToken, RefreshToken},
+    util::db,
+    util::db::Query,
+};
 use anyhow::Result as AnyResult;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use sqlx::{pool::PoolConnection, FromRow, Sqlite, Transaction};
@@ -74,6 +80,16 @@ impl User {
         Ok(db::fetch_single(query, conn).await?)
     }
 
+    pub async fn find_user_by_id(
+        uid: i64,
+        conn: &mut PoolConnection<Sqlite>,
+    ) -> AnyResult<Option<Self>> {
+        let sql = "select * from USER where user_id = ?1";
+        let query = Query::new(sql, args![uid]);
+
+        Ok(db::fetch_single(query, conn).await?)
+    }
+
     pub async fn login(
         username: &str,
         password: &str,
@@ -91,7 +107,11 @@ impl User {
         Ok(user)
     }
 
-    pub fn generate_token(&self) -> AccessToken {
+    pub fn generate_access_token(&self) -> AccessToken {
         AccessToken::new(self.user_id, self.permission)
+    }
+
+    pub fn generate_refresh_token(&self) -> RefreshToken {
+        RefreshToken::new(self.user_id)
     }
 }

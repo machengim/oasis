@@ -38,7 +38,6 @@
     try {
       const user: IUser = await api.post("/api/login", payload, true);
       userStore.set(user);
-      localStorage.setItem("oa_user", JSON.stringify(user));
       setNotification("success", "Login successfully");
       navigate("/files");
     } catch (e) {

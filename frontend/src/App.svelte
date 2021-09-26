@@ -16,7 +16,7 @@
   import type { ISiteBrief } from "./utils/types";
   import Spinner from "./components/Spinner.svelte";
   import { siteStore, setNotification, userStore } from "./utils/store";
-  import { getLocale, readUserLocal } from "./utils/util";
+  import { getLocale } from "./utils/util";
 
   let isLoading = true;
   let language = "";
@@ -42,28 +42,47 @@
   $: document.title = sitename;
 
   const initApp = async () => {
-    let user = readUserLocal();
-    if (user) {
-      userStore.set(user);
-    }
-
     init({
       fallbackLocale: "en",
       initialLocale: getLocale(),
     });
 
     try {
-      const endpoint = "/api/sys/config?mode=brief";
-      const site: ISiteBrief = await api.get(endpoint, "json");
-      if (site) {
-        siteStore.set({ ...site, storage: "" });
-      }
+      const siteReq = api.get("/api/sys/config?mode=brief", "json");
+      const tokenReq = api.refresh_token();
+      Promise.all([siteReq, tokenReq]).then((values: [ISiteBrief, void]) => {
+        const site = values[0];
+        if (site) {
+          siteStore.set({ ...site, storage: "" });
+        }
+      });
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read site info");
     }
 
+    await api.refresh_token();
     isLoading = false;
+
+    // Check if need to refresh token every 2 mins
+    // Condition is no user in store or the token is almost expired (5 mins)
+    setInterval(async () => {
+      if (needRefresh()) {
+        await api.refresh_token();
+      }
+    }, 1000 * 120);
+
+    const needRefresh = (): boolean => {
+      let user = $userStore;
+      if (!user) return true;
+
+      let currentTimeUtc = new Date().getTime();
+      if (user.expire - currentTimeUtc <= 300) {
+        return true;
+      }
+
+      return false;
+    };
   };
 </script>
 
