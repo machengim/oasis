@@ -23,7 +23,7 @@ impl<'a> RocketEnv<'a> {
     #[cfg(debug_assertions)]
     pub fn new() -> Self {
         let mut vars = HashMap::new();
-        vars.insert("ROCKET_ADDRESS", "127.0.0.1");
+        vars.insert("ROCKET_ADDRESS", "0.0.0.0"); // Change for mobile test
         vars.insert("ROCKET_PORT", "8000");
         vars.insert("ROCKET_WORKERS", "2");
         vars.insert("ROCKET_KEEP_ALIVE", "1");

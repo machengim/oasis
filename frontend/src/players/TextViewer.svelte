@@ -32,7 +32,7 @@
     let dir = dirs.join("/");
     let filePath = dir ? dir + "/" + filename : filename;
 
-    return "/api/file/text/" + encodeURIComponent(filePath);
+    return "/api/file/" + encodeURIComponent(filePath);
   };
 </script>
 

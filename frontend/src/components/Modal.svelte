@@ -16,7 +16,7 @@
   on:click={clickOutToClose ? onClose : () => {}}
 >
   <div
-    class="modal-{size} mx-auto my-60 bg-white border-gray-400 shadow"
+    class="modal-{size} center bg-white border-gray-400 shadow"
     on:click={clickInside}
   >
     <div class="border-b border-gray-200 p-4 flex flex-row justify-between">
@@ -34,6 +34,13 @@
 </div>
 
 <style>
+  .center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
   @media only screen and (min-width: 320px) {
     .modal-small {
       width: 12rem;

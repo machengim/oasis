@@ -5,10 +5,13 @@
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
+  import { checkMobile } from "../utils/util";
 
   export let onClose: () => void;
   export let filename: string;
   export let filePath: string;
+  // Clipboard permission may be unavailabel on mobiles.
+  const isMobile = checkMobile();
   let textarea: HTMLTextAreaElement;
   let link: string;
   let copied = false;
@@ -53,12 +56,12 @@
     isLoading = false;
   };
 
-  const copyLink = () => {
+  const copyLink = async () => {
     if (!textarea || !link) return;
 
     textarea.select();
     textarea.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(textarea.value);
+    await navigator.clipboard.writeText(textarea.value);
     copied = true;
   };
 
@@ -84,12 +87,14 @@
       >
     </div>
     <div class="w-full p-4 flex flex-row justify-end">
-      <Button
-        onClick={copyLink}
-        color={"blue"}
-        value={copied ? "Link copied!" : "Copy link"}
-        className="mr-4"
-      />
+      {#if !isMobile}
+        <Button
+          onClick={copyLink}
+          color={"blue"}
+          value={copied ? "Link copied!" : "Copy link"}
+          className="mr-4"
+        />
+      {/if}
       <Button onClick={onClose} value="Close" />
     </div>
   {/if}
