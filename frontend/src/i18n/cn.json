@@ -29,7 +29,9 @@
     "login": "登录",
     "logging": "登录中...",
     "check_update": "检查更新",
-    "check_updating": "检查中..."
+    "check_updating": "检查中...",
+    "copy_link": "复制链接",
+    "link_copied": "链接已复制"
   },
   "filetype": {
     "Code": "代码",
@@ -98,6 +100,12 @@
     "signout": {
       "title": "退出登录",
       "notice": "确定要退出登录?"
+    },
+    "file_share": {
+      "title": "文件分享",
+      "file": "文件",
+      "valid_period": "有效期",
+      "hours": "小时"
     }
   },
   "message": {

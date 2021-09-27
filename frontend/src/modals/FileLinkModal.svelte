@@ -5,13 +5,11 @@
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
-  import { checkMobile } from "../utils/util";
+  import copy from "copy-to-clipboard";
 
   export let onClose: () => void;
   export let filename: string;
   export let filePath: string;
-  // Clipboard permission may be unavailabel on mobiles.
-  const isMobile = checkMobile();
   let textarea: HTMLTextAreaElement;
   let link: string;
   let copied = false;
@@ -56,12 +54,12 @@
     isLoading = false;
   };
 
-  const copyLink = async () => {
+  const copyLink = () => {
     if (!textarea || !link) return;
-
     textarea.select();
     textarea.setSelectionRange(0, 99999);
-    await navigator.clipboard.writeText(textarea.value);
+
+    copy(textarea.value);
     copied = true;
   };
 
@@ -72,14 +70,17 @@
   };
 </script>
 
-<Modal {onClose} title="File share link">
+<Modal {onClose} title={$t("modal.file_share.title")}>
   {#if isLoading}
     <Spinner />
   {:else}
     <div class="p-4 text-lg">
-      <div>File: {filename}</div>
-      <div class="mb-4">Expire: 6 hours</div>
+      <div>{$t("modal.file_share.file")}: {filename}</div>
+      <div class="mb-4">
+        {$t("modal.file_share.valid_period")}: 6 {$t("modal.file_share.hours")}
+      </div>
       <textarea
+        id="textarea"
         bind:this={textarea}
         readonly
         class="border rounded w-full p-2 overflow-y-hidden focus:outline-none"
@@ -87,15 +88,13 @@
       >
     </div>
     <div class="w-full p-4 flex flex-row justify-end">
-      {#if !isMobile}
-        <Button
-          onClick={copyLink}
-          color={"blue"}
-          value={copied ? "Link copied!" : "Copy link"}
-          className="mr-4"
-        />
-      {/if}
-      <Button onClick={onClose} value="Close" />
+      <Button
+        onClick={copyLink}
+        color={"blue"}
+        value={copied ? $t("button.link_copied") : $t("button.copy_link")}
+        className="mr-4"
+      />
+      <Button onClick={onClose} value={$t("button.close")} />
     </div>
   {/if}
 </Modal>

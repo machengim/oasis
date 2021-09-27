@@ -1,53 +1,29 @@
 ## OASIS
 
-Personal file sharing and syncing system.
+Minimalized file hosting and sharing app.
 
-### Roadmap
+### Features
 
-**v0.1: Basic file server**
-
-+ [x] Setup
-+ [x] Login
-+ [x] File upload
-+ [x] File list
-+ [x] File delete/rename
-+ [x] Create folder
-
-**v0.2 File preview**
-
-+ [ ] Text file view
-+ [ ] Image view
-+ [ ] Video play
-+ [ ] Music play
++ [x] User authentication
++ [x] File preview
++ [x] Mobile compatibility
++ [x] Temporary sharing link
++ [x] Loop file list
++ [x] Multiple platform support (Linux, MacOS, Windows, ..)
++ [x] I18n (English, Chinese)
++ [] Custom media player
++ [] Multiple users management
++ [] HTTPS
 
 
-**v0.3 Mobile Compatibility**
+### File format support
 
-+ [ ] Responsive UI
-+ [ ] Mobile Actions
++ [x] Text
++ [x] Image
++ [x] Audio (mp3 / flac)
++ [x] Video (depend on browser)
++ [x] Subtitle (srt / vtt)
++ [x] PDF (supported by pdf.js)
++ [] Docx
++ [] Mobi
 
-**v0.4 Advance File Operation**
-
-+ [ ] File detail info
-+ [ ] File download
-+ [ ] Folder download
-+ [ ] File starring
-+ [ ] File thumbnail
-
-**v0.5 Multiple-user system**
-
-+ [ ] Sign up
-+ [ ] I18n
-+ [ ] Logs
-+ [ ] Dashboard
-+ [ ] Search
-+ [ ] Sharing
-+ [ ] Auto update
-
-**Others**
-
-+ [ ] Grid view for file list
-+ [ ] Desktop client
-+ [ ] Mobile client
-+ [ ] MySQL and PostgreSQL support
-+ [ ] E2E encryption?

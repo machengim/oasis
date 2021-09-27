@@ -31,6 +31,7 @@
     "typescript": "^4.0.0"
   },
   "dependencies": {
+    "copy-to-clipboard": "^3.3.1",
     "pdfobject": "^2.2.6",
     "plyr": "^3.6.8",
     "sirv-cli": "^1.0.0",

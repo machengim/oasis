@@ -29,7 +29,9 @@
     "login": "Login",
     "logging": "Logging in...",
     "check_update": "Check update",
-    "check_updating": "Checking..."
+    "check_updating": "Checking...",
+    "copy_link": "Copy link",
+    "link_copied": "Link copied"
   },
   "filetype": {
     "Code": "Code",
@@ -98,6 +100,12 @@
     "signout": {
       "title": "Sign out",
       "notice": "Are you sure you want to sign out?"
+    },
+    "file_share": {
+      "title": "File share link",
+      "file": "File",
+      "valid_period": "Valid period",
+      "hours": "hours"
     }
   },
   "message": {
