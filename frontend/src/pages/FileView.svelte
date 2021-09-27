@@ -103,11 +103,7 @@
     const dir = dirs.join("/");
     const path = dir ? dir + "/" + filename : filename;
 
-    if (fileType === FileType.Video || fileType === FileType.Music) {
-      return "/api/file/range/" + encodeURIComponent(path);
-    } else {
-      return "/api/file/binary/" + encodeURIComponent(path);
-    }
+    return "/api/file/" + encodeURIComponent(path);
   };
 
   const buildTrackPath = () => {

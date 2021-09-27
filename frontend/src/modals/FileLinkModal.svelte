@@ -17,13 +17,17 @@
   $: if (copied) {
     setTimeout(() => {
       copied = false;
+      clearSelection();
     }, 2000);
   }
 
   onMount(() => {
-    textarea.style.height = textarea.scrollHeight + "px";
     requestShareLink();
   });
+
+  $: if (link && textarea) {
+    textarea.style.height = textarea.scrollHeight + "px";
+  }
 
   const requestShareLink = async () => {
     isLoading = true;
@@ -35,7 +39,13 @@
     };
 
     try {
-      const res = await api.post(endpoint, payload, true);
+      const response = await api.post(endpoint, payload, false);
+      link =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        "/api/file/share?" +
+        response;
     } catch (e) {
       console.error(e);
     }
@@ -44,13 +54,12 @@
   };
 
   const copyLink = () => {
-    if (!textarea) return;
+    if (!textarea || !link) return;
 
     textarea.select();
     textarea.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(textarea.value);
     copied = true;
-    clearSelection();
   };
 
   const clearSelection = () => {
@@ -70,16 +79,15 @@
       <textarea
         bind:this={textarea}
         readonly
-        class="border rounded w-full overflow-y-hidden focus:outline-none"
+        class="border rounded w-full p-2 overflow-y-hidden focus:outline-none"
+        on:click={copyLink}>{link}</textarea
       >
-        http://localhost:8000/share/absdfidfkerl
-      </textarea>
     </div>
     <div class="w-full p-4 flex flex-row justify-end">
       <Button
         onClick={copyLink}
         color={"blue"}
-        value={copied ? "Copied" : "Copy link"}
+        value={copied ? "Link copied!" : "Copy link"}
         className="mr-4"
       />
       <Button onClick={onClose} value="Close" />

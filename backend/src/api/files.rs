@@ -1,4 +1,4 @@
-use crate::entity::file::File;
+use crate::entity::file::{File, FileType};
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
 use crate::service::error::Error;
@@ -14,11 +14,18 @@ use std::path::PathBuf;
 pub fn route() -> Vec<Route> {
     routes![
         dir_content,
-        file_binary,
-        file_range,
+        file_content,
         video_track,
-        text_file_content
+        generate_share_link,
+        get_share_link
     ]
+}
+
+#[derive(Responder)]
+pub enum FileResponse {
+    Range(RangedFile),
+    Binary(NamedFile),
+    Text(String),
 }
 
 #[derive(Deserialize, Debug)]
@@ -55,12 +62,12 @@ async fn dir_content(
     Ok(Json(content))
 }
 
-#[get("/file/range/<path>")]
-async fn file_range(
+#[get("/file/<path>")]
+async fn file_content(
     path: &str,
     _user: AuthUser,
     state: &State<AppState>,
-) -> Result<RangedFile, Error> {
+) -> Result<FileResponse, Error> {
     let storage = state.get_site()?.storage.clone();
     let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
 
@@ -69,26 +76,19 @@ async fn file_range(
         return Err(Error::BadRequest);
     }
 
-    Ok(RangedFile { path: target_path })
-}
-
-#[get("/file/binary/<path>")]
-async fn file_binary(
-    path: &str,
-    _user: AuthUser,
-    state: &State<AppState>,
-) -> Result<NamedFile, Error> {
-    let storage = state.get_site()?.storage.clone();
-    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
-
-    if !target_path.exists() || !target_path.is_file() {
-        eprintln!("Invalid file path: {:?}", &target_path);
-        return Err(Error::BadRequest);
+    match FileType::get_file_type(&target_path) {
+        FileType::Code | FileType::Text => Ok(FileResponse::Text(
+            file_system::read_text_file(target_path).await?,
+        )),
+        FileType::Video | FileType::Music => {
+            Ok(FileResponse::Range(RangedFile { path: target_path }))
+        }
+        _ => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
     }
-
-    Ok(NamedFile::open(target_path).await?)
 }
 
+// Temporary solution for track file searching.
+// Could remove this function to front end.
 #[get("/file/track/<path>")]
 async fn video_track(
     path: &str,
@@ -109,30 +109,35 @@ async fn video_track(
     Ok(track_str)
 }
 
-#[get("/file/text/<path>")]
-async fn text_file_content(
-    path: &str,
-    _user: AuthUser,
-    state: &State<AppState>,
-) -> Result<String, Error> {
-    let storage = state.get_site()?.storage.clone();
-    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
-
-    if !target_path.exists() || !target_path.is_file() {
-        eprintln!("Invalid file path: {:?}", &target_path);
-        return Err(Error::NotFound);
-    }
-
-    Ok(file_system::read_text_file(target_path).await?)
-}
-
 #[post("/file/share", data = "<req_body>")]
 async fn generate_share_link(
     state: &State<AppState>,
     req_body: Json<GenerateLinkRequest>,
     _user: AuthUser,
-) -> Result<(), Error> {
+) -> Result<String, Error> {
     let secret = state.get_secret()?;
+    let input = format!("path={}&expire={}", req_body.path, req_body.expire);
+    let hash = util::sha256(&input, &secret);
 
-    Ok(())
+    Ok(format!("{}&hash={}", input, hash))
+}
+
+#[get("/file/share?<path>&<expire>&<hash>")]
+async fn get_share_link(
+    state: &State<AppState>,
+    path: &str,
+    expire: i64,
+    hash: &str,
+) -> Result<FileResponse, Error> {
+    let secret = state.get_secret()?;
+    let path_encode = urlencoding::encode(path);
+
+    let input = format!("path={}&expire={}", path_encode, expire);
+    if hash != util::sha256(&input, &secret) {
+        return Err(Error::BadRequest);
+    }
+
+    let user = AuthUser::default();
+
+    Ok(file_content(path, user, state).await?)
 }
