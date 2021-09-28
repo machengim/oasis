@@ -18,7 +18,7 @@
         view: "FitV",
       },
       forcePDFJS: true,
-      PDFJS_URL: "/pdfjs/web/viewer.html",
+      PDFJS_URL: "/vendor/pdfjs/web/viewer.html",
     };
 
     PdfObject.embed(filePath, "#container", options);

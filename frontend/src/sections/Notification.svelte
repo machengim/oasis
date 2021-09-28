@@ -85,7 +85,7 @@
 </script>
 
 {#if isShowNotification}
-  <div class="absolute right-6 top-20 w-60 lg:w-80 overflow-x-hidden z-50">
+  <div class="absolute right-6 top-20 w-60 lg:w-72 overflow-x-hidden z-50">
     <div class={buildStyle()}>
       <div class="flex flex-row items-center">
         <div class="mr-2">
