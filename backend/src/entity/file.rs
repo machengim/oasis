@@ -55,13 +55,9 @@ impl File {
         };
 
         let file_type = FileType::get_file_type(path);
-        let size = if path.is_dir() {
-            0
-        } else {
-            match path.metadata() {
-                Ok(meta) => meta.len(),
-                Err(_) => 0,
-            }
+        let size = match (path.is_dir(), path.metadata()) {
+            (false, Ok(meta)) => meta.len(),
+            _ => 0,
         };
 
         Ok(Self {

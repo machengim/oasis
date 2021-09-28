@@ -1,8 +1,7 @@
+use crate::util::constants;
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{Method, Status};
 use rocket::{Request, Response};
-
-use crate::util::constants;
 
 pub struct StaticFileCache;
 
@@ -20,9 +19,38 @@ impl Fairing for StaticFileCache {
             return;
         }
 
-        if request.method() == Method::Get && request.uri().path().starts_with("/api/file/") {
+        if request.method() == Method::Get && allow_cache(request) {
             let content = format!("private, max-age={}", constants::CACHE_MAX_AGE);
             response.set_raw_header("Cache-Control", content);
         }
     }
+}
+
+// Do not cache development related files in debug mode.
+#[cfg(debug_assertions)]
+fn allow_cache<'r>(req: &'r Request<'_>) -> bool {
+    let req_path = req.uri().path();
+
+    if req_path.starts_with("/api/file/") {
+        return true;
+    }
+
+    false
+}
+
+#[cfg(not(debug_assertions))]
+fn allow_cache<'r>(req: &'r Request<'_>) -> bool {
+    let req_path = req.uri().path();
+
+    if req_path.starts_with("/api/file/") {
+        return true;
+    }
+
+    for ext in constants::CACHE_FILE_EXTS.iter() {
+        if req_path.ends_with(ext) {
+            return true;
+        }
+    }
+
+    false
 }

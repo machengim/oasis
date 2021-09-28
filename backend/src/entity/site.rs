@@ -1,11 +1,10 @@
 use crate::args;
 use crate::util::{
     self,
-    constants::{DEFAULT_APP_NAME, DEFAULT_LANGUAGE, DEFAULT_UPDATE_FREQ, VERSION},
+    constants::DEFAULT_UPDATE_FREQ,
     db::{self, fetch_single, Query},
 };
 use anyhow::Result as AnyResult;
-use rocket::serde::Serialize;
 use sqlx::pool::PoolConnection;
 use sqlx::{FromRow, Sqlite, Transaction};
 use std::path::PathBuf;
@@ -21,25 +20,6 @@ pub struct Site {
     pub update_freq: String,
     pub created_at: i64,
     pub updated_at: i64,
-}
-
-#[derive(Serialize, Debug)]
-#[serde(crate = "rocket::serde")]
-pub struct SiteBriefResponse {
-    pub name: String,
-    pub version: String,
-    pub language: String,
-    pub update_freq: String,
-}
-
-#[derive(Serialize, Debug)]
-#[serde(crate = "rocket::serde")]
-pub struct SiteFullResponse {
-    pub name: String,
-    pub version: String,
-    pub language: String,
-    pub update_freq: String,
-    pub storage: String,
 }
 
 impl Site {
@@ -124,51 +104,5 @@ impl Site {
         let current_timestamp = util::get_utc_seconds();
 
         current_timestamp - self.updated_at > interval
-    }
-}
-
-impl From<Site> for SiteBriefResponse {
-    fn from(s: Site) -> Self {
-        Self {
-            name: s.name,
-            version: s.version,
-            language: s.language,
-            update_freq: s.update_freq,
-        }
-    }
-}
-
-impl Default for SiteBriefResponse {
-    fn default() -> Self {
-        Self {
-            name: DEFAULT_APP_NAME.to_owned(),
-            version: VERSION.to_owned(),
-            language: DEFAULT_LANGUAGE.to_owned(),
-            update_freq: DEFAULT_UPDATE_FREQ.to_owned(),
-        }
-    }
-}
-
-impl From<Site> for SiteFullResponse {
-    fn from(s: Site) -> Self {
-        Self {
-            name: s.name,
-            version: s.version,
-            language: s.language,
-            storage: s.storage,
-            update_freq: s.update_freq,
-        }
-    }
-}
-
-impl Default for SiteFullResponse {
-    fn default() -> Self {
-        Self {
-            name: DEFAULT_APP_NAME.to_owned(),
-            version: VERSION.to_owned(),
-            language: DEFAULT_LANGUAGE.to_owned(),
-            storage: String::new(),
-            update_freq: DEFAULT_UPDATE_FREQ.to_owned(),
-        }
     }
 }

@@ -1,7 +1,7 @@
 use crate::entity::error::Error;
 use crate::entity::request::{SetupRequest, UpdateSiteRequest};
-use crate::entity::response::AppNeedUpdateResponse;
-use crate::entity::site::{Site, SiteBriefResponse, SiteFullResponse};
+use crate::entity::response::{AppNeedUpdateResponse, SiteBriefResponse, SiteFullResponse};
+use crate::entity::site::Site;
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthAdmin;
