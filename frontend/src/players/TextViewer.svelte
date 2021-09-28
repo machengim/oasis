@@ -1,5 +1,6 @@
 <script lang="ts">
   import { setNotification } from "../utils/store";
+  import { t } from "svelte-i18n";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
   import { FileType } from "../utils/types";
@@ -22,7 +23,7 @@
       content = await api.get(endpoint, "text");
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot fetch text file content");
+      setNotification("error", $t("message.error.read_file_error"));
     }
 
     isLoading = false;

@@ -1,15 +1,14 @@
 use anyhow::Result as AnyResult;
-use std::{
-    cmp::Ordering,
-    net::{IpAddr, Ipv4Addr},
-};
+use std::net::{IpAddr, Ipv4Addr};
 
+#[allow(dead_code)]
 struct LocalIpRange {
     start: IpAddr,
     end: IpAddr,
 }
 
 impl LocalIpRange {
+    #[allow(dead_code)]
     fn new(ips: [u8; 4], ipe: [u8; 4]) -> Self {
         let start = IpAddr::V4(Ipv4Addr::new(ips[0], ips[1], ips[2], ips[3]));
         let end = IpAddr::V4(Ipv4Addr::new(ipe[0], ipe[1], ipe[2], ipe[3]));
@@ -21,11 +20,16 @@ impl LocalIpRange {
 pub fn get() -> AnyResult<IpAddr> {
     #[cfg(target_os = "linux")]
     {
-        local_ip_address::local_ip()
+        match local_ip_address::local_ip() {
+            Ok(ip) => Ok(ip),
+            Err(_) => Err(anyhow::anyhow!("Cannot retreive local ip address")),
+        }
     }
 
     #[cfg(not(target_os = "linux"))]
     {
+        use std::cmp::Ordering;
+
         let mut ranges = vec![];
         ranges.push(LocalIpRange::new([192, 168, 0, 0], [192, 168, 255, 255]));
         ranges.push(LocalIpRange::new([172, 16, 0, 0], [172, 31, 255, 255]));

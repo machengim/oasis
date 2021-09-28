@@ -15,12 +15,12 @@
     isLoading = true;
     try {
       await api.get("/shutdown", "raw");
-      setNotification("success", "Goodbye!");
+      setNotification("success", $t("message.success.goodbye"));
       onClose();
       navigate("/login");
     } catch (e) {
       console.error(e);
-      setNotification("error", "Shutdown server failed");
+      setNotification("error", $t("message.success.shutdown_error"));
     }
 
     isLoading = false;

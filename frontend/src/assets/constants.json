@@ -1,0 +1,33 @@
+{
+  "app_name": "Oasis",
+  "website": {
+    "name": "chengma.dev/oasis",
+    "url": "https://chengma.dev/oasis"
+  },
+  "repo": {
+    "name": "Github repo",
+    "url": "https://github.com/machengim/oasis"
+  },
+  "links": [
+    {
+      "name": "Svelte",
+      "url": "https://svelte.dev"
+    },
+    {
+      "name": "Rocket",
+      "url": "https://rocket.rs"
+    },
+    {
+      "name": "Tailwind",
+      "url": "https://tailwindcss.com/"
+    },
+    {
+      "name": "PDFjs",
+      "url": "https://mozilla.github.io/pdf.js/"
+    },
+    {
+      "name": "Plyr",
+      "url": "https://plyr.io/"
+    }
+  ]
+}

@@ -1,40 +1,16 @@
+use crate::entity::error::Error;
+use crate::entity::request::{SetupRequest, UpdateSiteRequest};
+use crate::entity::response::AppNeedUpdateResponse;
 use crate::entity::site::{Site, SiteBriefResponse, SiteFullResponse};
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthAdmin;
-use crate::service::error::Error;
 use crate::service::token::AccessToken;
 use crate::util::{self, constants::APP_VERSION_URL, file_system};
-use rocket::serde::{json::Json, Deserialize, Serialize};
+use rocket::serde::json::Json;
 use rocket::{Either, Route, State};
 use sqlx::Connection;
 use std::path::PathBuf;
-
-#[derive(Deserialize, Debug)]
-#[serde(crate = "rocket::serde")]
-pub struct SetupRequest {
-    pub sitename: String,
-    pub username: String,
-    pub password: String,
-    pub storage: String,
-    pub language: String,
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(crate = "rocket::serde")]
-pub struct UpdateSiteRequest {
-    pub sitename: String,
-    pub storage: String,
-    pub language: String,
-    pub update_freq: String,
-}
-
-#[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
-pub struct UpdateNeedResponse {
-    pub need: bool,
-    pub url: String,
-}
 
 pub fn route() -> Vec<Route> {
     routes![
@@ -180,7 +156,7 @@ async fn update_site(
 async fn check_need_update(
     state: &State<AppState>,
     _admin: AuthAdmin,
-) -> Result<Json<UpdateNeedResponse>, Error> {
+) -> Result<Json<AppNeedUpdateResponse>, Error> {
     let mut conn = state.get_pool_conn().await?;
     let mut site = Site::read(&mut conn).await?.unwrap();
     let need = site.check_update_need();
@@ -192,5 +168,5 @@ async fn check_need_update(
 
     let url = APP_VERSION_URL.to_owned();
 
-    Ok(Json(UpdateNeedResponse { need, url }))
+    Ok(Json(AppNeedUpdateResponse { need, url }))
 }

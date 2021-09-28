@@ -5,7 +5,6 @@ mod entity;
 mod service;
 mod util;
 use entity::site::Site;
-use local_ip_address;
 use rocket::fs::FileServer;
 use service::app_state::AppState;
 use service::fairings::StaticFileCache;

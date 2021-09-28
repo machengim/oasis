@@ -1,4 +1,4 @@
-use rocket::http::Status;
+use rocket::http::{ContentType, Status};
 use rocket::request::Request;
 use rocket::response::{self, Responder, Response};
 use std::cmp::min;
@@ -28,6 +28,34 @@ impl Range {
     }
 }
 
+impl<'r, 'o: 'r> Responder<'r, 'o> for RangedFile {
+    fn respond_to(self, req: &'r Request<'_>) -> response::Result<'o> {
+        let path = self.path;
+        let (mut file, size) = match read_file_meta(&path) {
+            Ok((file, size)) => (file, size),
+            Err(_) => return Err(Status::InternalServerError),
+        };
+        let content_type = get_content_type(&path);
+        let range_header = req.headers().get_one("Range");
+        let (start, end) = get_range_length(size, range_header);
+        let len = end - start + 1;
+
+        let (contents, content_range) = match get_header_contents(start, end, size, &mut file) {
+            Ok((v, l)) => (v, l),
+            Err(_) => return Err(Status::InternalServerError),
+        };
+
+        Response::build()
+            .status(Status::PartialContent)
+            .header(content_type)
+            .raw_header("Content-Range", content_range)
+            .raw_header("Content-Length", len.to_string())
+            .raw_header("Cache-Control", "private, max-age=3600")
+            .sized_body(len as usize, Cursor::new(contents))
+            .ok()
+    }
+}
+
 fn parse_range_str(input: Option<&&str>) -> Option<u64> {
     let str_value = match input {
         Some(v) => v,
@@ -40,35 +68,6 @@ fn parse_range_str(input: Option<&&str>) -> Option<u64> {
     };
 
     Some(number)
-}
-
-impl<'r, 'o: 'r> Responder<'r, 'o> for RangedFile {
-    fn respond_to(self, req: &'r Request<'_>) -> response::Result<'o> {
-        let path = self.path;
-        let (mut file, size) = match read_file_meta(&path) {
-            Ok((file, size)) => (file, size),
-            Err(_) => return Err(Status::InternalServerError),
-        };
-        let file_type = read_file_ext(&path);
-
-        let range_header = req.headers().get_one("Range");
-        let (start, end) = get_range_length(size, range_header);
-        let len = end - start + 1;
-
-        let (contents, content_range) = match get_header_contents(start, end, size, &mut file) {
-            Ok((v, l)) => (v, l),
-            Err(_) => return Err(Status::InternalServerError),
-        };
-
-        Response::build()
-            .status(Status::PartialContent)
-            .raw_header("Content-Type", file_type)
-            .raw_header("Content-Range", content_range)
-            .raw_header("Content-Length", len.to_string())
-            .raw_header("Cache-Control", "private, max-age=3600")
-            .sized_body(len as usize, Cursor::new(contents))
-            .ok()
-    }
 }
 
 fn get_header_contents(
@@ -128,20 +127,16 @@ fn read_file_meta(path: &PathBuf) -> anyhow::Result<(File, u64)> {
     Ok((file, size))
 }
 
-fn read_file_ext(path: &PathBuf) -> &'static str {
+fn get_content_type(path: &PathBuf) -> ContentType {
     if let Some(ext) = path.extension() {
-        match ext.to_str().unwrap_or("") {
-            "mp4" | "mkv" | "avi" => return "video/mp4",
-            "mp3" => return "audio/mpeg",
-            "png" => return "image/png",
-            "jpg" | "jpeg" => return "image/jpeg",
-            "txt" | "css" | "js" => return "text/plain",
-            "htm" | "html" => return "text/html",
-            _ => (),
+        if let Some(ext_str) = ext.to_str() {
+            if let Some(content_type) = ContentType::from_extension(ext_str) {
+                return content_type;
+            }
         }
     }
 
-    "unknown"
+    ContentType::Binary
 }
 
 fn read_file_bytes(file: &mut File, start: u64, size: usize) -> anyhow::Result<Vec<u8>> {

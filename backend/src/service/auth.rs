@@ -1,4 +1,5 @@
-use super::{app_state::AppState, error::Error, token::AccessToken, token::Token};
+use super::{app_state::AppState, token::AccessToken, token::Token};
+use crate::entity::error::Error;
 use crate::util::constants::ACCESS_TOKEN;
 use rocket::{
     http::Status,

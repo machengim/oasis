@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { t } from "svelte-i18n";
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
@@ -11,35 +10,14 @@
   import { setNotification, siteStore } from "../utils/store";
   import * as api from "../utils/api";
   import { compareVersion } from "../utils/util";
+  import * as constants from "../assets/constants.json";
 
   export let onClose: () => void;
   export let setUpdateInfo: (info: IUpdateAppInfo) => void;
   let isLoading = false;
-  let website: ILink = null;
-  let repo: ILink = null;
-  let links: Array<ILink> = [];
-
-  onMount(() => initLinks());
-
-  const initLinks = () => {
-    website = {
-      name: "chengma.dev/oasis",
-      url: "https://chengma.dev/oasis",
-    };
-
-    repo = {
-      name: "Github repo",
-      url: "https://github.com/machengim/oasis",
-    };
-
-    links = [
-      { name: "Svelte", url: "https://svelte.dev" },
-      { name: "Rocket", url: "https://rocket.rs" },
-      { name: "Tailwind", url: "https://tailwindcss.com/" },
-      { name: "PDFjs", url: "https://mozilla.github.io/pdf.js/" },
-      { name: "Plyr", url: "https://plyr.io/" },
-    ];
-  };
+  let website: ILink = constants.website;
+  let repo: ILink = constants.repo;
+  let links: Array<ILink> = constants.links;
 
   const checkUpdate = async () => {
     try {
@@ -53,7 +31,7 @@
       }
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot get update info");
+      setNotification("error", $t("message.error.get_update_info_error"));
     }
 
     return false;

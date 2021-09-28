@@ -1,12 +1,14 @@
+use crate::entity::error::Error;
 use crate::entity::file::{File, FileType};
+use crate::entity::request::GenerateLinkRequest;
+use crate::entity::response::FileResponse;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
-use crate::service::error::Error;
 use crate::service::range::RangedFile;
 use crate::service::track;
 use crate::util::{self, file_system};
 use rocket::fs::NamedFile;
-use rocket::serde::{json::Json, Deserialize};
+use rocket::serde::json::Json;
 use rocket::tokio::fs;
 use rocket::{Route, State};
 use std::path::PathBuf;
@@ -19,20 +21,6 @@ pub fn route() -> Vec<Route> {
         generate_share_link,
         get_share_link
     ]
-}
-
-#[derive(Responder)]
-pub enum FileResponse {
-    Range(RangedFile),
-    Binary(NamedFile),
-    Text(String),
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(crate = "rocket::serde")]
-pub struct GenerateLinkRequest {
-    pub path: String,
-    pub expire: i64,
 }
 
 #[get("/dir?<path>")]
@@ -88,7 +76,7 @@ async fn file_content(
 }
 
 // Temporary solution for track file searching.
-// Could remove this function to front end.
+// Could remove this function in the future.
 #[get("/file/track/<path>")]
 async fn video_track(
     path: &str,

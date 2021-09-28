@@ -1,6 +1,5 @@
 pub mod app_state;
 pub mod auth;
-pub mod error;
 pub mod fairings;
 pub mod migrate_dir;
 pub mod range;

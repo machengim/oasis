@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
+  import { t } from "svelte-i18n";
   import { notificationStore } from "../utils/store";
   import { EIconType, EIconColor } from "../utils/types";
   import type { INotification } from "../utils/types";
-  import { upperFirstChar } from "../utils/util";
   import Icon from "../components/Icon.svelte";
 
   let notifications: INotification[] = [];
@@ -85,7 +85,7 @@
 </script>
 
 {#if isShowNotification}
-  <div class="absolute right-6 top-20 w-64 overflow-x-hidden z-50">
+  <div class="absolute right-6 top-20 w-60 lg:w-80 overflow-x-hidden z-50">
     <div class={buildStyle()}>
       <div class="flex flex-row items-center">
         <div class="mr-2">
@@ -95,7 +95,9 @@
           />
         </div>
         <div class="flex flex-col">
-          <div class="text-gray-700 font-bold">{upperFirstChar(type)}</div>
+          <div class="text-gray-700 font-bold">
+            {$t("message.type." + type)}
+          </div>
           <div class="text-sm">{msg}</div>
         </div>
       </div>

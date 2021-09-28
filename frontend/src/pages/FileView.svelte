@@ -93,7 +93,7 @@
       filesStore.set(files);
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot read directory");
+      setNotification("error", $t("message.error.read_dir_error"));
     }
 
     isLoading = false;

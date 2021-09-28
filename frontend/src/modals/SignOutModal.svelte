@@ -16,11 +16,12 @@
     try {
       await api.get("/api/user/signout", "raw");
       userStore.set(null);
-      setNotification("success", "Sign out successfully,");
+      setNotification("success", $t("message.sucess.signout"));
       onClose();
       navigate("/login");
     } catch (e) {
       console.error(e);
+      setNotification("error", $t("message.error.signout_fail"));
     }
 
     isLoading = false;

@@ -1,5 +1,5 @@
+use super::request::SetupRequest;
 use crate::{
-    api::sys::SetupRequest,
     args,
     service::token::{AccessToken, RefreshToken},
     util::db,

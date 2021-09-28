@@ -1,8 +1,7 @@
-use super::{app_state::AppState, error::Error};
-use crate::util::{
-    self,
-    constants::{ACCESS_TOKEN, ACCESS_TOKEN_MINS, REFRESH_TOKEN, REFRESH_TOKEN_DAYS},
-};
+use super::app_state::AppState;
+use crate::entity::error::Error;
+use crate::util;
+use crate::util::constants::{ACCESS_TOKEN, ACCESS_TOKEN_MINS, REFRESH_TOKEN, REFRESH_TOKEN_DAYS};
 use anyhow::Result as AnyResult;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use rocket::{

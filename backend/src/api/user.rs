@@ -1,37 +1,16 @@
+use crate::entity::error::Error;
+use crate::entity::request::{ChangePasswordRequest, LoginRequest};
+use crate::entity::response::LoginResponse;
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
-use crate::service::error::Error;
 use crate::service::token::{AccessToken, RefreshToken, Token};
 use crate::util::constants::*;
 use anyhow::Result as AnyResult;
 use rocket::http::{Cookie, CookieJar};
-use rocket::serde::{json::Json, Deserialize, Serialize};
+use rocket::serde::json::Json;
 use rocket::{Route, State};
 use sqlx::Connection;
-
-#[derive(Deserialize, Debug)]
-#[serde(crate = "rocket::serde")]
-pub struct LoginRequest {
-    pub username: String,
-    pub password: String,
-}
-
-#[derive(Deserialize)]
-#[serde(crate = "rocket::serde")]
-pub struct ChangePasswordRequest {
-    pub username: String,
-    pub old_password: String,
-    pub new_password: String,
-}
-
-#[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
-pub struct LoginResponse {
-    pub username: String,
-    pub permission: i8,
-    pub expire: usize,
-}
 
 pub fn route() -> Vec<Route> {
     routes![login, signout, change_password, refresh_access_token]

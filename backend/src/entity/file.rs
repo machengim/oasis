@@ -26,12 +26,12 @@ pub enum FileType {
 impl FileType {
     fn infer_file_type(ext: &str) -> Self {
         match ext.to_lowercase().as_str() {
-            "c" | "cpp" | "js" | "ts" | "rs" | "py" | "java" | "html" | "css" => Self::Code,
+            "c" | "cpp" | "js" | "ts" | "rs" | "py" | "java" | "html" | "css" | "sh" => Self::Code,
             "jpg" | "jpeg" | "gif" | "png" => Self::Image,
-            "mp3" | "flac" | "aac" | "ogg" => Self::Music,
+            "mp3" | "flac" | "aac" | "ogg" | "wav" => Self::Music,
             "pdf" => Self::Pdf,
             "mp4" | "mov" | "avi" | "mkv" | "webm" | "flv" => Self::Video,
-            "txt" | "md" | "srt" | "vtt" | "json" => Self::Text,
+            "txt" | "md" | "srt" | "vtt" | "json" | "yml" | "ini" | "conf" => Self::Text,
             _ => Self::Unknown,
         }
     }

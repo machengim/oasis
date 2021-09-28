@@ -88,7 +88,7 @@
   },
   "modal": {
     "about": {
-      "title": "关于 Oasis",
+      "title": "关于",
       "version": "版本",
       "website": "网站",
       "repo": "代码",
@@ -96,7 +96,7 @@
     },
     "shutdown": {
       "title": "关闭服务",
-      "notice": "确定要关闭服务器?"
+      "notice": "确定要关闭服务?"
     },
     "signout": {
       "title": "退出登录",
@@ -116,9 +116,33 @@
     }
   },
   "message": {
+    "type": {
+      "success": "成功",
+      "error": "错误"
+    },
+    "success": {
+      "goodbye": "Goodbye!",
+      "signout": "Sign out successfully",
+      "login": "Login successfully",
+      "update_password": "Update password successfully",
+      "update_site": "Update site config successfully",
+      "launch": "Launched successfully"
+    },
     "error": {
       "no_storage": "请选择存储位置",
-      "miss_password": "请输入新旧密码以修改"
+      "miss_password": "请输入新旧密码以修改",
+      "read_site_error": "Cannot read site info",
+      "get_update_info_error": "Cannot get update info",
+      "shutdown_error": "Shutdown server failed",
+      "signout_fail": "Error when signing out",
+      "read_volume_error": "Cannot read volumes",
+      "read_dir_error": "Cannot read directory",
+      "read_file_error": "Cannot read file content",
+      "login_fail": "Login failed",
+      "username_exist": "Username existed",
+      "update_password_fail": "Update password failed",
+      "update_site_fail": "Update site config failed",
+      "launch_fail": "Launch failed"
     }
   }
 }

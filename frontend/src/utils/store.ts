@@ -1,11 +1,12 @@
 import { get, Writable, writable } from 'svelte/store';
 import type { IFile, INotification, ELoopMethod, ISiteFull, IUser } from './types';
+import * as constants from '../assets/constants.json';
 
 export const siteStore: Writable<ISiteFull> = writable(null);
 
 export function getSitename() {
     let site = get(siteStore);
-    return (site && site.name) || "Oasis";
+    return (site && site.name) || constants.app_name;
 }
 
 export function getLang() {

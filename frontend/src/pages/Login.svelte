@@ -38,11 +38,11 @@
     try {
       const user: IUser = await api.post("/api/login", payload, true);
       userStore.set(user);
-      setNotification("success", "Login successfully");
+      setNotification("success", $t("message.success.login"));
       navigate("/files");
     } catch (e) {
       console.error(e);
-      setNotification("error", "Login failed");
+      setNotification("error", $t("message.error.login_fail"));
     }
     isLoading = false;
   };

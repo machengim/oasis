@@ -75,13 +75,13 @@
     try {
       await api.post("/api/sys/setup", payload, false);
       updateSiteStore();
-      setNotification("success", "Launched successfully.");
+      setNotification("success", $t("message.success.launch"));
     } catch (e) {
       console.error(e);
       if (e.message === "409") {
-        setNotification("error", "Username existed.");
+        setNotification("error", $t("message.success.username_exist"));
       } else {
-        setNotification("error", "Launch failed");
+        setNotification("error", $t("message.success.launch_fail"));
       }
       return false;
     }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { Router, Route } from "svelte-navigator";
-  import { init, locale } from "svelte-i18n";
+  import { init, locale, t } from "svelte-i18n";
   import Tailwind from "./components/Tailwind.svelte";
   import "./i18n";
   import Notification from "./sections/Notification.svelte";
@@ -77,7 +77,7 @@
       }
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot read site info");
+      setNotification("error", $t("message.error.read_site_error"));
     }
 
     isLoading = false;
@@ -106,7 +106,7 @@
       }
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot get update info");
+      setNotification("error", $t("message.error.get_update_info_error"));
     }
 
     return false;

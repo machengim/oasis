@@ -1,5 +1,5 @@
 import { getLocaleFromNavigator } from 'svelte-i18n';
-import { FileType, IFile, IFileOrder, IUser } from './types';
+import { FileType, IFile, IFileOrder } from './types';
 
 export function upperFirstChar(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
@@ -64,6 +64,7 @@ export function inferFileType(ext: string) {
     case "java":
     case "html":
     case "css":
+    case "sh":
       return FileType.Code;
     case "png":
     case "gif":
@@ -74,6 +75,7 @@ export function inferFileType(ext: string) {
     case "ogg":
     case "flac":
     case "aac":
+    case "wav":
       return FileType.Music;
     case "mp4":
     case "webm":
@@ -89,6 +91,9 @@ export function inferFileType(ext: string) {
     case "vtt":
     case "md":
     case "json":
+    case "yml":
+    case "ini":
+    case "conf":
       return FileType.Text;
     default:
       return FileType.Unknown;

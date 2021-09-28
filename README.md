@@ -9,11 +9,11 @@ Minimalized file hosting and sharing app.
 + [x] Mobile compatibility
 + [x] Temporary sharing link
 + [x] Loop file list
-+ [x] Multiple platform support (Linux, MacOS, Windows, ..)
++ [x] Multiple platform support
 + [x] I18n (English, Chinese)
-+ [] Custom media player
-+ [] Multiple users management
-+ [] HTTPS
++ [ ] Custom media player
++ [ ] Multiple users management
++ [ ] HTTPS
 
 
 ### File format support
@@ -24,6 +24,6 @@ Minimalized file hosting and sharing app.
 + [x] Video (depend on browser)
 + [x] Subtitle (srt / vtt)
 + [x] PDF (supported by pdf.js)
-+ [] Docx
-+ [] Mobi
++ [ ] Docx
++ [ ] Mobi
 

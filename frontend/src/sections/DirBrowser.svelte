@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
+  import { t } from "svelte-i18n";
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
@@ -24,7 +24,7 @@
       volumes = await api.get("/api/sys/volumes");
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot read volumes");
+      setNotification("error", $t("message.error.read_volume_error"));
     }
     isLoading = false;
   });
@@ -55,7 +55,7 @@
       back = false;
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot read directory");
+      setNotification("error", $t("message.error.read_dir_error"));
     } finally {
       isLoading = false;
     }

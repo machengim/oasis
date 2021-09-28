@@ -96,7 +96,7 @@
     },
     "shutdown": {
       "title": "Shutdown",
-      "notice": "Are you sure you want to shutdown the server?"
+      "notice": "Are you sure you want to shutdown the service?"
     },
     "signout": {
       "title": "Sign out",
@@ -116,9 +116,33 @@
     }
   },
   "message": {
+    "type": {
+      "success": "Success",
+      "error": "Error"
+    },
+    "success": {
+      "goodbye": "Goodbye!",
+      "signout": "Sign out successfully",
+      "login": "Login successfully",
+      "update_password": "Update password successfully",
+      "update_site": "Update site config successfully",
+      "launch": "Launched successfully"
+    },
     "error": {
       "no_storage": "Please choose a storage",
-      "miss_password": "Please fill in both fields to change password"
+      "miss_password": "Please fill in both fields to change password",
+      "read_site_error": "Cannot read site info",
+      "get_update_info_error": "Cannot get update info",
+      "shutdown_error": "Shutdown server failed",
+      "signout_fail": "Error when signing out",
+      "read_volume_error": "Cannot read volumes",
+      "read_dir_error": "Cannot read directory",
+      "read_file_error": "Cannot read file content",
+      "login_fail": "Login failed",
+      "username_exist": "Username existed",
+      "update_password_fail": "Update password failed",
+      "update_site_fail": "Update site config failed",
+      "launch_fail": "Launch failed"
     }
   }
 }

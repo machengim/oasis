@@ -35,11 +35,11 @@
     isLoading = true;
     try {
       await sendChangePasswordRequest();
-      setNotification("success", "Update password successfully");
+      setNotification("success", $t("message.success.update_password"));
       navigate("/login");
     } catch (e) {
       console.error(e);
-      setNotification("error", "Update password failed");
+      setNotification("error", $t("message.success.update_password_fail"));
     }
 
     isLoading = false;

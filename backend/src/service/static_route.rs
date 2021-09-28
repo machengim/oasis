@@ -1,5 +1,5 @@
-use super::error::Error;
 use super::token::AccessToken;
+use crate::entity::error::Error;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
 use crate::util;

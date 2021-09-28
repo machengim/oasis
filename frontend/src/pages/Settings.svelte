@@ -55,7 +55,7 @@
       siteStore.set(site);
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot read site info");
+      setNotification("error", $t("message.error.read_site_error"));
     }
 
     isLoading = false;
@@ -71,10 +71,11 @@
     isLoading = true;
     try {
       await sendUpdateConfigRequest();
+      setNotification("success", $t("message.success.update_site"));
       navigate("/");
     } catch (e) {
       console.error(e);
-      setNotification("error", "Cannot update config");
+      setNotification("error", $t("message.success.update_site_fail"));
     }
 
     isLoading = false;
