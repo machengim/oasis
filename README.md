@@ -31,11 +31,11 @@ Minimalized file hosting and sharing app.
 
 ### Tech stack
 
-+ [https://svelte.dev](Svelte)
-+ [https://rocket.rs](Rocket)
-+ [https://tailwindcss.com](Tailwind)
-+ [https://mozilla.github.io/pdf.js](Pdf.js)
-+ [https://plyr.io](Plyr)
++ [Svelte](https://svelte.dev)
++ [Rocket](https://rocket.rs)
++ [Tailwind](https://tailwindcss.com)
++ [Pdf.js](https://mozilla.github.io/pdf.js)
++ [Plyr](https://plyr.io)
 
 ### Build requirements
 
