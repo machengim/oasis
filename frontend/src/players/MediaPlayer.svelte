@@ -17,9 +17,7 @@
     player = initPlayer();
 
     player.on("ready", (_) => {
-      if ($loopStore) {
-        player.play();
-      }
+      player.play();
     });
 
     player.on("ended", (_) => {
@@ -120,7 +118,7 @@
     </video>
   {:else}
     <div
-      class="mt-4 xl:mt-36 xl:w-2/3 mx-auto p-2 border-2 rounded border-blue-400 shadow"
+      class="mt-4 lg:mt-36 lg:w-2/3 mx-auto p-2 border-2 rounded border-blue-400 shadow"
     >
       <audio class="player" controls>
         <source type="audio/mp3" />

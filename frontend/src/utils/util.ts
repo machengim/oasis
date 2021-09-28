@@ -140,3 +140,24 @@ export function getLocale() {
 
   return browserLocale.startsWith("cn") ? "cn" : "en";
 }
+
+export function compareVersion(v1: string, v2: string) {
+  const parts1 = v1.split(".").map(p => +p);
+  const parts2 = v2.split(".").map(p => +p);
+
+  for (let i = 0; i < Math.min(parts1.length, parts2.length); i++) {
+    if (parts1[i] > parts2[i]) {
+      return 1;
+    } else if (parts1[i] < parts2[i]) {
+      return -1;
+    }
+  }
+
+  if (parts1.length > parts2.length) {
+    return 1;
+  } else if (parts1.length < parts2.length) {
+    return -1;
+  }
+
+  return 0;
+}

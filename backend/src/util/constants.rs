@@ -9,3 +9,4 @@ pub const REFRESH_TOKEN: &'static str = "oa_refresh";
 pub const REFRESH_TOKEN_DAYS: i64 = 7;
 pub const DEFAULT_UPDATE_FREQ: &'static str = "monthly";
 pub const CACHE_MAX_AGE: i64 = 24 * 60 * 60;
+pub const APP_UPDATE_INFO: &'static str = "https://machengim.github.io/version.txt";

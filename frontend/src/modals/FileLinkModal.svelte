@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { t } from "svelte-i18n";
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
@@ -14,9 +14,10 @@
   let link: string;
   let copied = false;
   let isLoading = false;
+  let timeout: NodeJS.Timeout;
 
   $: if (copied) {
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       copied = false;
       clearSelection();
     }, 2000);
@@ -24,6 +25,11 @@
 
   onMount(() => {
     requestShareLink();
+  });
+
+  onDestroy(() => {
+    clearSelection();
+    timeout = null;
   });
 
   $: if (link && textarea) {

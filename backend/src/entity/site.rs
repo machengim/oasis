@@ -111,6 +111,20 @@ impl Site {
 
         Ok(db::execute(query, tx).await?)
     }
+
+    pub fn check_update_need(&self) -> bool {
+        let day_seconds = 24 * 60 * 60;
+        let interval = match self.update_freq.to_lowercase().as_str() {
+            "daily" => day_seconds,
+            "weekly" => 7 * day_seconds,
+            "monthly" => 30 * day_seconds,
+            _ => return false,
+        };
+
+        let current_timestamp = util::get_utc_seconds();
+
+        current_timestamp - self.updated_at > interval
+    }
 }
 
 impl From<Site> for SiteBriefResponse {

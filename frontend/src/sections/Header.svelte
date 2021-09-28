@@ -5,16 +5,20 @@
   import Icon from "../components/Icon.svelte";
   import Title from "./Title.svelte";
   import { EIconType } from "../utils/types";
+  import type { IUpdateAppInfo } from "../utils/types";
   import SignOutModal from "../modals/SignOutModal.svelte";
   import ShutdownModal from "../modals/ShutdownModal.svelte";
   import AboutModal from "../modals/AboutModal.svelte";
+  import UpdateModal from "../modals/UpdateModal.svelte";
 
   let sitename = getSitename();
   let section: string;
+  let updateInfo: IUpdateAppInfo;
   let showMenu = false;
   let showSignOutModal = false;
   let showShutdownModal = false;
   let showAboutModal = false;
+  let showUpdateModal = false;
 
   const unsubscribeSection = sectionStore.subscribe((newSection) => {
     if (newSection) section = newSection;
@@ -35,6 +39,11 @@
     document.addEventListener("click", closeAvatarMenu, false);
   } else {
     document.removeEventListener("click", closeAvatarMenu);
+  }
+
+  $: if (updateInfo) {
+    showAboutModal = false;
+    showUpdateModal = true;
   }
 
   const openAvatarMenu = (e: Event) => {
@@ -74,6 +83,14 @@
   const closeAboutModal = () => {
     showAboutModal = false;
   };
+
+  const setUpdateInfo = (info: IUpdateAppInfo) => {
+    updateInfo = info;
+  };
+
+  const closeUpdateModal = () => {
+    showUpdateModal = false;
+  };
 </script>
 
 {#if showSignOutModal}
@@ -83,7 +100,10 @@
   <ShutdownModal onClose={clostShutdownModal} />
 {/if}
 {#if showAboutModal}
-  <AboutModal onClose={closeAboutModal} />
+  <AboutModal onClose={closeAboutModal} {setUpdateInfo} />
+{/if}
+{#if showUpdateModal}
+  <UpdateModal onClose={closeUpdateModal} {updateInfo} />
 {/if}
 <div class="w-full h-14 bg-gray-50 shadow">
   <div

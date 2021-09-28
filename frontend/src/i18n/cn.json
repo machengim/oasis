@@ -31,7 +31,8 @@
     "check_update": "检查更新",
     "check_updating": "检查中...",
     "copy_link": "复制链接",
-    "link_copied": "链接已复制"
+    "link_copied": "链接已复制",
+    "open_download": "打开下载页面"
   },
   "filetype": {
     "Code": "代码",
@@ -106,6 +107,12 @@
       "file": "文件",
       "valid_period": "有效期",
       "hours": "小时"
+    },
+    "update_app": {
+      "title": "新版本发现",
+      "version": "版本",
+      "description": "描述",
+      "url": "下载链接"
     }
   },
   "message": {

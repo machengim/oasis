@@ -31,7 +31,8 @@
     "check_update": "Check update",
     "check_updating": "Checking...",
     "copy_link": "Copy link",
-    "link_copied": "Link copied"
+    "link_copied": "Link copied",
+    "open_download": "Open download page"
   },
   "filetype": {
     "Code": "Code",
@@ -106,6 +107,12 @@
       "file": "File",
       "valid_period": "Valid period",
       "hours": "hours"
+    },
+    "update_app": {
+      "title": "New version found",
+      "version": "Version",
+      "description": "Description",
+      "url": "Download url"
     }
   },
   "message": {

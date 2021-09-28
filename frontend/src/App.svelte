@@ -13,14 +13,21 @@
   import Settings from "./pages/Settings.svelte";
   import Profile from "./pages/Profile.svelte";
   import * as api from "./utils/api";
-  import type { ISiteBrief } from "./utils/types";
+  import type {
+    ISiteBrief,
+    IUpdateAppNeedRespose,
+    IUpdateAppInfo,
+  } from "./utils/types";
   import Spinner from "./components/Spinner.svelte";
   import { siteStore, setNotification, userStore } from "./utils/store";
-  import { getLocale } from "./utils/util";
+  import { compareVersion, getLocale } from "./utils/util";
+  import UpdateModal from "./modals/UpdateModal.svelte";
 
-  let isLoading = true;
   let language = "";
   let sitename = "";
+  let isLoading = true;
+  let showUpdateModal = false;
+  let updateInfo: IUpdateAppInfo;
 
   const unsubscribeSite = siteStore.subscribe((site) => {
     if (site) {
@@ -29,10 +36,17 @@
     }
   });
 
+  const unsubscribeUser = userStore.subscribe((user) => {
+    if (user && user.permission === 9) {
+      checkUpdate();
+    }
+  });
+
   onMount(() => initApp());
 
   onDestroy(() => {
     unsubscribeSite();
+    unsubscribeUser();
   });
 
   $: if (language) {
@@ -41,6 +55,10 @@
 
   $: document.title = sitename;
 
+  $: if (updateInfo) {
+    processUpdateInfo();
+  }
+
   const initApp = async () => {
     init({
       fallbackLocale: "en",
@@ -48,41 +66,58 @@
     });
 
     try {
-      const siteReq = api.get("/api/sys/config?mode=brief", "json");
+      const siteReq: Promise<ISiteBrief> = api.get(
+        "/api/sys/config?mode=brief"
+      );
       const tokenReq = api.refresh_token();
-      Promise.all([siteReq, tokenReq]).then((values: [ISiteBrief, void]) => {
-        const site = values[0];
-        if (site) {
-          siteStore.set({ ...site, storage: "" });
-        }
-      });
+      const values: [ISiteBrief, void] = await Promise.all([siteReq, tokenReq]);
+      const site = values[0];
+      if (site) {
+        siteStore.set({ ...site, storage: "" });
+      }
     } catch (e) {
       console.error(e);
       setNotification("error", "Cannot read site info");
     }
 
-    await api.refresh_token();
     isLoading = false;
 
     // Check if need to refresh token every 2 mins
-    // Condition is no user in store or the token is almost expired (5 mins)
+    // Condition is user in store and the token is almost expired (5 mins)
     setInterval(async () => {
-      if (needRefresh()) {
+      if (needRefreshToken()) {
         await api.refresh_token();
       }
     }, 1000 * 120);
+  };
 
-    const needRefresh = (): boolean => {
-      let user = $userStore;
-      if (!user) return true;
+  const needRefreshToken = (): boolean => {
+    if (!$userStore) return false;
 
-      let currentTimeUtc = new Date().getTime();
-      if (user.expire - currentTimeUtc <= 300) {
-        return true;
+    let currentTime = new Date().getTime();
+    return $userStore.expire - currentTime <= 300;
+  };
+
+  const checkUpdate = async () => {
+    try {
+      const response: IUpdateAppNeedRespose = await api.get("/api/sys/update");
+      if (response.need) {
+        updateInfo = await api.get(response.url);
       }
+    } catch (e) {
+      console.error(e);
+      setNotification("error", "Cannot get update info");
+    }
 
-      return false;
-    };
+    return false;
+  };
+
+  const processUpdateInfo = async () => {
+    const site = $siteStore;
+    if (!site || !updateInfo) return;
+    if (compareVersion(updateInfo.version, site.version) > 0) {
+      showUpdateModal = true;
+    }
   };
 </script>
 
@@ -94,6 +129,9 @@
       <Header />
       <Notification />
 
+      {#if showUpdateModal}
+        <UpdateModal onClose={() => (showUpdateModal = false)} {updateInfo} />
+      {/if}
       <Route path="/login" component={Login} />
       <Route path="/setup" component={Setup} />
       <Route path="/files" component={Files} primary={false} />

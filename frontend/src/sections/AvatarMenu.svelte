@@ -48,13 +48,13 @@
     >
       {$t("component.avatar_menu.settings")}
     </div>
+    <hr />
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={() => onOpenModal("about")}
     >
       {$t("component.avatar_menu.about")}
     </div>
-    <hr />
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={() => onOpenModal("shutdown")}

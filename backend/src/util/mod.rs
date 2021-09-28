@@ -47,6 +47,10 @@ pub fn sha256(input: &str, secret: &str) -> String {
     format!("{:X}", &result)
 }
 
+pub fn get_utc_seconds() -> i64 {
+    chrono::Utc::now().timestamp()
+}
+
 #[cfg(debug_assertions)]
 pub fn get_front_dir_constant() -> String {
     constants::FRONTEND_DIR_DEBUG.to_string()

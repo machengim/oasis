@@ -3,9 +3,17 @@
   import { t } from "svelte-i18n";
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
-  import type { ILink } from "../utils/types";
+  import type {
+    ILink,
+    IUpdateAppNeedRespose,
+    IUpdateAppInfo,
+  } from "../utils/types";
+  import { setNotification, siteStore } from "../utils/store";
+  import * as api from "../utils/api";
+  import { compareVersion } from "../utils/util";
 
   export let onClose: () => void;
+  export let setUpdateInfo: (info: IUpdateAppInfo) => void;
   let isLoading = false;
   let website: ILink = null;
   let repo: ILink = null;
@@ -33,7 +41,23 @@
     ];
   };
 
-  const checkUpdate = () => {};
+  const checkUpdate = async () => {
+    try {
+      const response: IUpdateAppNeedRespose = await api.get("/api/sys/update");
+      const updateInfo: IUpdateAppInfo = await api.get(response.url);
+      if (
+        $siteStore &&
+        compareVersion(updateInfo.version, $siteStore.version)
+      ) {
+        setUpdateInfo(updateInfo);
+      }
+    } catch (e) {
+      console.error(e);
+      setNotification("error", "Cannot get update info");
+    }
+
+    return false;
+  };
 </script>
 
 <Modal {onClose} title={$t("modal.about.title")}>

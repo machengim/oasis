@@ -17,10 +17,27 @@ export interface ILoginRequest {
 }
 
 export interface IUpdateConfigRequest {
-  sitename: string,
+  sitename: string;
   language: string;
   storage: string;
   update_freq: string;
+}
+
+export interface IUpdateAppNeedRespose {
+  need: boolean;
+  url: string;
+}
+
+export interface IUpdateAppInfo {
+  version: string;
+  descriptions: Array<IUpdateDescription>;
+  changelog: string;
+  url: string;
+}
+
+export interface IUpdateDescription {
+  lang: string;
+  detail: string;
 }
 
 export interface IChangePasswordRequest {

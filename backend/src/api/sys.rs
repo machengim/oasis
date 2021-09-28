@@ -1,10 +1,11 @@
 use crate::entity::site::{Site, SiteBriefResponse, SiteFullResponse};
 use crate::entity::user::User;
 use crate::service::app_state::AppState;
+use crate::service::auth::AuthAdmin;
 use crate::service::error::Error;
 use crate::service::token::AccessToken;
-use crate::util::{self, file_system};
-use rocket::serde::{json::Json, Deserialize};
+use crate::util::{self, constants, file_system};
+use rocket::serde::{json::Json, Deserialize, Serialize};
 use rocket::{Either, Route, State};
 use sqlx::Connection;
 use std::path::PathBuf;
@@ -28,8 +29,22 @@ pub struct UpdateSiteRequest {
     pub update_freq: String,
 }
 
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+pub struct UpdateNeedResponse {
+    pub need: bool,
+    pub url: Option<String>,
+}
+
 pub fn route() -> Vec<Route> {
-    routes![system_dirs, sys_volumes, setup, config, update_site]
+    routes![
+        system_dirs,
+        sys_volumes,
+        setup,
+        config,
+        update_site,
+        check_need_update
+    ]
 }
 
 #[post("/sys/setup", data = "<req_body>")]
@@ -49,7 +64,7 @@ async fn setup(state: &State<AppState>, req_body: Json<SetupRequest>) -> Result<
         return Err(Error::BadRequest);
     }
 
-    let current_timestamp = chrono::Utc::now().timestamp_millis();
+    let current_timestamp = util::get_utc_seconds();
     let mut conn = state.get_pool_conn().await?;
     let mut tx = conn.begin().await?;
 
@@ -159,4 +174,26 @@ async fn update_site(
     state.set_site(site)?;
 
     Ok(())
+}
+
+#[get("/sys/update")]
+async fn check_need_update(
+    state: &State<AppState>,
+    _admin: AuthAdmin,
+) -> Result<Json<UpdateNeedResponse>, Error> {
+    let mut conn = state.get_pool_conn().await?;
+    let mut site = Site::read(&mut conn).await?.unwrap();
+    let need = site.check_update_need();
+
+    site.updated_at = util::get_utc_seconds();
+    let mut tx = conn.begin().await?;
+    site.update(&mut tx).await?;
+    tx.commit().await?;
+
+    let url = match need {
+        true => Some(constants::APP_UPDATE_INFO.to_owned()),
+        false => None,
+    };
+
+    Ok(Json(UpdateNeedResponse { need, url }))
 }

@@ -1,5 +1,8 @@
 use super::{app_state::AppState, error::Error};
-use crate::util::constants::{ACCESS_TOKEN, ACCESS_TOKEN_MINS, REFRESH_TOKEN, REFRESH_TOKEN_DAYS};
+use crate::util::{
+    self,
+    constants::{ACCESS_TOKEN, ACCESS_TOKEN_MINS, REFRESH_TOKEN, REFRESH_TOKEN_DAYS},
+};
 use anyhow::Result as AnyResult;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use rocket::{
@@ -50,7 +53,7 @@ impl Token for AccessToken {}
 
 impl AccessToken {
     pub fn new(uid: i64, permission: i8) -> Self {
-        let expire_time = chrono::Utc::now().timestamp() + ACCESS_TOKEN_MINS * 60;
+        let expire_time = util::get_utc_seconds() + ACCESS_TOKEN_MINS * 60;
 
         AccessToken {
             exp: expire_time as usize,
@@ -90,7 +93,7 @@ impl Token for RefreshToken {}
 
 impl RefreshToken {
     pub fn new(uid: i64) -> Self {
-        let expire_time = chrono::Utc::now().timestamp() + REFRESH_TOKEN_DAYS * 24 * 60 * 60;
+        let expire_time = util::get_utc_seconds() + REFRESH_TOKEN_DAYS * 24 * 60 * 60;
 
         RefreshToken {
             exp: expire_time as usize,
