@@ -2,6 +2,7 @@ pub mod constants;
 pub mod db;
 pub mod file_system;
 pub mod init;
+pub mod local_ip;
 pub mod rocket_env;
 use anyhow::Result as AnyResult;
 use rand::{distributions::Alphanumeric, Rng};

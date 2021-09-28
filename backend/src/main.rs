@@ -9,7 +9,7 @@ use local_ip_address;
 use rocket::fs::FileServer;
 use service::app_state::AppState;
 use service::fairings::StaticFileCache;
-use util::{init, rocket_env::RocketEnv};
+use util::{init, local_ip, rocket_env::RocketEnv};
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
@@ -32,7 +32,7 @@ async fn main() -> Result<(), anyhow::Error> {
         .ignite()
         .await?;
 
-    let ip = local_ip_address::local_ip()?;
+    let ip = local_ip::get()?;
     println!("Server running on {}:{}", ip, rocket.config().port);
 
     rocket.launch().await?;
