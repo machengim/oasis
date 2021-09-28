@@ -3,7 +3,12 @@
   import { useFocus } from "svelte-navigator";
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification, sectionStore, userStore } from "../utils/store";
+  import {
+    setNotification,
+    sectionStore,
+    userStore,
+    resetTitle,
+  } from "../utils/store";
   import { useNavigate } from "svelte-navigator";
   import { validateForm } from "../utils/util";
   import type { ILoginRequest, IUser } from "../utils/types";
@@ -17,6 +22,7 @@
   let form: HTMLFormElement;
 
   sectionStore.set("login");
+  resetTitle();
 
   const onConfirm = async (e: Event) => {
     e.preventDefault();

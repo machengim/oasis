@@ -12,6 +12,7 @@
     siteStore,
     setNotification,
     sectionStore,
+    resetTitle,
   } from "../utils/store";
 
   const navigate = useNavigate();
@@ -26,6 +27,7 @@
   let isOpenDirBrowser = false;
 
   sectionStore.set("setup");
+  resetTitle();
 
   $: locale.set(language);
 

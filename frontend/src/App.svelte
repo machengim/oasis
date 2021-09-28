@@ -19,7 +19,12 @@
     IUpdateAppInfo,
   } from "./utils/types";
   import Spinner from "./components/Spinner.svelte";
-  import { siteStore, setNotification, userStore } from "./utils/store";
+  import {
+    siteStore,
+    setNotification,
+    userStore,
+    titleStore,
+  } from "./utils/store";
   import { compareVersion, getLocale } from "./utils/util";
   import UpdateModal from "./modals/UpdateModal.svelte";
 
@@ -42,18 +47,25 @@
     }
   });
 
+  const unsubscribeTitle = titleStore.subscribe((title) => {
+    if (title) {
+      document.title = title;
+    }
+  });
+
   onMount(() => initApp());
 
   onDestroy(() => {
     unsubscribeSite();
     unsubscribeUser();
+    unsubscribeTitle;
   });
 
   $: if (language) {
     locale.set(language);
   }
 
-  $: document.title = sitename;
+  // $: document.title = sitename;
 
   $: if (updateInfo) {
     processUpdateInfo();
@@ -75,6 +87,7 @@
       if (site) {
         siteStore.set({ ...site, storage: "" });
       }
+      titleStore.set(site.name);
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.read_site_error"));

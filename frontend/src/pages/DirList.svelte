@@ -1,7 +1,12 @@
 <script lang="ts">
   import { useNavigate } from "svelte-navigator";
   import { t } from "svelte-i18n";
-  import { setNotification, dirsStore, filesStore } from "../utils/store";
+  import {
+    setNotification,
+    dirsStore,
+    filesStore,
+    titleStore,
+  } from "../utils/store";
   import type { IFile, IFileOrder } from "../utils/types";
   import { EIconType } from "../utils/types";
   import * as api from "../utils/api";
@@ -16,6 +21,10 @@
   let files: Array<IFile> = [];
   let order: IFileOrder = { key: "name", asc: true };
   let isLoading = false;
+
+  $: if (dirs.length >= 1) {
+    titleStore.set(dirs[dirs.length - 1]);
+  }
 
   $: fetchDirContent(dirs);
 

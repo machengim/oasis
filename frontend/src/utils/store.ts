@@ -35,3 +35,14 @@ export const dirsStore: Writable<Array<string>> = writable([]);
 export const filesStore: Writable<Array<IFile>> = writable([]);
 
 export const loopStore: Writable<ELoopMethod> = writable(null);
+
+export const titleStore: Writable<string> = writable(null);
+
+export function resetTitle() {
+    const site = get(siteStore);
+    if (site && site.name) {
+        titleStore.set(site.name);
+    } else {
+        titleStore.set(constants.app_name);
+    }
+}

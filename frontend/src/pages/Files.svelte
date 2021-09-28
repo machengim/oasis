@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useLocation } from "svelte-navigator";
-  import { sectionStore } from "../utils/store";
+  import { resetTitle, sectionStore } from "../utils/store";
   import DirList from "./DirList.svelte";
   import FileView from "./FileView.svelte";
 
@@ -9,6 +9,8 @@
   let filename: string;
 
   sectionStore.set("files");
+  resetTitle();
+
   $: if ($location) parseLocation();
 
   const parseLocation = () => {

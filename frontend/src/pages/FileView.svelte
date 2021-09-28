@@ -7,6 +7,7 @@
     filesStore,
     setNotification,
     loopStore,
+    titleStore,
   } from "../utils/store";
   import { EIconColor, ELoopMethod, FileType, EIconType } from "../utils/types";
   import type { IFile, IFileOrder, ILoopIcon } from "../utils/types";
@@ -46,6 +47,7 @@
   });
 
   $: if (filename) {
+    titleStore.set(filename);
     fileType = extractFileType();
     filePath = buildFilePath();
   }

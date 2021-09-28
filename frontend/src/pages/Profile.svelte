@@ -1,7 +1,12 @@
 <script lang="ts">
   import { useNavigate, useFocus } from "svelte-navigator";
   import { t } from "svelte-i18n";
-  import { setNotification, sectionStore, getUsername } from "../utils/store";
+  import {
+    setNotification,
+    sectionStore,
+    getUsername,
+    resetTitle,
+  } from "../utils/store";
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
   import type { IChangePasswordRequest } from "../utils/types";
@@ -16,6 +21,7 @@
   let isMissingPassword = false;
 
   sectionStore.set("profile");
+  resetTitle();
 
   const onConfirm = async (e: Event) => {
     isMissingPassword = false;

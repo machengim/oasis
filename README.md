@@ -11,19 +11,27 @@ Minimalized file hosting and sharing app.
 + [x] Loop file list
 + [x] Multiple platform support
 + [x] I18n (English, Chinese)
-+ [ ] Custom media player
-+ [ ] Multiple users management
-+ [ ] HTTPS
+
 
 
 ### File format support
 
 + [x] Text
-+ [x] Image
-+ [x] Audio (mp3 / flac)
-+ [x] Video (depend on browser)
++ [x] Image (browser support)
++ [x] Audio (browser support)
++ [x] Video (browser support)
 + [x] Subtitle (srt / vtt)
 + [x] PDF (supported by pdf.js)
-+ [ ] Docx
-+ [ ] Mobi
 
+### Roadmap
+
++ [ ] Custom media player
++ [ ] Multiple users management
++ [ ] HTTPS
++ [ ] More file format support
+
+### Build requirements
+
++ Node 14.17
++ Rust 1.54
++ Python3

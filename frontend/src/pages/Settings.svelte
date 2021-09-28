@@ -12,6 +12,7 @@
     sectionStore,
     getSitename,
     getLang,
+    resetTitle,
   } from "../utils/store";
   import type { ISiteFull, IUpdateConfigRequest } from "../utils/types";
 
@@ -27,6 +28,7 @@
   let update_freq: string;
 
   sectionStore.set("settings");
+  resetTitle();
 
   const unsubscribeSite = siteStore.subscribe((site) => {
     if (site) {
