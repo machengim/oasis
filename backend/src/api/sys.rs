@@ -4,7 +4,7 @@ use crate::service::app_state::AppState;
 use crate::service::auth::AuthAdmin;
 use crate::service::error::Error;
 use crate::service::token::AccessToken;
-use crate::util::{self, constants, file_system};
+use crate::util::{self, constants::APP_VERSION_URL, file_system};
 use rocket::serde::{json::Json, Deserialize, Serialize};
 use rocket::{Either, Route, State};
 use sqlx::Connection;
@@ -33,7 +33,7 @@ pub struct UpdateSiteRequest {
 #[serde(crate = "rocket::serde")]
 pub struct UpdateNeedResponse {
     pub need: bool,
-    pub url: Option<String>,
+    pub url: String,
 }
 
 pub fn route() -> Vec<Route> {
@@ -190,10 +190,7 @@ async fn check_need_update(
     site.update(&mut tx).await?;
     tx.commit().await?;
 
-    let url = match need {
-        true => Some(constants::APP_UPDATE_INFO.to_owned()),
-        false => None,
-    };
+    let url = APP_VERSION_URL.to_owned();
 
     Ok(Json(UpdateNeedResponse { need, url }))
 }

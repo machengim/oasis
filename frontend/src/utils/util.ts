@@ -161,3 +161,22 @@ export function compareVersion(v1: string, v2: string) {
 
   return 0;
 }
+
+export function srtToVtt(input: string): string {
+  let output = "WEBVTT\n\n";
+  const lines = input.split("\n");
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.match(/^\d+\s*$/)) {
+      continue;
+    } else if (line.match(/^.*-->.*\s*$/)) {
+      const time_line = line.replace(/,/g, ".");
+      output += time_line + "\n";
+    } else {
+      output += line + "\n";
+    }
+  }
+
+  return output;
+}

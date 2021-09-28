@@ -1,7 +1,7 @@
 use crate::args;
 use crate::util::{
     self,
-    constants::DEFAULT_UPDATE_FREQ,
+    constants::{DEFAULT_APP_NAME, DEFAULT_LANGUAGE, DEFAULT_UPDATE_FREQ, VERSION},
     db::{self, fetch_single, Query},
 };
 use anyhow::Result as AnyResult;
@@ -141,10 +141,10 @@ impl From<Site> for SiteBriefResponse {
 impl Default for SiteBriefResponse {
     fn default() -> Self {
         Self {
-            name: "Oasis".to_owned(),
-            version: "0.1".to_owned(),
-            language: "en".to_owned(),
-            update_freq: "monthly".to_owned(),
+            name: DEFAULT_APP_NAME.to_owned(),
+            version: VERSION.to_owned(),
+            language: DEFAULT_LANGUAGE.to_owned(),
+            update_freq: DEFAULT_UPDATE_FREQ.to_owned(),
         }
     }
 }
@@ -164,11 +164,11 @@ impl From<Site> for SiteFullResponse {
 impl Default for SiteFullResponse {
     fn default() -> Self {
         Self {
-            name: "Oasis".to_owned(),
-            version: "0.1".to_owned(),
-            language: "en".to_owned(),
+            name: DEFAULT_APP_NAME.to_owned(),
+            version: VERSION.to_owned(),
+            language: DEFAULT_LANGUAGE.to_owned(),
             storage: String::new(),
-            update_freq: "monthly".to_owned(),
+            update_freq: DEFAULT_UPDATE_FREQ.to_owned(),
         }
     }
 }

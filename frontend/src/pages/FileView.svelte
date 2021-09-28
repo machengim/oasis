@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { t, isLoading as isLoadingI18N, locale } from "svelte-i18n";
+  import { t } from "svelte-i18n";
   import { useNavigate } from "svelte-navigator";
   import {
     dirsStore,
@@ -25,9 +25,9 @@
   export let dirs: Array<string>;
   export let filename: string;
   let filePath: string;
-  let trackPath: string = null;
+  let trackPath: string;
   let siblings: Array<IFile>;
-  let filesInStore: Array<IFile>;
+  let filesInStore: Array<IFile> = [];
   let isLoading = false;
   let fileType: FileType;
   let loopIcons: Array<ILoopIcon> = [];
@@ -48,10 +48,10 @@
   $: if (filename) {
     fileType = extractFileType();
     filePath = buildFilePath();
+  }
 
-    if (fileType === FileType.Video) {
-      trackPath = buildTrackPath();
-    }
+  $: if (filename && fileType === FileType.Video && filesInStore.length > 0) {
+    trackPath = buildTrackPath();
   }
 
   $: if (fileType && filesInStore) {
@@ -111,9 +111,14 @@
     if (splits.length <= 1) return null;
 
     splits.pop();
-    const trackFilename = splits.join("") + ".vtt";
-    let dir = dirs.join("/");
-    let filePath = dir ? dir + "/" + trackFilename : trackFilename;
+    const vttTrackName = splits.join(".") + ".vtt";
+    const srtTrackName = splits.join(".") + ".srt";
+    const findTrack = filesInStore.find(
+      (file) => file.filename === vttTrackName || file.filename === srtTrackName
+    );
+    if (!findTrack) return null;
+    const dir = dirs.join("/");
+    const filePath = dir ? dir + "/" + vttTrackName : vttTrackName;
 
     return "/api/file/track/" + encodeURIComponent(filePath);
   };
