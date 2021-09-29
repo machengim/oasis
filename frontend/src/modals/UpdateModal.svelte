@@ -28,14 +28,14 @@
     </div>
     <div>
       <span>{$t("modal.update_app.description")}:</span>
-      <span class="ml-2 px-1">{description}</span>
+      <span class="ml-2 px-1 break-all">{description}</span>
     </div>
     <div>
       <span>{$t("modal.update_app.url")}:</span>
       <a
         href={updateInfo.url}
         target="_blank"
-        class="px-1 ml-2 rounded-sm hover:bg-blue-400 hover:text-white"
+        class="px-1 ml-2 rounded-sm hover:bg-blue-400 hover:text-white break-all"
         >{updateInfo.url}</a
       >
     </div>

@@ -50,7 +50,7 @@
         <a
           href={website.url}
           target="_blank"
-          class="px-1 ml-2 rounded-sm hover:bg-blue-400 hover:text-white"
+          class="px-1 ml-2 rounded-sm hover:bg-blue-400 hover:text-white break-all"
         >
           {website.name}
         </a>
@@ -62,7 +62,7 @@
         <a
           href={repo.url}
           target="_blank"
-          class="px-1 ml-2 rounded-sm hover:bg-blue-400 hover:text-white"
+          class="px-1 ml-2 rounded-sm hover:bg-blue-400 hover:text-white break-all"
         >
           {repo.name}
         </a>

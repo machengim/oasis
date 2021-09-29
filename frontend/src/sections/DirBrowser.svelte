@@ -8,25 +8,15 @@
 
   export let onClose = () => {};
   export let onSelect = (v: string) => {};
-
   let volumes: string[] = [];
-  let dirs: string[] = [];
+  let path: string[] = null;
+  let sub_dirs: string[] = [];
   let selectedVolume = "";
-  let selectedDir = "";
   let currentDir = "";
-  let level = 0;
-  let back = false;
   let isLoading = false;
 
-  onMount(async () => {
-    try {
-      isLoading = true;
-      volumes = await api.get("/api/sys/volumes");
-    } catch (e) {
-      console.error(e);
-      setNotification("error", $t("message.error.read_volume_error"));
-    }
-    isLoading = false;
+  onMount(() => {
+    fetchVolumes();
   });
 
   $: if (volumes.length > 0) {
@@ -34,49 +24,100 @@
   }
 
   $: if (selectedVolume) {
-    level = 0;
-    selectedDir = selectedVolume;
+    path = [];
   }
 
-  $: if (selectedDir) {
-    fetchDirs(selectedDir);
+  $: if (path) {
+    currentDir = buildFullPath();
+    fetchSubDirs();
   }
 
-  const selectVolume = (e: any) => {
-    selectedVolume = e.target.value;
+  const fetchVolumes = async () => {
+    isLoading = true;
+    try {
+      const volumes_res: Array<string> = await api.get("/api/sys/volumes");
+      volumes = volumes_res.map((s) => removeVolumeTailChar(s));
+    } catch (e) {
+      console.error(e);
+      setNotification("error", $t("message.error.read_volume_error"));
+    }
+    isLoading = false;
   };
 
-  const fetchDirs = async (dir: string) => {
+  const fetchSubDirs = async () => {
+    const currentPath = path;
+    isLoading = true;
     try {
-      isLoading = true;
-      dirs = await api.get("/api/sys/dirs/" + encodeURIComponent(dir));
-      currentDir = selectedDir;
-      level = back ? level - 1 : level + 1;
-      back = false;
+      const endpoint = "/api/sys/dirs/" + encodeURIComponent(buildFullPath());
+      // Tricky part is, on Windows, the result may be `C:Windows`
+      // if the special character has been cleaned up in the volume name.
+      const sub_dirs_res: Array<string> = await api.get(endpoint);
+      if (currentPath === path) {
+        sub_dirs_res.sort();
+        sub_dirs = sub_dirs_res
+          .map((s) => formatDir(s))
+          .filter((s) => s[0] !== "." && s[0] !== "$");
+      }
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.read_dir_error"));
-    } finally {
-      isLoading = false;
+      if (currentPath === path && path.length > 0) {
+        path = path.slice(0, -1);
+      }
+    }
+
+    isLoading = false;
+  };
+
+  const selectVolume = (e: any) => {
+    selectedVolume = e.target.value.toString();
+  };
+
+  const selectDir = (dir: string) => {
+    path = [...path, dir];
+  };
+
+  const goToParentDir = () => {
+    if (path && path.length > 0) {
+      path = path.slice(0, -1);
     }
   };
 
-  const goToParentDir = (): void => {
-    const dirSplit = currentDir.split("/").filter((e) => e.length > 0);
-    if (currentDir.startsWith("/") && dirSplit.length > 0) {
-      dirSplit[0] = "/" + dirSplit[0];
+  // For Linux and Mac, it looks like `/home/user/Documents`,
+  // For Windows, it looks like `C:/Windows/System` or `C:\\Windows\\System.
+  // And volume names may vary from `/` to `/run/media/user/Toshiba`.
+  const buildFullPath = () => {
+    let fullPath = selectedVolume;
+
+    for (let pathComponent of path) {
+      const lastChar = fullPath.charAt(fullPath.length - 1);
+      const appendPath = lastChar === "/" ? pathComponent : "/" + pathComponent;
+      fullPath += appendPath;
     }
 
-    dirSplit.pop();
-    const parentDir =
-      dirSplit.length > 0 && dirSplit[0] ? dirSplit.join("/") : "/";
-    back = true;
-    selectedDir = parentDir;
+    return fullPath;
   };
 
-  const formatDir = (dir: string): string => {
-    const dirSplit = dir.split("/");
-    return dirSplit[dirSplit.length - 1];
+  const formatDir = (dir: string) => {
+    // Windows may return the full dir path back, such as `C:\\Windows\\System`.
+    // Only the final part is expected.
+    const dirSplit = dir.split(/[\/\\]/).filter((s) => s.trim().length > 0);
+    if (dirSplit.length > 0) {
+      return dirSplit.pop();
+    }
+
+    return null;
+  };
+
+  const removeVolumeTailChar = (vol: string) => {
+    if (vol.length <= 1) {
+      return vol;
+    }
+    if (vol[vol.length - 1] === "\\") {
+      vol = vol.slice(0, -1) + "/";
+    }
+
+    return vol;
   };
 </script>
 
@@ -115,7 +156,7 @@
       {#if isLoading}
         <Spinner />
       {:else}
-        {#if level > 1}
+        {#if path && path.length > 0}
           <div
             class="mx-2 px-2 rounded hover:bg-gray-200 cursor-pointer break-words"
             on:click={goToParentDir}
@@ -124,12 +165,12 @@
           </div>
         {/if}
 
-        {#each dirs as dir}
+        {#each sub_dirs as dir}
           <div
             class="mx-2 px-2 rounded hover:bg-gray-200 cursor-pointer break-words"
-            on:click={() => (selectedDir = dir)}
+            on:click={() => selectDir(dir)}
           >
-            {formatDir(dir)}
+            {dir}
           </div>
         {/each}
       {/if}

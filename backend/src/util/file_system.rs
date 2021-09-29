@@ -64,11 +64,12 @@ fn detect_encoding(buffer: &[u8]) -> AnyResult<&'static Encoding> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tokio::runtime::Runtime;
 
     #[cfg(target_os = "linux")]
     #[test]
     fn test_get_sub_directories() {
+        use tokio::runtime::Runtime;
+
         let path = PathBuf::from("/home");
         let rt = Runtime::new().unwrap();
         let sub_directories = rt.block_on(get_sub_dirs(&path)).unwrap();

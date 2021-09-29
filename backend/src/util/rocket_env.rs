@@ -27,7 +27,7 @@ impl<'a> RocketEnv<'a> {
         vars.insert("ROCKET_PORT", "8000");
         vars.insert("ROCKET_WORKERS", "2");
         vars.insert("ROCKET_KEEP_ALIVE", "1");
-        vars.insert("ROCKET_LOG_LEVEL", "critical");
+        vars.insert("ROCKET_LOG_LEVEL", "debug");
 
         RocketEnv { vars }
     }

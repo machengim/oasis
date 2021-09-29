@@ -89,7 +89,7 @@
         id="textarea"
         bind:this={textarea}
         readonly
-        class="border rounded w-full p-2 overflow-y-hidden focus:outline-none"
+        class="border ta-height rounded w-full p-2 leading-normal overflow-y-auto focus:outline-none"
         on:click={copyLink}>{link}</textarea
       >
     </div>
@@ -104,3 +104,16 @@
     </div>
   {/if}
 </Modal>
+
+<style>
+  @media only screen and (min-width: 320px) {
+    .ta-height {
+      max-height: 15rem;
+    }
+  }
+  @media only screen and (min-width: 768px) {
+    .ta-height {
+      max-height: 25rem;
+    }
+  }
+</style>

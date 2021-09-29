@@ -41,7 +41,7 @@
   <Spinner />
 {:else}
   <div
-    class="p-2 text-viewer-height overflow-y-auto border-2 border-gray-500 shadow"
+    class="p-2 viewer-height overflow-y-auto border-2 border-gray-500 shadow"
   >
     {#if fileType === FileType.Text}
       <pre class="text-lg">
@@ -56,10 +56,3 @@
     {/if}
   </div>
 {/if}
-
-<style>
-  .text-viewer-height {
-    min-height: 30rem;
-    max-height: 80vh;
-  }
-</style>
