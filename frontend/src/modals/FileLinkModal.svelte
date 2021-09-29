@@ -6,6 +6,7 @@
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
   import copy from "copy-to-clipboard";
+  import { checkMobile } from "../utils/util";
 
   export let onClose: () => void;
   export let filename: string;
@@ -33,7 +34,15 @@
   });
 
   $: if (link && textarea) {
-    textarea.style.height = textarea.scrollHeight + "px";
+    const maxHeight = 15 * 16;
+    const taHeight = Math.min(textarea.scrollHeight, maxHeight);
+
+    textarea.style.height = taHeight + "px";
+    if (textarea.scrollHeight > maxHeight) {
+      textarea.style.overflowY = "scroll";
+    } else {
+      textarea.style.overflowY = "hidden";
+    }
   }
 
   const requestShareLink = async () => {
@@ -89,7 +98,7 @@
         id="textarea"
         bind:this={textarea}
         readonly
-        class="border ta-height rounded w-full p-2 leading-normal overflow-y-auto focus:outline-none"
+        class="border rounded w-full p-2 focus:outline-none"
         on:click={copyLink}>{link}</textarea
       >
     </div>
@@ -104,16 +113,3 @@
     </div>
   {/if}
 </Modal>
-
-<style>
-  @media only screen and (min-width: 320px) {
-    .ta-height {
-      max-height: 15rem;
-    }
-  }
-  @media only screen and (min-width: 768px) {
-    .ta-height {
-      max-height: 25rem;
-    }
-  }
-</style>
