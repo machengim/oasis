@@ -83,6 +83,7 @@ export function inferFileType(ext: string) {
     case "avi":
     case "mov":
     case "flv":
+    case "wmv":
       return FileType.Video;
     case "pdf":
       return FileType.Pdf;

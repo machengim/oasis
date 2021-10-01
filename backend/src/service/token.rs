@@ -137,7 +137,7 @@ mod tests {
     #[should_panic]
     fn test_token_should_panic() {
         let mut claim = AccessToken::new(1, 9);
-        claim.exp -= 7 as usize * 24 * 60 * 60 + 1;
+        claim.exp -= 30 * 60;
         let token = claim.encode("secret").unwrap();
         let validate = AccessToken::decode(&token, "secret").unwrap();
         assert_eq!(validate.permission, 9);

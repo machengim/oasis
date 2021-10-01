@@ -56,8 +56,7 @@ async fn change_password(
     let mut tx = conn.begin().await?;
     user.update(&mut tx).await?;
     tx.commit().await?;
-
-    jar.remove(Cookie::named(ACCESS_TOKEN));
+    remove_tokens(jar);
 
     Ok(())
 }

@@ -16,7 +16,7 @@
     try {
       await api.get("/api/user/signout", "raw");
       userStore.set(null);
-      setNotification("success", $t("message.sucess.signout"));
+      setNotification("success", $t("message.success.signout"));
       onClose();
       navigate("/login");
     } catch (e) {

@@ -35,7 +35,7 @@ pub async fn get_sub_dirs(dir: &PathBuf) -> AnyResult<Vec<PathBuf>> {
     Ok(sub_dirs)
 }
 
-// All text file needs to be read after checking its encoding method.
+// All text file needs to check the encoding method.
 pub async fn read_text_file(path: PathBuf) -> AnyResult<String> {
     let mut buffer = vec![];
     let mut file = fs::File::open(path).await?;

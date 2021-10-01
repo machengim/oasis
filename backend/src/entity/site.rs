@@ -30,26 +30,23 @@ impl Site {
         let update_freq = DEFAULT_UPDATE_FREQ.to_owned();
 
         Self {
-            name: name.to_string(),
+            name: name.to_owned(),
             site_id: 0,
             version,
             storage: storage_str,
             secret,
-            language: language.to_string(),
+            language: language.to_owned(),
             update_freq,
             created_at,
             updated_at: created_at,
         }
     }
 
-    pub async fn read(conn: &mut PoolConnection<Sqlite>) -> Result<Option<Self>, sqlx::Error> {
+    pub async fn read(conn: &mut PoolConnection<Sqlite>) -> AnyResult<Option<Self>> {
         let sql = "select * from Site";
         let query = Query::new(sql, vec![]);
 
-        match fetch_single(query, conn).await? {
-            Some(v) => Ok(Some(v)),
-            _ => Ok(None),
-        }
+        Ok(fetch_single(query, conn).await?)
     }
 
     pub async fn insert(&self, tx: &mut Transaction<'_, Sqlite>) -> anyhow::Result<i64> {
@@ -93,15 +90,14 @@ impl Site {
     }
 
     pub fn check_update_need(&self) -> bool {
-        let day_seconds = 24 * 60 * 60;
+        let current_timestamp = util::get_utc_seconds();
+        let seconds_per_day = 24 * 60 * 60;
         let interval = match self.update_freq.to_lowercase().as_str() {
-            "daily" => day_seconds,
-            "weekly" => 7 * day_seconds,
-            "monthly" => 30 * day_seconds,
+            "daily" => seconds_per_day,
+            "weekly" => 7 * seconds_per_day,
+            "monthly" => 30 * seconds_per_day,
             _ => return false,
         };
-
-        let current_timestamp = util::get_utc_seconds();
 
         current_timestamp - self.updated_at > interval
     }

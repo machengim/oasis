@@ -1,9 +1,5 @@
 {
   "app_name": "Oasis",
-  "website": {
-    "name": "chengma.dev/oasis",
-    "url": "https://chengma.dev/oasis"
-  },
   "repo": {
     "name": "Github repo",
     "url": "https://github.com/machengim/oasis"

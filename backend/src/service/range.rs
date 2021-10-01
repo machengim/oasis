@@ -1,3 +1,4 @@
+use anyhow::Result as AnyResult;
 use rocket::http::{ContentType, Status};
 use rocket::request::Request;
 use rocket::response::{self, Responder, Response};
@@ -19,7 +20,7 @@ pub struct Range {
 }
 
 impl Range {
-    pub fn from(range_req: &str) -> Self {
+    pub fn new(range_req: &str) -> Self {
         let v: Vec<&str> = range_req.split(|c| c == '=' || c == '-').collect();
         let start: Option<u64> = parse_range_str(v.get(1));
         let end: Option<u64> = parse_range_str(v.get(2));
@@ -75,7 +76,7 @@ fn get_header_contents(
     end: u64,
     size: u64,
     file: &mut File,
-) -> anyhow::Result<(Vec<u8>, String)> {
+) -> AnyResult<(Vec<u8>, String)> {
     let len = end - start + 1;
     let contents = read_file_bytes(file, start, len as usize)?;
     let content_range = format!("bytes {}-{}/{}", start, end, size);
@@ -86,7 +87,7 @@ fn get_header_contents(
 fn get_range_length(size: u64, range_header: Option<&str>) -> (u64, u64) {
     match range_header {
         Some(range_str) => {
-            let range = Range::from(range_str);
+            let range = Range::new(range_str);
             return get_some_range_length(size, range);
         }
         None => get_none_range_length(size),
@@ -120,7 +121,7 @@ fn get_some_range_length(size: u64, range: Range) -> (u64, u64) {
     (start, end)
 }
 
-fn read_file_meta(path: &PathBuf) -> anyhow::Result<(File, u64)> {
+fn read_file_meta(path: &PathBuf) -> AnyResult<(File, u64)> {
     let file = File::open(path)?;
     let size = file.metadata()?.len();
 
@@ -139,7 +140,7 @@ fn get_content_type(path: &PathBuf) -> ContentType {
     ContentType::Binary
 }
 
-fn read_file_bytes(file: &mut File, start: u64, size: usize) -> anyhow::Result<Vec<u8>> {
+fn read_file_bytes(file: &mut File, start: u64, size: usize) -> AnyResult<Vec<u8>> {
     file.seek(SeekFrom::Start(start))?;
     let mut contents = vec![0u8; size];
     file.read_exact(&mut *contents)?;

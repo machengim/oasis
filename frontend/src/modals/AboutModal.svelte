@@ -15,7 +15,6 @@
   export let onClose: () => void;
   export let setUpdateInfo: (info: IUpdateAppInfo) => void;
   let isLoading = false;
-  let website: ILink = constants.website;
   let repo: ILink = constants.repo;
   let links: Array<ILink> = constants.links;
 
@@ -44,18 +43,6 @@
       <span>{$t("modal.about.version")}: </span>
       <span class="ml-2 px-1">0.1</span>
     </div>
-    {#if website}
-      <div>
-        {$t("modal.about.website")}:
-        <a
-          href={website.url}
-          target="_blank"
-          class="px-1 ml-2 rounded-sm hover:bg-blue-400 hover:text-white break-all"
-        >
-          {website.name}
-        </a>
-      </div>
-    {/if}
     {#if repo}
       <div>
         {$t("modal.about.repo")}:

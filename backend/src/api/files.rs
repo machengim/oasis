@@ -84,7 +84,7 @@ async fn video_track(
     state: &State<AppState>,
 ) -> Result<String, Error> {
     let storage = state.get_site()?.storage.clone();
-    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+    let target_path = PathBuf::from(storage).join(&util::parse_encoded_url(path)?);
 
     let track_str = match track::get_track(target_path).await {
         Ok(str) => str,

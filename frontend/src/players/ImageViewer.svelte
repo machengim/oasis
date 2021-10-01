@@ -22,6 +22,7 @@
   let fullscreen = false;
   let autoPlayTimeout: NodeJS.Timeout;
   let menuTimeout: NodeJS.Timeout;
+  let timeOutStart = -1;
 
   const onAutoPlay = (loopMethod: ELoopMethod) => {
     if (loopMethod) {
@@ -70,10 +71,29 @@
   }
 
   $: if (showMenu) {
-    menuTimeout = setTimeout(() => {
-      showMenu = false;
-    }, 2000);
+    startMenuTimer();
   }
+
+  const startMenuTimer = () => {
+    timeOutStart = new Date().getTime();
+    accurateTimeOut(2000, () => (showMenu = false));
+  };
+
+  const accurateTimeOut = (length: number, callback: () => void) => {
+    const timer = (t: number, callback: () => void) => {
+      menuTimeout = setTimeout(() => {
+        const timeElapsed = new Date().getTime() - timeOutStart;
+        if (length - timeElapsed < 200) {
+          callback();
+        } else {
+          let t = length - timeElapsed;
+          timer(t, callback);
+        }
+      }, t);
+    };
+
+    timer(length, callback);
+  };
 
   const reset = () => {
     touchPointX = -1;
@@ -85,9 +105,7 @@
 
     if (menuTimeout) {
       clearTimeout(menuTimeout);
-      menuTimeout = setTimeout(() => {
-        showMenu = false;
-      }, 2000);
+      startMenuTimer();
     }
 
     if (autoPlayTimeout) {

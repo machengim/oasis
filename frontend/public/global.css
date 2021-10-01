@@ -21,6 +21,17 @@ input:disabled {
   border-radius: 50%;
 }
 
+.container-height {
+  height: calc(100vh - 4rem);
+}
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+}
+
 :root {
   --plyr-font-size-small: 1rem;
   --plyr-font-size-base: 1.3rem;

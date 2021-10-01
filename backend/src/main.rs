@@ -12,10 +12,7 @@ use util::{init, local_ip, rocket_env::RocketEnv};
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    if !init::check_db_file() {
-        init::create_db().await?;
-    }
-
+    init::init_app().await?;
     let pool = init::get_db_pool().await?;
     let mut conn = pool.acquire().await?;
     let site_op = Site::read(&mut conn).await?;

@@ -1,5 +1,5 @@
 import { get, Writable, writable } from 'svelte/store';
-import type { IFile, INotification, ELoopMethod, ISiteFull, IUser } from './types';
+import type { IFile, INotification, ELoopMethod, IUser, ISiteFull } from './types';
 import * as constants from '../assets/constants.json';
 
 export const siteStore: Writable<ISiteFull> = writable(null);

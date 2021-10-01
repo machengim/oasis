@@ -30,7 +30,7 @@ impl FileType {
             "jpg" | "jpeg" | "gif" | "png" => Self::Image,
             "mp3" | "flac" | "aac" | "ogg" | "wav" => Self::Music,
             "pdf" => Self::Pdf,
-            "mp4" | "mov" | "avi" | "mkv" | "webm" | "flv" => Self::Video,
+            "mp4" | "mov" | "avi" | "mkv" | "webm" | "flv" | "wmv" => Self::Video,
             "txt" | "md" | "srt" | "vtt" | "json" | "yml" | "ini" | "conf" => Self::Text,
             _ => Self::Unknown,
         }
@@ -39,7 +39,7 @@ impl FileType {
     pub fn get_file_type(path: &PathBuf) -> Self {
         match (path.is_dir(), path.extension()) {
             (true, _) => Self::Dir,
-            (false, Some(ext)) => Self::infer_file_type(ext.to_str().unwrap()),
+            (false, Some(ext)) => Self::infer_file_type(ext.to_str().unwrap_or("")),
             (false, None) => Self::Unknown,
         }
     }

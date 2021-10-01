@@ -81,7 +81,7 @@ fn shutdown(shutdown: Shutdown, token: AccessToken) -> Result<(), Error> {
         return Err(Error::Forbidden);
     }
 
-    println!("Server shut down as user required");
+    println!("Server shutting down as user required");
     shutdown.notify();
 
     Ok(())

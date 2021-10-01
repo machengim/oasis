@@ -34,13 +34,6 @@
 </div>
 
 <style>
-  .center {
-    position: absolute;
-    left: 50%;
-    top: 45%;
-    transform: translate(-50%, -50%);
-  }
-
   @media only screen and (min-width: 320px) {
     .modal-small {
       width: 12rem;

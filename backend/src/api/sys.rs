@@ -135,9 +135,8 @@ async fn update_site(
     }
 
     let storage_str = storage.to_str().unwrap().to_owned();
-
     let mut conn = state.get_pool_conn().await?;
-    let mut site = Site::read(&mut conn).await?.unwrap();
+    let mut site = Site::read(&mut conn).await?.ok_or(500)?;
     site.name = req_body.sitename.to_owned();
     site.language = req_body.language.to_owned();
     site.update_freq = req_body.update_freq.to_owned();
@@ -148,7 +147,6 @@ async fn update_site(
     tx.commit().await?;
 
     state.set_site(site)?;
-
     Ok(())
 }
 
@@ -158,15 +156,14 @@ async fn check_need_update(
     _admin: AuthAdmin,
 ) -> Result<Json<AppNeedUpdateResponse>, Error> {
     let mut conn = state.get_pool_conn().await?;
-    let mut site = Site::read(&mut conn).await?.unwrap();
+    let mut site = Site::read(&mut conn).await?.ok_or(500)?;
     let need = site.check_update_need();
-
     site.updated_at = util::get_utc_seconds();
+
     let mut tx = conn.begin().await?;
     site.update(&mut tx).await?;
     tx.commit().await?;
 
     let url = APP_VERSION_URL.to_owned();
-
     Ok(Json(AppNeedUpdateResponse { need, url }))
 }

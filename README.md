@@ -6,9 +6,9 @@ Minimalized file hosting and sharing app.
 
 + User authentication
 + File preview
++ Play list
 + Mobile compatibility
 + Temporary sharing link
-+ Loop file list
 + Multiple platform support
 + I18n (English, Chinese)
 
@@ -26,7 +26,6 @@ Minimalized file hosting and sharing app.
 + [ ] Custom media player
 + [ ] Multiple users management
 + [ ] HTTPS
-+ [ ] Server side transcoding
 + [ ] More file format support
 
 ### Tech stack

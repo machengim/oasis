@@ -6,7 +6,6 @@
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
   import copy from "copy-to-clipboard";
-  import { checkMobile } from "../utils/util";
 
   export let onClose: () => void;
   export let filename: string;
@@ -98,7 +97,7 @@
         id="textarea"
         bind:this={textarea}
         readonly
-        class="border rounded w-full p-2 focus:outline-none"
+        class="border rounded w-full p-2 focus:outline-none break-all"
         on:click={copyLink}>{link}</textarea
       >
     </div>

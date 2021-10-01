@@ -45,7 +45,7 @@
       navigate("/login");
     } catch (e) {
       console.error(e);
-      setNotification("error", $t("message.success.update_password_fail"));
+      setNotification("error", $t("message.error.update_password_fail"));
     }
 
     isLoading = false;
@@ -80,10 +80,10 @@
   };
 </script>
 
-<div class="absolute w-full">
+<div class="relative container-height w-full">
   <form on:submit={onConfirm} bind:this={form}>
     <div
-      class="w-100 mx-auto mt-28 bg-gray-50 shadow rounded-lg flex flex-col items-center p-2 md:p-8"
+      class="w-100 mx-auto center bg-gray-50 shadow rounded-lg flex flex-col items-center p-2 md:p-8"
     >
       <div class="text-xl font-bold mb-8 text-gray-700">
         {$t("component.profile.title")}

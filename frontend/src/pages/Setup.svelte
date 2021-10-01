@@ -102,7 +102,7 @@
 {#if $isLoadingI18N}
   <Spinner />
 {:else}
-  <div class="absolute w-full">
+  <div class="relative container-height w-full">
     {#if isOpenDirBrowser}
       <DirBrowser
         onClose={() => (isOpenDirBrowser = false)}
@@ -114,7 +114,7 @@
     {/if}
     <form on:submit={onConfirm} bind:this={form}>
       <div
-        class="w-96 mx-auto mt-28 bg-gray-50 shadow rounded-lg flex flex-col items-center p-8"
+        class="w-96 mx-auto center bg-gray-50 shadow rounded-lg flex flex-col items-center p-8"
       >
         <div class="text-xl font-bold mb-8 text-gray-700">
           {$t("component.setup.title")}

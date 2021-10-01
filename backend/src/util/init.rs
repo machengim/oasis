@@ -7,8 +7,12 @@ use sqlx::{
 };
 use std::path::PathBuf;
 
-pub fn check_db_file() -> bool {
-    get_db_file_location().exists()
+pub async fn init_app() -> AnyResult<()> {
+    if !get_db_file_location().exists() {
+        create_db().await?;
+    }
+
+    Ok(())
 }
 
 pub async fn create_db() -> AnyResult<()> {
@@ -25,7 +29,9 @@ pub async fn create_db() -> AnyResult<()> {
         .await?;
 
     const ASSETS: Dir = include_dir!("./assets");
-    let migration_dir = ASSETS.get_dir("migrations").unwrap();
+    let migration_dir = ASSETS
+        .get_dir("migrations")
+        .ok_or(anyhow::anyhow!("Migration dir not found"))?;
     let migrator = Migrator::new(MigrationDir::new(migration_dir)).await?;
     migrator.run(&mut conn).await?;
     conn.close();

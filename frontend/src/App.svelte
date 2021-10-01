@@ -29,14 +29,12 @@
   import UpdateModal from "./modals/UpdateModal.svelte";
 
   let language = "";
-  let sitename = "";
   let isLoading = true;
   let showUpdateModal = false;
   let updateInfo: IUpdateAppInfo;
 
   const unsubscribeSite = siteStore.subscribe((site) => {
     if (site) {
-      sitename = site.name;
       language = site.language;
     }
   });
@@ -58,14 +56,12 @@
   onDestroy(() => {
     unsubscribeSite();
     unsubscribeUser();
-    unsubscribeTitle;
+    unsubscribeTitle();
   });
 
   $: if (language) {
     locale.set(language);
   }
-
-  // $: document.title = sitename;
 
   $: if (updateInfo) {
     processUpdateInfo();
@@ -85,9 +81,9 @@
       const values: [ISiteBrief, void] = await Promise.all([siteReq, tokenReq]);
       const site = values[0];
       if (site) {
-        siteStore.set({ ...site, storage: "" });
+        siteStore.set(site);
+        titleStore.set(site.name);
       }
-      titleStore.set(site.name);
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.read_site_error"));
