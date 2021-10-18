@@ -104,7 +104,8 @@ async fn generate_share_link(
     _user: AuthUser,
 ) -> Result<String, Error> {
     let secret = state.get_secret()?;
-    let input = format!("path={}&expire={}", req_body.path, req_body.expire);
+    let path_encode = urlencoding::encode(&req_body.path);
+    let input = format!("path={}&expire={}", path_encode, req_body.expire);
     let hash = util::sha256(&input, &secret);
 
     Ok(format!("{}&hash={}", input, hash))

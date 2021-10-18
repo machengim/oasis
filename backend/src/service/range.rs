@@ -118,6 +118,10 @@ fn get_some_range_length(size: u64, range: Range) -> (u64, u64) {
         end = size - 1;
     }
 
+    if end > start + DEFAULT_RANGE_SIZE {
+        end = start + DEFAULT_RANGE_SIZE;
+    }
+
     (start, end)
 }
 
