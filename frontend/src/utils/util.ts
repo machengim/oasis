@@ -49,7 +49,8 @@ export function captilizeFirst(input: string) {
 }
 
 export function compareArray<T>(arrayA: Array<T>, arrayB: Array<T>) {
-  return arrayA.length === arrayB.length &&
+
+  return arrayA.length === arrayB.length && 
     arrayA.every(function (value, index) { return value === arrayB[index] });
 }
 
@@ -127,6 +128,10 @@ export function compareFile(a: IFile, b: IFile, order: IFileOrder) {
 
 export function checkMobile() {
   return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+}
+
+export function checkSafari() {
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 }
 
 export function readCookie(name: string) {

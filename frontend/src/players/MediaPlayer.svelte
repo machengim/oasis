@@ -3,7 +3,7 @@
   import { loopStore } from "../utils/store";
   import Plyr from "plyr";
   import { ELoopMethod, FileType } from "../utils/types";
-  import { checkMobile } from "../utils/util";
+  import { checkMobile, checkSafari } from "../utils/util";
 
   export let filePath: string;
   export let trackPath: string = null;
@@ -11,42 +11,49 @@
   export let onComplete: () => void;
 
   let player: Plyr;
+  let splayer: HTMLVideoElement;
   let isLoop = false;
+  let isSafari = checkSafari();
 
   onMount(() => {
-    player = initPlayer();
+    if (!isSafari) {
+      player = initPlayer();
 
-    player.on("ready", (_) => {
-      player.play();
-    });
+      player.on("ready", (_) => {
+        player.play();
+      });
 
-    player.on("ended", (_) => {
-      if ($loopStore === ELoopMethod.repeat) {
-        player.currentTime = 0;
-      } else {
-        onComplete();
-      }
-    });
-
+      player.on("ended", (_) => {
+        if ($loopStore === ELoopMethod.repeat) {
+          player.currentTime = 0;
+        } else {
+          onComplete();
+        }
+      });
+    }
     document.addEventListener("fullscreenchange", onFullScreen, true);
   });
 
-  $: if (filePath && player) {
-    const mediaType = getMediaType();
-    const trackSrc = mediaType === "video" ? trackPath : "";
+  $: if (filePath) {
+    if (player) {
+      const mediaType = getMediaType();
+      const trackSrc = mediaType === "video" ? trackPath : "";
 
-    player.source = {
-      type: mediaType,
-      sources: initMediaSource(),
-      tracks: [
-        {
-          kind: "captions",
-          label: "Caption",
-          src: trackSrc,
-          default: true,
-        },
-      ],
-    };
+      player.source = {
+        type: mediaType,
+        sources: initMediaSource(),
+        tracks: [
+          {
+            kind: "captions",
+            label: "Caption",
+            src: trackSrc,
+            default: true,
+          },
+        ],
+      };
+    } else if (splayer) {
+      splayer.load();
+    }
   }
 
   const getMediaType = () => {
@@ -102,20 +109,45 @@
       window.screen.orientation.unlock();
     }
   };
+
+  const onSvideoEnd = () => {
+    if ($loopStore === ELoopMethod.repeat) {
+      splayer.currentTime = 0;
+    } else {
+      onComplete();
+    }
+  };
+
+  const onSvideoCanplay = () => {
+    splayer.play();
+  };
 </script>
 
 <div>
   {#if fileType === FileType.Video}
-    <video
-      class="player"
-      crossorigin="anonymous"
-      playsinline
-      controls
-      loop={isLoop}
-    >
-      <source type="video/mp4" />
-      <track kind="captions" default />
-    </video>
+    {#if isSafari}
+      <!-- svelte-ignore a11y-media-has-caption -->
+      <video
+        controls
+        playsinline
+        bind:this={splayer}
+        on:canplay={onSvideoCanplay}
+        on:ended={onSvideoEnd}
+      >
+        <source src={filePath} type="video/mp4" />
+      </video>
+    {:else}
+      <video
+        class="player"
+        crossorigin="anonymous"
+        playsinline
+        controls
+        loop={isLoop}
+      >
+        <source type="video/mp4" />
+        <track kind="captions" default />
+      </video>
+    {/if}
   {:else}
     <div
       class="mt-4 lg:mt-36 lg:w-2/3 mx-auto p-2 border-2 rounded border-blue-400 shadow"

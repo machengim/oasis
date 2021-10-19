@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import Icon from "../components/Icon.svelte";
   import { EIconColor, EIconType } from "../utils/types";
-  import { checkMobile } from "../utils/util";
 
   export let filePath: string;
   let container: HTMLDivElement;
@@ -26,6 +25,12 @@
       // if (checkMobile()) {
       //   window.screen.orientation.unlock();
       // }
+    }
+  };
+
+  const playVideo = () => {
+    if (video) {
+      video.play();
     }
   };
 </script>
@@ -59,7 +64,8 @@
         type={EIconType.play}
         color={EIconColor.white}
         size="huge"
-        className="ml-24 mr-24"
+        className="ml-24 mr-24 cursor-pointer"
+        onClick={playVideo}
       />
       <Icon type={EIconType.play_forward} color={EIconColor.white} />
     </div>

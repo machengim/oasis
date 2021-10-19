@@ -33,6 +33,8 @@
   let fileType: FileType;
   let loopIcons: Array<ILoopIcon> = [];
   let showFileLinkModal = false;
+  // Fix compareDir bug when at the root dir.
+  let rootFetched = false;
 
   const unsubscribeFiles = filesStore.subscribe((files) => {
     filesInStore = files;
@@ -57,7 +59,10 @@
   }
 
   $: if (fileType && filesInStore) {
-    if (compareArray(dirs, $dirsStore)) {
+    if (dirs.length === 0 && $dirsStore.length === 0 && !rootFetched) {
+      fetchDirContent(dirs);
+      rootFetched = true;
+    } else if (compareArray(dirs, $dirsStore)) {
       const order: IFileOrder = { key: "name", asc: true };
       const siblingFiles = $filesStore.filter((f) => f.file_type === fileType);
       siblingFiles.sort((a, b) => compareFile(a, b, order));
