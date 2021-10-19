@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import screenfull from "screenfull";
   import Icon from "../components/Icon.svelte";
   import { EIconColor, EIconType } from "../utils/types";
   import { checkMobile } from "../utils/util";
@@ -20,9 +19,7 @@
 
   const toggleFullScreen = async () => {
     if (container && !fullscreen) {
-      if (screenfull.isEnabled) {
-        screenfull.request(container);
-      }
+      await container.requestFullscreen();
     } else {
       await document.exitFullscreen();
 
