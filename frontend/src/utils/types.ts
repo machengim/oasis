@@ -130,7 +130,14 @@ export enum EIconType {
   repeat = "repeat",
   unknown = "unknown",
   closecircle = "closecircle",
-  link = "link"
+  link = "link",
+  play = "play",
+  play_forward = "play_forward",
+  play_back = "play_back",
+  play_speed = "play_speed",
+  close_caption = "close_caption",
+  play_next = "play_next",
+  list = "list"
 }
 
 export enum EIconColor {

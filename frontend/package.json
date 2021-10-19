@@ -34,6 +34,7 @@
     "copy-to-clipboard": "^3.3.1",
     "pdfobject": "^2.2.6",
     "plyr": "^3.6.8",
+    "screenfull": "^5.1.0",
     "sirv-cli": "^1.0.0",
     "svelte-i18n": "^3.3.10",
     "svelte-navigator": "^3.1.5"

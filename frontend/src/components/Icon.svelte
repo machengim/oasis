@@ -4,7 +4,7 @@
 
   export let type: EIconType;
   export let color: EIconColor = EIconColor.gray;
-  export let size: "small" | "tiny" | "default" | "large" = "default";
+  export let size: "small" | "tiny" | "default" | "large" | "huge" = "default";
   export let className: string = "";
   export let onClick: (e) => void = null;
   let iconColor = "#000";
@@ -34,6 +34,9 @@
         break;
       case "large":
         style = "w-12 h-12";
+        break;
+      case "huge":
+        style = "w-16 h-16";
         break;
       default:
         style = "w-8 h-8";
@@ -113,6 +116,20 @@
         return `<path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/><line x1="320" y1="320" x2="192" y2="192" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="192" y1="320" x2="320" y2="192" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
       case "link":
         return `<path d="M208,352H144a96,96,0,0,1,0-192h64" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:36px"/><path d="M304,160h64a96,96,0,0,1,0,192H304" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:36px"/><line x1="163.29" y1="256" x2="350.71" y2="256" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:36px"/>`;
+      case "play":
+        return `<polygon points="96 448 416 256 96 64 96 448"/>`;
+      case "play_forward":
+        return `<path d="M32,145.52v221c0,13.28,13,21.72,23.63,15.35l188.87-113c9.24-5.53,9.24-20.07,0-25.6l-188.87-113C45,123.8,32,132.24,32,145.52Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/><path d="M260.57,145.52v221c0,13.28,13,21.72,23.63,15.35l188.87-113c9.24-5.53,9.24-20.07,0-25.6l-188.87-113C273.56,123.8,260.57,132.24,260.57,145.52Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/>`;
+      case "play_back":
+        return `<path d="M480,145.52v221c0,13.28-13,21.72-23.63,15.35L267.5,268.8c-9.24-5.53-9.24-20.07,0-25.6l188.87-113C467,123.8,480,132.24,480,145.52Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/><path d="M251.43,145.52v221c0,13.28-13,21.72-23.63,15.35L38.93,268.8c-9.24-5.53-9.24-20.07,0-25.6l188.87-113C238.44,123.8,251.43,132.24,251.43,145.52Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/>`;
+      case "play_speed":
+        return `<path d="M326.1,231.9l-47.5,75.5a31,31,0,0,1-7,7,30.11,30.11,0,0,1-35-49l75.5-47.5a10.23,10.23,0,0,1,11.7,0A10.06,10.06,0,0,1,326.1,231.9Z"/><path d="M256,64C132.3,64,32,164.2,32,287.9A223.18,223.18,0,0,0,88.3,436.4c1.1,1.2,2.1,2.4,3.2,3.5a25.19,25.19,0,0,0,37.1-.1,173.13,173.13,0,0,1,254.8,0,25.19,25.19,0,0,0,37.1.1l3.2-3.5A223.18,223.18,0,0,0,480,287.9C480,164.2,379.7,64,256,64Z" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="256" y1="128" x2="256" y2="160" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><line x1="416" y1="288" x2="384" y2="288" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><line x1="128" y1="288" x2="96" y2="288" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><line x1="165.49" y1="197.49" x2="142.86" y2="174.86" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><line x1="346.51" y1="197.49" x2="369.14" y2="174.86" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/>`;
+      case "close_caption":
+        return `<path d="M0,80V432H512V80ZM464,255.78c0,25.74-1.6,45.32-3.77,77.22s-19.2,54.34-59.09,57.86S305.37,394.71,256,394.6c-49,.11-105.14-.11-145.14-3.74s-56.8-26-59.09-57.86S48,281.52,48,255.78s.11-42.46,3.77-77.22,23-54.12,59.09-57.64S209.14,117.4,256,117.4s109,0,145.14,3.52,55.43,23,59.09,57.64S464,230.15,464,255.78Z"/><path d="M367.57,282.84v.77c0,17.93-11.11,28.49-25.95,28.49s-24.84-11.88-26.27-28.49c0,0-1.31-8.69-1.31-26.29a229.5,229.5,0,0,1,1.53-28.6c2.64-18.7,11.77-28.49,26.6-28.49s26.49,12.76,26.49,32.12v.55h49.58c0-24.09-6.05-45.76-18.25-59.4S369.76,153,345.8,153a108.06,108.06,0,0,0-33,4.73,58.82,58.82,0,0,0-25.94,16.61C279.63,182.3,274,192.86,270,206.17s-6,30-6,50.27c0,19.8,1.65,36.3,4.84,49.61s8,23.87,14.4,31.79a49.76,49.76,0,0,0,24,16.5q14.5,4.62,34,4.62c27.47,0,47.26-7,59.13-20.57S418,305.06,418,279.1H367.35C367.57,279.1,367.57,281.85,367.57,282.84Z"/><path d="M197.3,282.84v.77c0,17.93-11.1,28.49-25.94,28.49s-24.84-11.88-26.27-28.49c0,0-1.31-8.69-1.31-26.29a229.5,229.5,0,0,1,1.53-28.6c2.64-18.7,11.77-28.49,26.6-28.49S198.4,213,198.4,232.35v.55H248c0-24.09-6-45.76-18.25-59.4S199.5,153,175.54,153a108.06,108.06,0,0,0-33,4.73,58.82,58.82,0,0,0-25.94,16.61c-7.26,7.92-12.86,18.48-16.93,31.79s-6,30-6,50.27c0,19.8,1.65,36.3,4.84,49.61s8,23.87,14.4,31.79a49.76,49.76,0,0,0,24,16.5q14.51,4.62,34,4.62c27.48,0,47.27-7,59.14-20.57s17.81-33.33,17.81-59.29H197.08C197.3,279.1,197.3,281.85,197.3,282.84Z"/>`;
+      case "play_next":
+        return `<path d="M112,111V401c0,17.44,17,28.52,31,20.16l247.9-148.37c12.12-7.25,12.12-26.33,0-33.58L143,90.84C129,82.48,112,93.56,112,111Z" style="fill:none;stroke:${iconColor};stroke-miterlimit:10;stroke-width:32px"/><line x1="400" y1="80" x2="400" y2="432" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/>`;
+      case "list":
+        return `<line x1="160" y1="144" x2="448" y2="144" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="160" y1="256" x2="448" y2="256" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="160" y1="368" x2="448" y2="368" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><circle cx="80" cy="144" r="16" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><circle cx="80" cy="256" r="16" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><circle cx="80" cy="368" r="16" style="fill:none;stroke:${iconColor};stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>`;
       default:
         return null;
     }
