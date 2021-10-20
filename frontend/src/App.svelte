@@ -81,7 +81,7 @@
       const values: [ISiteBrief, void] = await Promise.all([siteReq, tokenReq]);
       const site = values[0];
       if (site) {
-        siteStore.set(site);
+        siteStore.set({...site, storage: ""});
         titleStore.set(site.name);
       }
     } catch (e) {

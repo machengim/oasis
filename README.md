@@ -1,6 +1,15 @@
 ## OASIS
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/master/LICENSE-MIT) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)
+
 Minimalized file hosting and sharing app.
+
+### Install
+
+1. Download from the release page
+2. Uncompress
+3. Run `oasis` or `oasis.exe`
+4. Visit the server's IP address in your favorite browser
 
 ### Features
 
@@ -18,7 +27,7 @@ Minimalized file hosting and sharing app.
 + Image (browser support)
 + Audio (browser support)
 + Video (browser support)
-+ Subtitle (srt / vtt)
++ Subtitle (srt / vtt format, tested in Chrome, Firefox and Edge by now)
 + PDF (supported by pdf.js)
 
 ### Roadmap
@@ -36,7 +45,7 @@ Minimalized file hosting and sharing app.
 + [Pdf.js](https://mozilla.github.io/pdf.js)
 + [Plyr](https://plyr.io)
 
-### Build requirements
+### Build process
 
 + Node 14.17
 + Rust 1.54
