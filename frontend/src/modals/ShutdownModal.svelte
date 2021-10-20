@@ -20,7 +20,7 @@
       navigate("/login");
     } catch (e) {
       console.error(e);
-      setNotification("error", $t("message.success.shutdown_error"));
+      setNotification("error", $t("message.error.shutdown_error"));
     }
 
     isLoading = false;

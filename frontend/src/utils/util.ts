@@ -55,7 +55,7 @@ export function compareArray<T>(arrayA: Array<T>, arrayB: Array<T>) {
 }
 
 export function inferFileType(ext: string) {
-  switch (ext.toLowerCase()) {
+  switch (ext && ext.toLowerCase()) {
     case "c":
     case "cpp":
     case "js":

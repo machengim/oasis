@@ -52,7 +52,6 @@
   });
 
   onDestroy(() => {
-    console.log("Destroying...");
     unsubscribeAutoPlay();
 
     if (autoPlayTimeout) {
@@ -187,7 +186,6 @@
     if (!checkSafari()) {
       fullscreen = !!document.fullscreenElement;
     }
-    console.log("element: ", document.fullscreenElement);
 
     toggleImgClass();
 
