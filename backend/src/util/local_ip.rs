@@ -31,14 +31,15 @@ pub fn get() -> AnyResult<IpAddr> {
         use std::cmp::Ordering;
 
         let mut ranges = vec![];
-        ranges.push(LocalIpRange::new([192, 168, 0, 0], [192, 168, 255, 255]));
+        ranges.push(LocalIpRange::new([192, 168, 0, 0], [192, 168, 0, 255]));
         ranges.push(LocalIpRange::new([172, 16, 0, 0], [172, 31, 255, 255]));
         ranges.push(LocalIpRange::new([10, 0, 0, 0], [10, 255, 255, 255]));
 
-        let names = vec!["ethernet", "wi-fi", "en0"];
+        // the name is not sure, it could be "wlan" or "以太网" on some devices.
+        // let names = vec!["ethernet", "wi-fi", "en0"];
         let network_interfaces = local_ip_address::list_afinet_netifas().unwrap();
 
-        for (name, ip) in network_interfaces.iter() {
+        for (_name, ip) in network_interfaces.iter() {
             if !ip.is_ipv4() {
                 continue;
             }
@@ -46,7 +47,7 @@ pub fn get() -> AnyResult<IpAddr> {
             for range in ranges.iter() {
                 if ip.cmp(&range.start) == Ordering::Greater
                     && ip.cmp(&range.end) == Ordering::Less
-                    && names.contains(&name.to_lowercase().as_str())
+                    // && names.contains(&name.to_lowercase().as_str())
                 {
                     return Ok(*ip);
                 }
