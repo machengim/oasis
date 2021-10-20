@@ -48,6 +48,6 @@ pub async fn get_db_pool() -> Result<SqlitePool, sqlx::Error> {
 }
 
 fn get_db_file_location() -> PathBuf {
-    let pwd = std::env::current_dir().expect("Cannot get app directory");
+    let pwd = super::get_pwd();
     pwd.join("db").join("main.db")
 }

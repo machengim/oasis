@@ -26,14 +26,34 @@ pub fn parse_encoded_url(url: &str) -> AnyResult<PathBuf> {
 }
 
 pub fn get_frontend_path() -> PathBuf {
-    let front_dir = get_front_dir_constant();
-    let path = PathBuf::from(front_dir);
+    let path = get_frontend_dir();
 
     if !path.exists() || !path.is_dir() {
         panic!("Invalid frontend directory");
     }
 
     path
+}
+
+#[cfg(debug_assertions)]
+pub fn get_frontend_dir() -> PathBuf {
+    let front_dir = constants::FRONTEND_DIR_DEBUG;
+    PathBuf::from(front_dir)
+}
+
+#[cfg(not(debug_assertions))]
+pub fn get_frontend_dir() -> PathBuf {
+    let front_dir = constants::FRONTEND_DIR_RELEASE;
+    let pwd = get_pwd();
+    pwd.join(front_dir)
+}
+
+pub fn get_pwd() -> PathBuf {
+    let exe_file = std::env::current_exe().expect("Cannot get app directory");
+    exe_file
+        .parent()
+        .expect("Cannot get parent dir of exe file")
+        .to_path_buf()
 }
 
 pub fn get_version_constant() -> String {
@@ -52,15 +72,15 @@ pub fn get_utc_seconds() -> i64 {
     chrono::Utc::now().timestamp()
 }
 
-#[cfg(debug_assertions)]
-pub fn get_front_dir_constant() -> String {
-    constants::FRONTEND_DIR_DEBUG.to_string()
-}
+// #[cfg(debug_assertions)]
+// pub fn get_front_dir_constant() -> String {
+//     constants::FRONTEND_DIR_DEBUG.to_string()
+// }
 
-#[cfg(not(debug_assertions))]
-pub fn get_front_dir_constant() -> String {
-    constants::FRONTEND_DIR_RELEASE.to_string()
-}
+// #[cfg(not(debug_assertions))]
+// pub fn get_front_dir_constant() -> String {
+//     constants::FRONTEND_DIR_RELEASE.to_string()
+// }
 
 #[cfg(test)]
 mod test {
