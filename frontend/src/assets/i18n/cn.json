@@ -126,7 +126,8 @@
       "login": "登陆成功",
       "update_password": "密码更新成功",
       "update_site": "站点配置更新成功",
-      "launch": "站点启动成功"
+      "launch": "站点启动成功",
+      "app_up_to_date": "您的软件是最新版本"
     },
     "error": {
       "no_storage": "请选择存储位置",

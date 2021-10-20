@@ -126,7 +126,8 @@
       "login": "Login successfully",
       "update_password": "Update password successfully",
       "update_site": "Update site config successfully",
-      "launch": "Launched successfully"
+      "launch": "Launched successfully",
+      "app_up_to_date": "Your app is up to date"
     },
     "error": {
       "no_storage": "Please choose a storage",

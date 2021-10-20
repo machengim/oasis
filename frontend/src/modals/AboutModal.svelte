@@ -19,21 +19,26 @@
   let links: Array<ILink> = constants.links;
 
   const checkUpdate = async () => {
+    if (!$siteStore) {
+      return;
+    }
+
+    isLoading = true;
+
     try {
       const response: IUpdateAppNeedRespose = await api.get("/api/sys/update");
       const updateInfo: IUpdateAppInfo = await api.get(response.url);
-      if (
-        $siteStore &&
-        compareVersion(updateInfo.version, $siteStore.version)
-      ) {
+      if (compareVersion(updateInfo.version, $siteStore.version) > 0) {
         setUpdateInfo(updateInfo);
+      } else {
+        setNotification("success", $t("message.success.app_up_to_date"));
       }
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.get_update_info_error"));
     }
 
-    return false;
+    isLoading = false;
   };
 </script>
 
