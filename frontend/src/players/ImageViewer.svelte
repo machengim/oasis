@@ -1,8 +1,9 @@
 <script lang="ts">
+  import screenfull from "screenfull";
   import { onMount, onDestroy } from "svelte";
   import { loopStore } from "../utils/store";
   import Icon from "../components/Icon.svelte";
-  import { checkMobile } from "../utils/util";
+  import { checkMobile, checkSafari } from "../utils/util";
   import { EIconType, EIconColor, ELoopMethod } from "../utils/types";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
@@ -51,6 +52,7 @@
   });
 
   onDestroy(() => {
+    console.log("Destroying...");
     unsubscribeAutoPlay();
 
     if (autoPlayTimeout) {
@@ -60,9 +62,9 @@
       clearTimeout(menuTimeout);
     }
 
-    player.removeEventListener("touchstart", onTouchStart);
-    player.removeEventListener("touchmove", onTouchMove);
-    document.removeEventListener("fullscreenchange", onFullScreenChange);
+    player.removeEventListener("touchstart", onTouchStart, true);
+    player.removeEventListener("touchmove", onTouchMove, true);
+    document.removeEventListener("fullscreenchange", onFullScreenChange, true);
   });
 
   $: if (filePath) {
@@ -128,21 +130,12 @@
   }
 
   const toggleFullScreen = async () => {
-    if (player && !fullscreen) {
-      try {
-        await player.requestFullscreen();
-      } catch (e) {
-        console.error(e);
-      }
-
-      if (checkMobile()) {
-        await window.screen.orientation.lock("landscape");
-      }
-    } else {
-      await document.exitFullscreen();
-
-      if (checkMobile()) {
-        window.screen.orientation.unlock();
+    if (player && screenfull.isEnabled) {
+      await screenfull.toggle(player, { navigationUI: "hide" });
+      // Safari doesn't fire 'fullscreenchange' event.
+      if (checkSafari()) {
+        fullscreen = !fullscreen;
+        await onFullScreenChange();
       }
     }
   };
@@ -190,9 +183,24 @@
     }
   };
 
-  const onFullScreenChange = () => {
-    fullscreen = !!document.fullscreenElement;
+  const onFullScreenChange = async () => {
+    if (!checkSafari()) {
+      fullscreen = !!document.fullscreenElement;
+    }
+    console.log("element: ", document.fullscreenElement);
+
     toggleImgClass();
+
+    if (!checkMobile()) return;
+    if (fullscreen) {
+      try {
+        await window.screen.orientation.lock("landscape");
+      } catch (e) {
+        console.error("Unable to lock orientation: ", e);
+      }
+    } else {
+      window.screen.orientation.unlock();
+    }
   };
 
   const buildImgClass = () => {
@@ -204,7 +212,6 @@
 
   const toggleImgClass = () => {
     if (!imgDiv) return;
-
     const imgHeight = "viewer-height";
     const hFull = "h-full";
 

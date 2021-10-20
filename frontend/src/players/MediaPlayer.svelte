@@ -98,6 +98,8 @@
 
   const onFullScreen = async () => {
     if (!checkMobile()) return;
+    console.log("check mobile? ", checkMobile());
+    console.log("element: ", document.fullscreenElement);
     const fullscreen = !!document.fullscreenElement;
     if (fullscreen) {
       try {
