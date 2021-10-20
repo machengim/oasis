@@ -2,6 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/master/LICENSE-MIT) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)
 
+[中文 README](https://github.com/machengim/oasis/blob/main/README_cn.md)
+
 Minimalized file hosting and sharing app.
 
 ### Install
@@ -27,12 +29,13 @@ Minimalized file hosting and sharing app.
 + Image (browser support)
 + Audio (browser support)
 + Video (browser support)
-+ Subtitle (srt / vtt format, tested in Chrome, Firefox and Edge by now)
++ Subtitle (srt / vtt format, supported in Chrome, Firefox and Edge by now)
 + PDF (supported by pdf.js)
 
 ### Roadmap
 
 + [ ] Custom media player
++ [ ] Download files
 + [ ] Multiple users management
 + [ ] HTTPS
 + [ ] More file format support
