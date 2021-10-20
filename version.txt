@@ -1,14 +1,14 @@
 {
-    version: "0.1",
-    descriptions: [
+    "version": "0.1",
+    "descriptions": [
         {
-            lang: "en",
-            detail: ""
+            "lang": "en",
+            "detail": ""
         },
         {
-            lang: "cn",
-            detail: ""
+            "lang": "cn",
+            "detail": ""
         }
     ],
-    url: "https://github.com/machengim/oasis"
+    "url": "https://github.com/machengim/oasis"
 }
