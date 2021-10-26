@@ -105,10 +105,10 @@ async fn generate_share_link(
 ) -> Result<String, Error> {
     let secret = state.get_secret()?;
     let path_encode = urlencoding::encode(&req_body.path);
-    let input = format!("path={}&expire={}", path_encode, req_body.expire);
+    let input = format!("expire={}&path={}", req_body.expire, path_encode);
     let hash = util::sha256(&input, &secret);
 
-    Ok(format!("{}&hash={}", input, hash))
+    Ok(format!("hash={}&{}", hash, input))
 }
 
 #[get("/file/share?<path>&<expire>&<hash>")]
@@ -121,7 +121,7 @@ async fn get_share_link(
     let secret = state.get_secret()?;
     let path_encode = urlencoding::encode(path);
 
-    let input = format!("path={}&expire={}", path_encode, expire);
+    let input = format!("expire={}&path={}", expire, path_encode);
     if hash != util::sha256(&input, &secret) {
         return Err(Error::BadRequest);
     }
