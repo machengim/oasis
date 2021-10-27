@@ -48,6 +48,16 @@ pub fn get_frontend_dir() -> PathBuf {
     pwd.join(front_dir)
 }
 
+#[cfg(debug_assertions)]
+pub fn get_verion_url() -> String {
+    String::from(constants::APP_VERSION_URL_DEBUG)
+}
+
+#[cfg(not(debug_assertions))]
+pub fn get_verion_url() -> String {
+    String::from(constants::APP_VERSION_URL_RELEASE)
+}
+
 pub fn get_pwd() -> PathBuf {
     let exe_file = std::env::current_exe().expect("Cannot get app directory");
     exe_file

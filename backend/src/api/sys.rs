@@ -6,7 +6,7 @@ use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthAdmin;
 use crate::service::token::AccessToken;
-use crate::util::{self, constants::APP_VERSION_URL, file_system};
+use crate::util::{self, file_system};
 use rocket::serde::json::Json;
 use rocket::{Either, Route, State};
 use sqlx::Connection;
@@ -164,6 +164,6 @@ async fn check_need_update(
     site.update(&mut tx).await?;
     tx.commit().await?;
 
-    let url = APP_VERSION_URL.to_owned();
+    let url = util::get_verion_url();
     Ok(Json(AppNeedUpdateResponse { need, url }))
 }
