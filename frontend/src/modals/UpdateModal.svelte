@@ -24,20 +24,11 @@
   <div class="p-4 text-lg">
     <div>
       <span>{$t("modal.update_app.version")}:</span>
-      <span class="ml-2 px-1">{updateInfo.version}</span>
+      <span class="px-1 font-light">{updateInfo.version}</span>
     </div>
-    <div>
+    <div class="mt-2">
       <span>{$t("modal.update_app.description")}:</span>
-      <span class="ml-2 px-1 break-all">{description}</span>
-    </div>
-    <div>
-      <span>{$t("modal.update_app.url")}:</span>
-      <a
-        href={updateInfo.url}
-        target="_blank"
-        class="px-1 ml-2 rounded-sm hover:bg-blue-400 hover:text-white break-all"
-        >{updateInfo.url}</a
-      >
+      <span class="px-1 font-light break-all">{description}</span>
     </div>
     <div class="w-full mt-4 p-4 flex flex-row justify-end">
       <Button

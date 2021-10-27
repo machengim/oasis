@@ -48,6 +48,16 @@ pub fn get_frontend_dir() -> PathBuf {
     pwd.join(front_dir)
 }
 
+#[cfg(debug_assertions)]
+pub fn get_verion_url() -> String {
+    String::from(constants::APP_VERSION_URL_DEBUG)
+}
+
+#[cfg(not(debug_assertions))]
+pub fn get_verion_url() -> String {
+    String::from(constants::APP_VERSION_URL_RELEASE)
+}
+
 pub fn get_pwd() -> PathBuf {
     let exe_file = std::env::current_exe().expect("Cannot get app directory");
     exe_file
@@ -71,16 +81,6 @@ pub fn sha256(input: &str, secret: &str) -> String {
 pub fn get_utc_seconds() -> i64 {
     chrono::Utc::now().timestamp()
 }
-
-// #[cfg(debug_assertions)]
-// pub fn get_front_dir_constant() -> String {
-//     constants::FRONTEND_DIR_DEBUG.to_string()
-// }
-
-// #[cfg(not(debug_assertions))]
-// pub fn get_front_dir_constant() -> String {
-//     constants::FRONTEND_DIR_RELEASE.to_string()
-// }
 
 #[cfg(test)]
 mod test {

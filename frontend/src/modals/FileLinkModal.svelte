@@ -11,9 +11,11 @@
   export let filename: string;
   export let filePath: string;
   let textarea: HTMLTextAreaElement;
+  let downloadLink: HTMLAnchorElement;
   let link: string;
   let copied = false;
   let isLoading = false;
+  let isDownloading = false;
   let timeout: NodeJS.Timeout;
 
   $: if (copied) {
@@ -21,6 +23,12 @@
       copied = false;
       clearSelection();
     }, 2000);
+  }
+
+  $: if (isDownloading) {
+    setTimeout(() => {
+      isDownloading = false;
+    }, 1000);
   }
 
   onMount(() => {
@@ -82,6 +90,13 @@
       window.getSelection().removeAllRanges();
     }
   };
+
+  const downloadFile = () => {
+    if (downloadLink) {
+      downloadLink.click();
+      isDownloading = true;
+    }
+  };
 </script>
 
 <Modal {onClose} title={$t("modal.file_share.title")}>
@@ -107,6 +122,20 @@
         color={"blue"}
         value={copied ? $t("button.link_copied") : $t("button.copy_link")}
         className="mr-4"
+      />
+      <Button
+        onClick={downloadFile}
+        color={"blue"}
+        value={$t("button.download")}
+        className="mr-4"
+        disabled={isDownloading}
+      />
+      <!-- svelte-ignore a11y-missing-content -->
+      <a
+        href={link}
+        download={filename}
+        bind:this={downloadLink}
+        class="hidden"
       />
       <Button onClick={onClose} value={$t("button.close")} />
     </div>
