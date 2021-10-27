@@ -81,7 +81,7 @@
       const values: [ISiteBrief, void] = await Promise.all([siteReq, tokenReq]);
       const site = values[0];
       if (site) {
-        siteStore.set({...site, storage: ""});
+        siteStore.set({ ...site, storage: "" });
         titleStore.set(site.name);
       }
     } catch (e) {
@@ -103,7 +103,7 @@
   const needRefreshToken = (): boolean => {
     if (!$userStore) return false;
 
-    let currentTime = new Date().getTime();
+    let currentTime = new Date().getTime() / 1000;
     return $userStore.expire - currentTime <= 300;
   };
 
