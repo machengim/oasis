@@ -32,7 +32,8 @@
     "check_updating": "检查中...",
     "copy_link": "复制链接",
     "link_copied": "链接已复制",
-    "open_download": "下载"
+    "open_download": "前往下载",
+    "download": "下载"
   },
   "filetype": {
     "Code": "代码",

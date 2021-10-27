@@ -32,7 +32,8 @@
     "check_updating": "Checking...",
     "copy_link": "Copy link",
     "link_copied": "Link copied",
-    "open_download": "Download"
+    "open_download": "Goto download",
+    "download": "Download"
   },
   "filetype": {
     "Code": "Code",
