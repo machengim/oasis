@@ -1,12 +1,12 @@
 use crate::entity::error::Error;
-use crate::entity::file::{File, FileType};
+use crate::entity::file::File;
 use crate::entity::request::GenerateLinkRequest;
 use crate::entity::response::FileResponse;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
-use crate::service::range::RangedFile;
+use crate::service::range::{Range, RangedFile};
 use crate::service::track;
-use crate::util::{self, file_system};
+use crate::util;
 use rocket::fs::NamedFile;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
@@ -55,6 +55,7 @@ async fn file_content(
     path: &str,
     _user: AuthUser,
     state: &State<AppState>,
+    range_header: Range,
 ) -> Result<FileResponse, Error> {
     let storage = state.get_site()?.storage.clone();
     let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
@@ -64,14 +65,12 @@ async fn file_content(
         return Err(Error::BadRequest);
     }
 
-    match FileType::get_file_type(&target_path) {
-        FileType::Code | FileType::Text => Ok(FileResponse::Text(
-            file_system::read_text_file(target_path).await?,
-        )),
-        FileType::Video | FileType::Music => {
-            Ok(FileResponse::Range(RangedFile { path: target_path }))
+    match range_header.range {
+        Some(range) => {
+            let ranged_file = RangedFile::new(range, target_path).await?;
+            Ok(FileResponse::Range(ranged_file))
         }
-        _ => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
+        None => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
     }
 }
 
@@ -117,6 +116,7 @@ async fn get_share_link(
     path: &str,
     expire: i64,
     hash: &str,
+    range_header: Range,
 ) -> Result<FileResponse, Error> {
     let secret = state.get_secret()?;
     let path_encode = urlencoding::encode(path);
@@ -128,5 +128,5 @@ async fn get_share_link(
 
     let user = AuthUser::default();
 
-    Ok(file_content(path, user, state).await?)
+    Ok(file_content(path, user, state, range_header).await?)
 }

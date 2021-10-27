@@ -9,7 +9,6 @@ use super::site::Site;
 pub enum FileResponse {
     Range(RangedFile),
     Binary(NamedFile),
-    Text(String),
 }
 
 #[derive(Serialize)]
