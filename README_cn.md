@@ -4,7 +4,7 @@
 
 [English README](https://github.com/machengim/oasis/blob/main/README.md)
 
-极简文件服务和共享应用。
+极简自建文件服务器。
 
 ### 安装
 

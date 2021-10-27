@@ -4,7 +4,7 @@
 
 [中文 README](https://github.com/machengim/oasis/blob/main/README_cn.md)
 
-Minimalized file hosting and sharing app.
+Minimalized self-hosted file server.
 
 ### Install
 
