@@ -301,7 +301,7 @@
               {#each siblings as sibling, i}
                 {#if filename === sibling.filename}
                   <div class="bg-blue-400 text-white rounded mb-1">
-                    <span class="px-2 py-1">
+                    <span class="px-2 py-1 break-all">
                       {sibling.filename}
                     </span>
                   </div>

@@ -17,6 +17,7 @@
   let isLoading = false;
   let repo: ILink = constants.repo;
   let links: Array<ILink> = constants.links;
+  let version = ($siteStore && $siteStore.version) || "0.1";
 
   const checkUpdate = async () => {
     if (!$siteStore) {
@@ -46,7 +47,7 @@
   <div class="p-4 text-lg">
     <div>
       <span>{$t("modal.about.version")}: </span>
-      <span class="ml-2 px-1">0.1</span>
+      <span class="ml-2 px-1">{version}</span>
     </div>
     {#if repo}
       <div>

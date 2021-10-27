@@ -6,7 +6,7 @@
 
 Minimalized self-hosted file server.
 
-![](https://github.com/machengim/oasis/blob/dev/doc/Oasis_demo.jpg?raw=true)
+![](https://github.com/machengim/oasis/blob/main/doc/Oasis_demo.jpg?raw=true)
 
 ### Install
 
