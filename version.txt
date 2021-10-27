@@ -3,11 +3,11 @@
     "descriptions": [
         {
             "lang": "en",
-            "detail": "External video player support via shared link, eg. VLC, MPV; Update functionality finalized."
+            "detail": "External video player support via shared link, eg. VLC, MPV."
         },
         {
             "lang": "cn",
-            "detail": "通过分享链结支持外部视频播放器, 如VLC, MPV; 完善升级功能."
+            "detail": "通过分享链接支持外部视频播放器, 如VLC, MPV."
         }
     ],
     "url": "https://github.com/machengim/oasis/releases"

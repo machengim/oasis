@@ -46,7 +46,7 @@
     }
   }
 
-  @media only screen and (min-width: 1024px) {
+  @media only screen and (min-width: 768px) {
     .modal-small {
       width: 20rem;
     }
