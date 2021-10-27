@@ -15,6 +15,8 @@ async fn main() -> Result<(), anyhow::Error> {
     init::init_app().await?;
     let pool = init::get_db_pool().await?;
     let mut conn = pool.acquire().await?;
+    init::check_update(&mut conn).await?;
+
     let site_op = Site::read(&mut conn).await?;
     let state = AppState::new(site_op, pool);
     RocketEnv::new().setup();
