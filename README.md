@@ -4,7 +4,7 @@
 
 [中文 README](https://github.com/machengim/oasis/blob/main/README_cn.md)
 
-Minimalized self-hosted file server.
+A self-hosted file server.
 
 ![](https://github.com/machengim/oasis/blob/main/doc/Oasis_demo.jpg?raw=true)
 

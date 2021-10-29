@@ -4,7 +4,7 @@
 
 [English README](https://github.com/machengim/oasis/blob/main/README.md)
 
-极简自建文件服务器。
+自建文件服务器。
 
 ![](https://github.com/machengim/oasis/blob/main/doc/Oasis_demo.jpg?raw=true)
 
