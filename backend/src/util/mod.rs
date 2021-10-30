@@ -2,7 +2,6 @@ pub mod constants;
 pub mod db;
 pub mod file_system;
 pub mod init;
-pub mod local_ip;
 pub mod rocket_env;
 use anyhow::Result as AnyResult;
 use rand::{distributions::Alphanumeric, Rng};
@@ -80,6 +79,27 @@ pub fn sha256(input: &str, secret: &str) -> String {
 
 pub fn get_utc_seconds() -> i64 {
     chrono::Utc::now().timestamp()
+}
+
+pub fn get_listen_ip_and_port() -> Result<Option<(String, u16)>, anyhow::Error> {
+    let args: Vec<String> = std::env::args().collect();
+    let ip;
+    let port;
+    if args.len() == 1 {
+        ip = "0.0.0.0";
+        port = 8000;
+    } else if args.len() == 3 {
+        ip = &args[1];
+        match args[2].parse() {
+            Ok(p) => {
+                port = p;
+            }
+            _ => return Err(anyhow::anyhow!("Invalid port number")),
+        }
+    } else {
+        return Ok(None);
+    }
+    Ok(Some((ip.to_string(), port)))
 }
 
 #[cfg(test)]
