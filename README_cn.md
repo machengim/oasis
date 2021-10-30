@@ -42,19 +42,23 @@
 - [ ] 多用户管理
 - [ ] HTTPS
 - [ ] 更多文件格式支持
+- [ ] 文件上传
 
 ### 技术栈
 
 - [Svelte](https://svelte.dev)
 - [Rocket](https://rocket.rs)
 - [Tailwind](https://tailwindcss.com)
+
+### 致谢
+
 - [Pdf.js](https://mozilla.github.io/pdf.js)
 - [Plyr](https://plyr.io)
 
 ### 构建
 
-- Node 14.17
-- Rust 1.54
+- Node 14.17+
+- Rust 1.54+
 - Python3
 
 ```

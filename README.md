@@ -42,16 +42,20 @@ A self-hosted file server.
 - [ ] Multiple users management
 - [ ] HTTPS
 - [ ] More file format support
+- [ ] File upload
 
 ### Tech stack
 
 - [Svelte](https://svelte.dev)
 - [Rocket](https://rocket.rs)
 - [Tailwind](https://tailwindcss.com)
+
+### Credit
+
 - [Pdf.js](https://mozilla.github.io/pdf.js)
 - [Plyr](https://plyr.io)
 
-### Build process
+### Building process
 
 - Node 14.17+
 - Rust 1.54+
