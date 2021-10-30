@@ -59,9 +59,8 @@
 
 - Node 14.17+
 - Rust 1.54+
-- Python3
 
 ```
 cd path/to/oasis
-python3 build.py
+node build.js
 ```

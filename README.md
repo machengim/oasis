@@ -55,13 +55,12 @@ A self-hosted file server.
 - [Pdf.js](https://mozilla.github.io/pdf.js)
 - [Plyr](https://plyr.io)
 
-### Building process
+### Build process
 
 - Node 14.17+
 - Rust 1.54+
-- Python3
 
 ```
 cd path/to/oasis
-python3 build.py
+node build.js
 ```
