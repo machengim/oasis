@@ -111,7 +111,7 @@ fn retrieve_ip() -> AnyResult<(IpAddr, bool)> {
         // the name is not sure, it could be "wlan" or "以太网" on some devices.
         // let names = vec!["ethernet", "wi-fi", "en0"];
         let network_interfaces = local_ip_address::list_afinet_netifas().unwrap();
-        let ips = vec![];
+        let mut ips = vec![];
         for (_name, ip) in network_interfaces.iter() {
             if !ip.is_ipv4() {
                 continue;

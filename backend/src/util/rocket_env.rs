@@ -10,7 +10,7 @@ pub struct RocketEnv<'a> {
 
 impl<'a> RocketEnv<'a> {
     #[cfg(not(debug_assertions))]
-    pub fn setup(config: &ServerConfig) -> Self {
+    pub fn setup(config: &ServerConfig) {
         let ip_str = config.ip.to_string();
         let port_str = config.port.to_string();
 
