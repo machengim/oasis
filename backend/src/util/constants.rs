@@ -1,3 +1,5 @@
+use std::net::{IpAddr, Ipv4Addr};
+
 pub const DEFAULT_APP_NAME: &'static str = "Oasis";
 pub const DEFAULT_UPDATE_FREQ: &'static str = "monthly";
 pub const DEFAULT_LANGUAGE: &'static str = "en";
@@ -19,3 +21,4 @@ pub const APP_VERSION_URL_DEBUG: &'static str =
     "https://raw.githubusercontent.com/machengim/oasis/dev/version.txt";
 #[allow(dead_code)]
 pub const CACHE_FILE_EXTS: [&'static str; 3] = ["html", "js", "css"];
+pub const DEFAULT_IP: IpAddr = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
