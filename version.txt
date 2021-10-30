@@ -1,13 +1,13 @@
 {
-    "version": "0.1.1",
+    "version": "0.1.2",
     "descriptions": [
         {
             "lang": "en",
-            "detail": "External media player support via shared link, eg. VLC, MPV; FileDownload."
+            "detail": "Config file for specifying IP and port"
         },
         {
             "lang": "cn",
-            "detail": "通过分享链接支持外部媒体播放器, 如VLC, MPV; 文件下载."
+            "detail": "在设置文件中指定IP和端口"
         }
     ],
     "url": "https://github.com/machengim/oasis/releases"
