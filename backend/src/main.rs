@@ -62,6 +62,6 @@ async fn main() -> Result<(), anyhow::Error> {
 }
 
 fn print_help() -> ! {
-    println!("Usage: ./server [ip] [port]");
+    println!("Usage: ./oasis [ip] [port]");
     std::process::exit(0);
 }
