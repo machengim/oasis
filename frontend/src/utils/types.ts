@@ -96,6 +96,19 @@ export interface IUser {
   expire: number;
 }
 
+export interface IUploadTask {
+  file: File;
+  targetDir: string;
+  status: EUploadStatus;
+  progress: number;
+}
+
+export interface IPreUploadRequest {
+  filename: string;
+  size: number;
+  targetDir: string;
+}
+
 export enum FileType {
   Code = "Code",
   Dir = "Dir",
@@ -155,4 +168,13 @@ export enum ELoopMethod {
   repeat = "repeat",  // repeat single file
   shuffle = "shuffle",  // random shuffle play list
   loop = "loop"     // loop play list in sequence
+}
+
+export enum EUploadStatus {
+  waiting = "waiting",
+  preparing = "preparing",
+  uploading = "uploading",
+  finishing = "finishing",
+  success = "success",
+  failed = "failed"
 }

@@ -6,8 +6,10 @@
     dirsStore,
     filesStore,
     titleStore,
+    uploadTaskStore,
   } from "../utils/store";
-  import type { IFile, IFileOrder } from "../utils/types";
+  import type { IFile, IFileOrder, IUploadTask } from "../utils/types";
+  import { EUploadStatus } from "../utils/types";
   import { EIconType } from "../utils/types";
   import * as api from "../utils/api";
   import Icon from "../components/Icon.svelte";
@@ -15,12 +17,19 @@
   import BreadCrum from "../components/BreadCrum.svelte";
   import { formatSize, compareFile } from "../utils/util";
   import FileIcon from "../components/FileIcon.svelte";
+  import Button from "../components/Button.svelte";
+  import PromptModal from "../modals/PromptModal.svelte";
 
   const navigate = useNavigate();
   export let dirs: Array<string>;
   let files: Array<IFile> = [];
   let order: IFileOrder = { key: "name", asc: true };
   let isLoading = false;
+  let fileSelector: HTMLInputElement;
+  let title: string;
+  let text: string;
+  let result = false;
+  let showPromptModal = false;
 
   $: if (dirs.length >= 1) {
     titleStore.set(dirs[dirs.length - 1]);
@@ -95,11 +104,77 @@
 
     navigate(targetPath);
   };
+
+  const openSelectFileDialog = () => {
+    if (fileSelector) {
+      fileSelector.click();
+    }
+  };
+
+  const selectUploadFile = async (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const filelist = target.files as FileList;
+    const targetDir = encodeURIComponent(dirs.join("/"));
+
+    for (const file of filelist) {
+      if (files.findIndex((f) => f.filename === file.name) >= 0) {
+        title = "Filename existed";
+        text = `File <b>${file.name}</b> already existed. Are you sure you want to overwrite it?`;
+        result = false;
+        showPromptModal = true;
+
+        while (showPromptModal) {
+          await new Promise((r) => setTimeout(r, 200));
+        }
+
+        if (!result) {
+          continue;
+        }
+      }
+
+      const upload: IUploadTask = {
+        file,
+        targetDir,
+        status: EUploadStatus.waiting,
+        progress: 0,
+      };
+
+      uploadTaskStore.set(upload);
+    }
+  };
+
+  const setResult = (r: boolean) => {
+    result = r;
+  };
+
+  const closePrompModal = () => {
+    showPromptModal = false;
+  };
 </script>
 
+{#if showPromptModal}
+  <PromptModal
+    {title}
+    {text}
+    onClose={closePrompModal}
+    setResult={(r) => setResult(r)}
+  />
+{/if}
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
-    <BreadCrum {dirs} className="py-1" />
+    <div class="flex flex-row items-center justify-between">
+      <BreadCrum {dirs} className="py-1" />
+      <div>
+        <Button onClick={openSelectFileDialog} color="blue" value="+ Upload" />
+        <input
+          type="file"
+          class="hidden"
+          bind:this={fileSelector}
+          multiple
+          on:change={selectUploadFile}
+        />
+      </div>
+    </div>
     {#if isLoading}
       <Spinner />
     {:else}

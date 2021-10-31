@@ -1,5 +1,5 @@
 import { get, Writable, writable } from 'svelte/store';
-import type { IFile, INotification, ELoopMethod, IUser, ISiteFull } from './types';
+import type { IFile, INotification, ELoopMethod, IUser, ISiteFull, IUploadTask } from './types';
 import * as constants from '../assets/constants.json';
 
 export const siteStore: Writable<ISiteFull> = writable(null);
@@ -46,3 +46,5 @@ export function resetTitle() {
         titleStore.set(constants.app_name);
     }
 }
+
+export const uploadTaskStore: Writable<IUploadTask> = writable(null);
