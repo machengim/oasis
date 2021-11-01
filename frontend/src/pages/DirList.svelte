@@ -7,6 +7,7 @@
     filesStore,
     titleStore,
     uploadTaskStore,
+    completeTaskStore,
   } from "../utils/store";
   import type { IFile, IFileOrder, IUploadTask } from "../utils/types";
   import { EUploadStatus } from "../utils/types";
@@ -15,10 +16,11 @@
   import Icon from "../components/Icon.svelte";
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
-  import { formatSize, compareFile } from "../utils/util";
+  import { formatSize, compareFile, inferFileType } from "../utils/util";
   import FileIcon from "../components/FileIcon.svelte";
   import Button from "../components/Button.svelte";
   import PromptModal from "../modals/PromptModal.svelte";
+  import { onDestroy } from "svelte";
 
   const navigate = useNavigate();
   export let dirs: Array<string>;
@@ -30,6 +32,26 @@
   let text: string;
   let result = false;
   let showPromptModal = false;
+
+  const unsubscribeTaskUpdate = completeTaskStore.subscribe((task) => {
+    if (task && task.status === EUploadStatus.success) {
+      let encodedDir = encodeURIComponent(dirs.join("/"));
+      if (encodedDir === task.targetDir) {
+        const file = task.file;
+        const fileEntry: IFile = {
+          file_type: inferFileType(file.name),
+          filename: file.name,
+          size: file.size,
+        };
+        files.push(fileEntry);
+        files = files;
+      }
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribeTaskUpdate();
+  });
 
   $: if (dirs.length >= 1) {
     titleStore.set(dirs[dirs.length - 1]);

@@ -1,5 +1,5 @@
 import { get, Writable, writable } from 'svelte/store';
-import type { IFile, INotification, ELoopMethod, IUser, ISiteFull, IUploadTask } from './types';
+import type { IFile, INotification, ELoopMethod, IUser, ISiteFull, IUploadTask, ITaskUpdate, EUploadStatus } from './types';
 import * as constants from '../assets/constants.json';
 
 export const siteStore: Writable<ISiteFull> = writable(null);
@@ -48,3 +48,15 @@ export function resetTitle() {
 }
 
 export const uploadTaskStore: Writable<IUploadTask> = writable(null);
+
+export const completeTaskStore: Writable<IUploadTask> = writable(null);
+
+export const taskUpdateStore: Writable<ITaskUpdate> = writable(null);
+
+export function updateTask(file: File, status: EUploadStatus, progress: number) {
+    let update: ITaskUpdate = {
+        file, status, progress
+    };
+
+    taskUpdateStore.set(update);
+}

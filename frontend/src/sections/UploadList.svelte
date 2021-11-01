@@ -1,13 +1,16 @@
 <script lang="ts">
-  import { uploadTaskStore } from "../utils/store";
+  import { taskUpdateStore, uploadTaskStore } from "../utils/store";
   import Icon from "../components/Icon.svelte";
   import { EIconColor, EIconType, EUploadStatus } from "../utils/types";
   import type { IUploadTask } from "../utils/types";
   import { onDestroy } from "svelte";
   import PromptModal from "../modals/PromptModal.svelte";
+  import { upload } from "../utils/upload";
+  import { sleep } from "../utils/util";
 
   let showList = true;
   let uploadTasks: Array<IUploadTask> = [];
+  let currentTask: IUploadTask = null;
   let result = false;
   let showPromptModal = false;
   let text: string;
@@ -19,9 +22,54 @@
     }
   });
 
+  const unsubscribeTaskUpdate = taskUpdateStore.subscribe((update) => {
+    if (update) {
+      const index = uploadTasks.findIndex((t) => t.file === update.file);
+      if (index >= 0) {
+        const file = uploadTasks[index];
+        file.status = update.status;
+        file.progress = update.progress;
+        uploadTasks = uploadTasks;
+      }
+    }
+  });
+
   onDestroy(() => {
     unsubscribeUploadTasks();
+    unsubscribeTaskUpdate();
   });
+
+  $: if (uploadTasks) {
+    if (
+      !currentTask ||
+      currentTask.status === EUploadStatus.success ||
+      currentTask.status === EUploadStatus.failed ||
+      uploadTasks.findIndex((t) => t.file === currentTask.file) < 0
+    ) {
+      currentTask = findNextTask();
+    }
+  }
+
+  $: if (currentTask) {
+    processCurrentTask();
+  }
+
+  const findNextTask = () => {
+    if (uploadTasks.length === 0) {
+      return null;
+    }
+
+    const nextIndex = uploadTasks.findIndex(
+      (t) => t.status === EUploadStatus.waiting
+    );
+    return uploadTasks[nextIndex];
+  };
+
+  const processCurrentTask = async () => {
+    currentTask.status = EUploadStatus.preparing;
+    uploadTasks = uploadTasks;
+    await upload(currentTask);
+  };
 
   const toggleShowList = () => {
     showList = !showList;
@@ -29,8 +77,7 @@
 
   const removeAllTasks = async () => {
     const unfinishedTasks = uploadTasks.filter(
-      (t) =>
-        t.status !== EUploadStatus.success && t.status !== EUploadStatus.failed
+      (t) => t.status !== EUploadStatus.success
     ).length;
 
     if (unfinishedTasks === 0) {
@@ -44,7 +91,7 @@
       showPromptModal = true;
 
       while (showPromptModal) {
-        await new Promise((r) => setTimeout(r, 200));
+        await sleep(200);
       }
 
       if (result) {
@@ -53,21 +100,21 @@
     }
   };
 
-  const removeTask = async (task: IUploadTask) => {
+  const removeTask = async (task: IUploadTask, finished: boolean) => {
     const index = uploadTasks.findIndex((t) => t.file === task.file);
-    if (index >= 0) {
+    result = finished;
+    if (index >= 0 && !result) {
       text = `Are you sure you want to cancel the upload task of file <b>${task.file.name}</b> ?`;
-      result = false;
       showPromptModal = true;
 
       while (showPromptModal) {
-        await new Promise((r) => setTimeout(r, 200));
+        await sleep(200);
       }
+    }
 
-      if (result) {
-        uploadTasks.splice(index, 1);
-        uploadTasks = uploadTasks;
-      }
+    if (result) {
+      uploadTasks.splice(index, 1);
+      uploadTasks = uploadTasks;
     }
   };
 
@@ -77,6 +124,12 @@
 
   const setResult = (r: boolean) => {
     result = r;
+  };
+
+  // Input format: 0.1225, output: 12.3%
+  const formatProgress = (progress: number) => {
+    const value = (Math.round(progress * 10000) / 100).toFixed(1);
+    return `${value}%`;
   };
 </script>
 
@@ -132,14 +185,18 @@
               {task.file.name}
             </div>
             <div class="flex flex-row">
-              <div class="mr-1">{task.status}</div>
-              {#if task.status === EUploadStatus.finishing || task.status === EUploadStatus.success}
+              {#if task.status === EUploadStatus.uploading}
+                <div class="mr-1">{formatProgress(task.progress)}</div>
+              {:else}
+                <div class="mr-1">{task.status}</div>
+              {/if}
+              {#if task.status === EUploadStatus.success}
                 <Icon
                   type={EIconType.success}
                   color={EIconColor.green}
                   size="small"
                   className="cursor-pointer"
-                  onClick={() => removeTask(task)}
+                  onClick={() => removeTask(task, true)}
                 />
               {:else}
                 <Icon
@@ -147,7 +204,7 @@
                   color={EIconColor.red}
                   size="small"
                   className="cursor-pointer"
-                  onClick={() => removeTask(task)}
+                  onClick={() => removeTask(task, false)}
                 />
               {/if}
             </div>

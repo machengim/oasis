@@ -50,11 +50,30 @@ export function captilizeFirst(input: string) {
 
 export function compareArray<T>(arrayA: Array<T>, arrayB: Array<T>) {
 
-  return arrayA.length === arrayB.length && 
+  return arrayA.length === arrayB.length &&
     arrayA.every(function (value, index) { return value === arrayB[index] });
 }
 
-export function inferFileType(ext: string) {
+function extractFileExt(filename: string) {
+  if (!filename) {
+    return FileType.Unknown;
+  }
+
+  const splits = filename.split(".");
+  let file_ext: string;
+
+  if (splits.length < 2) {
+    file_ext = null;
+  } else {
+    file_ext = splits.slice(-1)[0].toLowerCase();
+  }
+
+  return file_ext;
+};
+
+export function inferFileType(filename: string) {
+  const ext = extractFileExt(filename);
+
   switch (ext && ext.toLowerCase()) {
     case "c":
     case "cpp":
@@ -190,4 +209,8 @@ export function srtToVtt(input: string): string {
   }
 
   return output;
+}
+
+export function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms))
 }

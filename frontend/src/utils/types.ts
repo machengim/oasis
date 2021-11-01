@@ -103,10 +103,17 @@ export interface IUploadTask {
   progress: number;
 }
 
-export interface IPreUploadRequest {
+export interface ITaskUpdate {
+  file: File;
+  status: EUploadStatus;
+  progress: number;
+}
+
+export interface IUploadRequest {
   filename: string;
   size: number;
-  targetDir: string;
+  target: string; // target directory to store the uploading file
+  hash: string;   // the md5 value of the file
 }
 
 export enum FileType {

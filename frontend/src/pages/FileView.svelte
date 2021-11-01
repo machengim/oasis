@@ -50,7 +50,7 @@
 
   $: if (filename) {
     titleStore.set(filename);
-    fileType = extractFileType();
+    fileType = inferFileType(filename);
     filePath = buildFilePath();
   }
 
@@ -128,19 +128,6 @@
     const filePath = dir ? dir + "/" + vttTrackName : vttTrackName;
 
     return "/api/file/track/" + encodeURIComponent(filePath);
-  };
-
-  const extractFileType = () => {
-    const splits = filename.split(".");
-    let file_ext: string;
-
-    if (splits.length < 2) {
-      file_ext = null;
-    } else {
-      file_ext = splits.slice(-1)[0].toLowerCase();
-    }
-
-    return inferFileType(file_ext);
   };
 
   const selectSibling = (index: number) => {
