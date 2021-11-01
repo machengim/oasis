@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { taskUpdateStore, uploadTaskStore } from "../utils/store";
+  import { terminateWorkers, uploadTaskStore } from "../utils/store";
   import Icon from "../components/Icon.svelte";
   import { EIconColor, EIconType, EUploadStatus } from "../utils/types";
   import type { IUploadTask } from "../utils/types";
@@ -7,6 +7,7 @@
   import PromptModal from "../modals/PromptModal.svelte";
   import { upload } from "../utils/upload";
   import { sleep } from "../utils/util";
+  import * as api from "../utils/api";
 
   let showList = true;
   let uploadTasks: Array<IUploadTask> = [];
@@ -15,28 +16,14 @@
   let showPromptModal = false;
   let text: string;
 
-  const unsubscribeUploadTasks = uploadTaskStore.subscribe((task) => {
-    if (task) {
-      uploadTasks.push(task);
-      uploadTasks = uploadTasks;
-    }
-  });
-
-  const unsubscribeTaskUpdate = taskUpdateStore.subscribe((update) => {
-    if (update) {
-      const index = uploadTasks.findIndex((t) => t.file === update.file);
-      if (index >= 0) {
-        const file = uploadTasks[index];
-        file.status = update.status;
-        file.progress = update.progress;
-        uploadTasks = uploadTasks;
-      }
+  const unsubscribeUploadTasks = uploadTaskStore.subscribe((tasks) => {
+    if (tasks) {
+      uploadTasks = tasks;
     }
   });
 
   onDestroy(() => {
     unsubscribeUploadTasks();
-    unsubscribeTaskUpdate();
   });
 
   $: if (uploadTasks) {
@@ -81,7 +68,7 @@
     ).length;
 
     if (unfinishedTasks === 0) {
-      uploadTasks = [];
+      uploadTaskStore.set([]);
     } else {
       const is_text = unfinishedTasks > 1 ? "are" : "is";
       const tasks_text = unfinishedTasks > 1 ? "tasks" : "task";
@@ -95,7 +82,22 @@
       }
 
       if (result) {
-        uploadTasks = [];
+        const hashesToRemove = uploadTasks
+          .map((t) => t.hash)
+          .filter((h) => !!h);
+        console.log(hashesToRemove);
+
+        terminateWorkers();
+        uploadTaskStore.set([]);
+
+        if (hashesToRemove.length > 0) {
+          try {
+            const payload = { hashes: hashesToRemove };
+            await api.remove(`/api/upload`, payload, false);
+          } catch (e) {
+            console.error(e);
+          }
+        }
       }
     }
   };
@@ -113,8 +115,19 @@
     }
 
     if (result) {
+      const hashToRemove = uploadTasks[index].hash;
+      terminateWorkers();
       uploadTasks.splice(index, 1);
-      uploadTasks = uploadTasks;
+      uploadTaskStore.set(uploadTasks);
+
+      if (hashToRemove) {
+        try {
+          const payload = { hashes: [hashToRemove] };
+          await api.remove(`/api/upload`, payload, false);
+        } catch (e) {
+          console.error(e);
+        }
+      }
     }
   };
 

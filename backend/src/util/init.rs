@@ -53,9 +53,9 @@ pub async fn check_update(conn: &mut PoolConnection<Sqlite>) -> AnyResult<()> {
         let mut tx = conn.begin().await?;
         site.update(&mut tx).await?;
         tx.commit().await?;
-        println!("Update to version: {}", version_app);
     }
 
+    println!("Oasis version {}", constants::VERSION);
     Ok(())
 }
 

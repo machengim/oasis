@@ -38,13 +38,15 @@
       let encodedDir = encodeURIComponent(dirs.join("/"));
       if (encodedDir === task.targetDir) {
         const file = task.file;
+        // Files with the same name should not exist in the same dir.
+        const newFiles = files.filter((f) => f.filename !== file.name);
         const fileEntry: IFile = {
           file_type: inferFileType(file.name),
           filename: file.name,
           size: file.size,
         };
-        files.push(fileEntry);
-        files = files;
+        newFiles.push(fileEntry);
+        files = newFiles;
       }
     }
   });
@@ -161,7 +163,9 @@
         progress: 0,
       };
 
-      uploadTaskStore.set(upload);
+      const tasks = $uploadTaskStore;
+      tasks.push(upload);
+      uploadTaskStore.set(tasks);
     }
   };
 

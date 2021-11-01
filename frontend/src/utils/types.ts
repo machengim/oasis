@@ -101,12 +101,7 @@ export interface IUploadTask {
   targetDir: string;
   status: EUploadStatus;
   progress: number;
-}
-
-export interface ITaskUpdate {
-  file: File;
-  status: EUploadStatus;
-  progress: number;
+  hash?: string;
 }
 
 export interface IUploadRequest {

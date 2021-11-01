@@ -1,5 +1,5 @@
 import { get, Writable, writable } from 'svelte/store';
-import type { IFile, INotification, ELoopMethod, IUser, ISiteFull, IUploadTask, ITaskUpdate, EUploadStatus } from './types';
+import type { IFile, INotification, ELoopMethod, IUser, ISiteFull, IUploadTask, EUploadStatus } from './types';
 import * as constants from '../assets/constants.json';
 
 export const siteStore: Writable<ISiteFull> = writable(null);
@@ -47,16 +47,39 @@ export function resetTitle() {
     }
 }
 
-export const uploadTaskStore: Writable<IUploadTask> = writable(null);
+export const uploadTaskStore: Writable<Array<IUploadTask>> = writable([]);
 
 export const completeTaskStore: Writable<IUploadTask> = writable(null);
 
-export const taskUpdateStore: Writable<ITaskUpdate> = writable(null);
-
 export function updateTask(file: File, status: EUploadStatus, progress: number) {
-    let update: ITaskUpdate = {
-        file, status, progress
-    };
+    const tasks = get(uploadTaskStore);
+    const index = tasks.findIndex(t => t.file === file);
+    if (index >= 0) {
+        tasks[index].status = status;
+        tasks[index].progress = progress;
+        uploadTaskStore.set(tasks);
+    }
+}
 
-    taskUpdateStore.set(update);
+export const workerStore: Writable<Array<Worker>> = writable([]);
+
+export function pushWorker(worker: Worker) {
+    const newWorkers = get(workerStore);
+    newWorkers.push(worker);
+    workerStore.set(newWorkers);
+}
+
+export function removeWorker(worker: Worker) {
+    const workers = get(workerStore);
+    const newWorkers = workers.filter(w => w !== worker);
+    workerStore.set(newWorkers);
+}
+
+export function terminateWorkers() {
+    const workers = get(workerStore);
+    for (const worker of workers) {
+        worker.terminate();
+    }
+
+    workerStore.set([]);
 }

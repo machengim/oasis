@@ -57,3 +57,9 @@ pub struct UploadSliceRequest {
     pub index: u64,
     pub data: Vec<u8>,
 }
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct CancelUploadRequest {
+    pub hashes: Vec<String>,
+}
