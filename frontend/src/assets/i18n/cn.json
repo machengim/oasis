@@ -33,7 +33,8 @@
     "copy_link": "复制链接",
     "link_copied": "链接已复制",
     "open_download": "前往下载",
-    "download": "下载"
+    "download": "下载",
+    "upload": "+ 上传"
   },
   "filetype": {
     "Code": "代码",
@@ -85,6 +86,9 @@
     },
     "login": {
       "title": "用户登录"
+    },
+    "upload_list": {
+      "title": "上传列表"
     }
   },
   "modal": {
@@ -114,6 +118,11 @@
       "version": "版本",
       "description": "描述",
       "url": "下载链接"
+    },
+    "upload": {
+      "title_cancel": "取消上传任务",
+      "cancel_uploads_warn": "有未完成的上传任务. 确定要取消它们吗?",
+      "cancel_upload_file": "确定要取消正在上传的文件:"
     }
   },
   "message": {

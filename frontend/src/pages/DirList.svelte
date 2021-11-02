@@ -8,6 +8,7 @@
     titleStore,
     uploadTaskStore,
     completeTaskStore,
+    resetTitle,
   } from "../utils/store";
   import type { IFile, IFileOrder, IUploadTask } from "../utils/types";
   import { EUploadStatus } from "../utils/types";
@@ -58,6 +59,8 @@
 
   $: if (dirs.length >= 1) {
     titleStore.set(dirs[dirs.length - 1]);
+  } else {
+    resetTitle();
   }
 
   $: fetchDirContent(dirs);
@@ -203,7 +206,11 @@
     <div class="flex flex-row items-center justify-between">
       <BreadCrum {dirs} className="py-1" />
       <div>
-        <Button onClick={openSelectFileDialog} color="blue" value="+ Upload" />
+        <Button
+          onClick={openSelectFileDialog}
+          color="blue"
+          value={$t("button.upload")}
+        />
         <input
           type="file"
           class="hidden"

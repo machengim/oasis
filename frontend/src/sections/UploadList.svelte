@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { terminateWorkers, uploadTaskStore } from "../utils/store";
+  import { uploadTaskStore } from "../utils/store";
+  import { t } from "svelte-i18n";
   import Icon from "../components/Icon.svelte";
   import { EIconColor, EIconType, EUploadStatus } from "../utils/types";
   import type { IUploadTask } from "../utils/types";
@@ -73,10 +74,7 @@
     if (unfinishedTasks === 0) {
       uploadTaskStore.set([]);
     } else {
-      const is_text = unfinishedTasks > 1 ? "are" : "is";
-      const tasks_text = unfinishedTasks > 1 ? "tasks" : "task";
-      const them_text = unfinishedTasks > 1 ? "them" : "it";
-      text = `There ${is_text} <b>${unfinishedTasks} unfinished</b> upload ${tasks_text} in the job queue. Are you sure you want to cancel ${them_text}?`;
+      text = $t("modal.upload.cancel_uploads_warn");
       result = false;
       showPromptModal = true;
 
@@ -90,9 +88,9 @@
         } catch (e) {
           console.error(e);
         }
-      }
 
-      uploadTaskStore.set([]);
+        uploadTaskStore.set([]);
+      }
     }
   };
 
@@ -100,7 +98,11 @@
     const index = uploadTasks.findIndex((t) => t.file === task.file);
     result = finished;
     if (index >= 0 && !result) {
-      text = `Are you sure you want to cancel the upload task of file <b>${task.file.name}</b> ?`;
+      text =
+        $t("modal.upload.cancel_upload_file") +
+        " <b>" +
+        task.file.name +
+        "</b> ?";
       showPromptModal = true;
 
       while (showPromptModal) {
@@ -146,7 +148,7 @@
 
 {#if showPromptModal}
   <PromptModal
-    title="Cancel upload task"
+    title={$t("modal.upload.title_cancel")}
     {text}
     onClose={closePrompModal}
     setResult={(r) => setResult(r)}
@@ -157,7 +159,10 @@
     class="fixed w-60 lg:w-72 bottom-2 right-2 lg:bottom-8 lg:right-8 z-20 border rounded shadow bg-white bg-opacity-100"
   >
     <div class="px-2 py-2 flex flex-row justify-between ">
-      <div class="text-lg text-blue-400">Upload list {uploadInfo}</div>
+      <div class="text-lg text-blue-400">
+        {$t("component.upload_list.title")}
+        {uploadInfo}
+      </div>
       <div class="flex flex-row">
         {#if showList}
           <Icon

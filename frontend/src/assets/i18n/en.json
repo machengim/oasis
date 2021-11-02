@@ -33,7 +33,8 @@
     "copy_link": "Copy link",
     "link_copied": "Link copied",
     "open_download": "Goto download",
-    "download": "Download"
+    "download": "Download",
+    "upload": "+ Upload"
   },
   "filetype": {
     "Code": "Code",
@@ -85,6 +86,9 @@
     },
     "login": {
       "title": "Login"
+    },
+    "upload_list": {
+      "title": "Upload List"
     }
   },
   "modal": {
@@ -114,6 +118,11 @@
       "version": "Version",
       "description": "Description",
       "url": "Download url"
+    },
+    "upload": {
+      "title_cancel": "Cancel upload task",
+      "cancel_uploads_warn": "There are unfinished upload tasks. Are you sure you want to cancel them?",
+      "cancel_upload_file": "Are you sure you want to cancel the upload task:"
     }
   },
   "message": {
