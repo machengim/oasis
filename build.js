@@ -4,9 +4,9 @@ const child_process = require("child_process");
 const path = require("path");
 
 const copyRecursiveSync = (src, dest) => {
-  var exists = fs.existsSync(src);
-  var stats = exists && fs.statSync(src);
-  var isDirectory = exists && stats.isDirectory();
+  const exists = fs.existsSync(src);
+  const stats = exists && fs.statSync(src);
+  const isDirectory = exists && stats.isDirectory();
   if (isDirectory) {
     fs.mkdirSync(dest);
     fs.readdirSync(src).forEach(function (childItemName) {

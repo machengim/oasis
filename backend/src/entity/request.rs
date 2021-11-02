@@ -61,5 +61,5 @@ pub struct UploadSliceRequest {
 #[derive(Deserialize, Debug)]
 #[serde(crate = "rocket::serde")]
 pub struct CancelUploadRequest {
-    pub hashes: Vec<String>,
+    pub uuids: Vec<String>,
 }

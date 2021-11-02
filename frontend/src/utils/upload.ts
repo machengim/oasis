@@ -13,7 +13,7 @@ export async function upload(task: IUploadTask) {
     removeWorker(worker);
 
     task.hash = hash;
-    const payload = buildUploadRequest(task, hash);
+    const payload = buildUploadRequest(task);
 
     try {
       await preUpload(task, payload);
@@ -24,12 +24,12 @@ export async function upload(task: IUploadTask) {
   }
 }
 
-function buildUploadRequest(task: IUploadTask, hash: string) {
+function buildUploadRequest(task: IUploadTask) {
   const payload: IUploadRequest = {
     filename: task.file.name,
     size: task.file.size,
     target: task.targetDir,
-    hash,
+    hash: task.hash,
   };
 
   return payload;
@@ -37,7 +37,8 @@ function buildUploadRequest(task: IUploadTask, hash: string) {
 
 async function preUpload(task: IUploadTask, payload: IUploadRequest) {
   try {
-    await api.post("/api/pre-upload", payload, false);
+    const uuid: string = await api.post("/api/pre-upload", payload, false);
+    task.uuid = uuid;
     updateTask(task.file, EUploadStatus.uploading, 0);
   } catch (e) {
     updateTask(task.file, EUploadStatus.failed, task.progress);
@@ -46,42 +47,33 @@ async function preUpload(task: IUploadTask, payload: IUploadRequest) {
 }
 
 async function uploadFile(task: IUploadTask, hash: string) {
+  if (!task.uuid || !task.hash) return;
+
   const file = task.file;
-  const MB = 1024 * 1024;
-  const sliceLength = 2 * MB;
-
   let start = 0;
-  let index = 0;
-  let end = Math.min(start + sliceLength, file.size);
-
   const worker = new Worker("js/upload_worker.js");
   pushWorker(worker);
 
-  worker.postMessage({ file, hash, start, end, index });
+  worker.postMessage({ task, start });
   worker.onmessage = async (e) => {
-    const message = e.data;
-    if (message.type === "done") {
-      const progress = message.data / file.size;
-      if (progress >= 1) {
-        updateTask(task.file, EUploadStatus.finishing, task.progress);
-        worker.terminate();
-        removeWorker(worker);
+    start = e.data;
+    const progress = start / file.size;
 
-        let payload = buildUploadRequest(task, hash);
+    if (progress >= 1) {
+      updateTask(task.file, EUploadStatus.finishing, task.progress);
+      worker.terminate();
+      removeWorker(worker);
 
-        try {
-          await finishUpload(task, payload);
-        } catch (e) {
-          throw e;
-        }
-      } else {
-        updateTask(task.file, EUploadStatus.uploading, progress);
-        start = end;
-        end = Math.min(start + sliceLength, file.size);
-        index++;
-        worker.postMessage({ file, hash, start, end, index });
+      try {
+        await finishUpload(task);
+      } catch (e) {
+        throw e;
       }
+    } else {
+      updateTask(task.file, EUploadStatus.uploading, progress);
+      worker.postMessage({ task, start });
     }
+
   }
 
   worker.onerror = (e) => {
@@ -92,9 +84,9 @@ async function uploadFile(task: IUploadTask, hash: string) {
   }
 }
 
-async function finishUpload(task: IUploadTask, payload: IUploadRequest) {
+async function finishUpload(task: IUploadTask) {
   try {
-    await api.post("/api/finish-upload", payload, false);
+    await api.post(`/api/finish-upload/${task.uuid}`, null, false);
     updateTask(task.file, EUploadStatus.success, task.progress);
     completeTaskStore.set(task);
   } catch (e) {

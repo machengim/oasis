@@ -97,6 +97,7 @@ export interface IUser {
 }
 
 export interface IUploadTask {
+  uuid?: string;
   file: File;
   targetDir: string;
   status: EUploadStatus;

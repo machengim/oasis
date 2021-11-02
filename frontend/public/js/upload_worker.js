@@ -1,12 +1,18 @@
 self.onmessage = async (e) => {
-  const { file, hash, start, end, index } = e.data;
+  const { task, start } = e.data;
+  const file = task.file;
+  const sliceLength = 2 * 1024 * 1024;
+  const end = Math.min(start + sliceLength, file.size);
+  const index = Math.round(start / sliceLength) + 1;
   const buffer = await file.slice(start, end).arrayBuffer();
+  const endpoint = `/api/upload/${task.uuid}/${index}`;
+
   const xhr = new XMLHttpRequest();
-  const endpoint = `/api/upload/${hash}/${index}`;
+
   xhr.open('POST', endpoint);
 
   xhr.onload = (_) => {
-    self.postMessage({ type: "done", data: end });
+    self.postMessage(end);
   }
 
   xhr.onerror = (e) => {
