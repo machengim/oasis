@@ -1,9 +1,9 @@
 import { EUploadStatus, IUploadRequest, IUploadTask } from "./types";
 import * as api from './api';
-import { updateTask, completeTaskStore, pushWorker, removeWorker } from "./store";
+import { updateTask, completeTaskStore, pushWorker, removeWorker, terminateWorkers, uploadTaskStore } from "./store";
 
 export async function upload(task: IUploadTask) {
-  const worker = new Worker("js/md5_worker.js");
+  const worker = new Worker("/js/md5_worker.js");
   pushWorker(worker);
   worker.postMessage(task.file);
 
@@ -51,7 +51,7 @@ async function uploadFile(task: IUploadTask, hash: string) {
 
   const file = task.file;
   let start = 0;
-  const worker = new Worker("js/upload_worker.js");
+  const worker = new Worker("/js/upload_worker.js");
   pushWorker(worker);
 
   worker.postMessage({ task, start });
@@ -91,6 +91,24 @@ async function finishUpload(task: IUploadTask) {
     completeTaskStore.set(task);
   } catch (e) {
     updateTask(task.file, EUploadStatus.failed, task.progress);
+    throw e;
+  }
+}
+
+export async function cancelUploads(tasks: Array<IUploadTask>) {
+  const tasksToRemove = tasks.filter(t => !!t.uuid);
+  if (tasksToRemove.filter(t => t.status === EUploadStatus.preparing ||
+    t.status === EUploadStatus.uploading ||
+    t.status === EUploadStatus.finishing).length > 0) {
+    terminateWorkers();
+  }
+
+  const uuids = tasksToRemove.map((t) => t.uuid);
+
+  try {
+    const payload = { uuids };
+    await api.post(`/api/cancel-upload`, payload, false);
+  } catch (e) {
     throw e;
   }
 }

@@ -106,7 +106,7 @@ async fn finish_upload(state: &State<AppState>, uuid: &str, _user: AuthUser) -> 
     Ok(())
 }
 
-#[delete("/upload", data = "<req_body>")]
+#[post("/cancel-upload", data = "<req_body>")]
 async fn cancel_upload(
     state: &State<AppState>,
     req_body: Json<CancelUploadRequest>,

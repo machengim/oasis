@@ -5,9 +5,8 @@
   import type { IUploadTask } from "../utils/types";
   import { onDestroy } from "svelte";
   import PromptModal from "../modals/PromptModal.svelte";
-  import { upload } from "../utils/upload";
+  import { upload, cancelUploads } from "../utils/upload";
   import { sleep } from "../utils/util";
-  import * as api from "../utils/api";
 
   let showList = true;
   let uploadTasks: Array<IUploadTask> = [];
@@ -86,23 +85,14 @@
       }
 
       if (result) {
-        const hashesToRemove = uploadTasks
-          .map((t) => t.hash)
-          .filter((h) => !!h);
-        console.log(hashesToRemove);
-
-        terminateWorkers();
-        uploadTaskStore.set([]);
-
-        if (hashesToRemove.length > 0) {
-          try {
-            const payload = { hashes: hashesToRemove };
-            await api.remove(`/api/upload`, payload, false);
-          } catch (e) {
-            console.error(e);
-          }
+        try {
+          await cancelUploads(uploadTasks);
+        } catch (e) {
+          console.error(e);
         }
       }
+
+      uploadTaskStore.set([]);
     }
   };
 
@@ -119,24 +109,14 @@
     }
 
     if (result) {
-      if (finished) {
-        uploadTasks.splice(index, 1);
-        uploadTaskStore.set(uploadTasks);
-      } else {
-        const hashToRemove = uploadTasks[index].hash;
-        terminateWorkers();
-        uploadTasks.splice(index, 1);
-        uploadTaskStore.set(uploadTasks);
-
-        if (hashToRemove) {
-          try {
-            const payload = { hashes: [hashToRemove] };
-            await api.remove(`/api/upload`, payload, false);
-          } catch (e) {
-            console.error(e);
-          }
-        }
+      try {
+        await cancelUploads([task]);
+      } catch (e) {
+        console.error(e);
       }
+
+      uploadTasks.splice(index, 1);
+      uploadTaskStore.set(uploadTasks);
     }
   };
 
