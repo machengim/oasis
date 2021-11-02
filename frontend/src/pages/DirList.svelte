@@ -31,6 +31,7 @@
   let title: string;
   let text: string;
   let result = false;
+  let resultForAll = false;
   let showPromptModal = false;
 
   const unsubscribeTaskUpdate = completeTaskStore.subscribe((task) => {
@@ -141,7 +142,10 @@
     const targetDir = encodeURIComponent(dirs.join("/"));
 
     for (const file of filelist) {
-      if (files.findIndex((f) => f.filename === file.name) >= 0) {
+      if (
+        !resultForAll &&
+        files.findIndex((f) => f.filename === file.name) >= 0
+      ) {
         title = "Filename existed";
         text = `File <b>${file.name}</b> already existed. Are you sure you want to overwrite it?`;
         result = false;
@@ -151,7 +155,7 @@
           await new Promise((r) => setTimeout(r, 200));
         }
 
-        if (!result) {
+        if (!result && !resultForAll) {
           continue;
         }
       }
@@ -167,10 +171,16 @@
       tasks.push(upload);
       uploadTaskStore.set(tasks);
     }
+
+    resultForAll = false;
   };
 
   const setResult = (r: boolean) => {
     result = r;
+  };
+
+  const setResultAll = (r: boolean) => {
+    resultForAll = r;
   };
 
   const closePrompModal = () => {
@@ -184,6 +194,8 @@
     {text}
     onClose={closePrompModal}
     setResult={(r) => setResult(r)}
+    hasExtraResult={true}
+    setExtraResult={(r) => setResultAll(r)}
   />
 {/if}
 <div class="relative w-full h-full">

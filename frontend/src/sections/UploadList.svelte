@@ -12,9 +12,11 @@
   let showList = true;
   let uploadTasks: Array<IUploadTask> = [];
   let currentTask: IUploadTask = null;
+  // Whether the user confirmed to remove the task
   let result = false;
   let showPromptModal = false;
   let text: string;
+  let uploadInfo = "";
 
   const unsubscribeUploadTasks = uploadTaskStore.subscribe((tasks) => {
     if (tasks) {
@@ -27,6 +29,8 @@
   });
 
   $: if (uploadTasks) {
+    formatUploadInfo();
+
     if (
       !currentTask ||
       currentTask.status === EUploadStatus.success ||
@@ -115,17 +119,22 @@
     }
 
     if (result) {
-      const hashToRemove = uploadTasks[index].hash;
-      terminateWorkers();
-      uploadTasks.splice(index, 1);
-      uploadTaskStore.set(uploadTasks);
+      if (finished) {
+        uploadTasks.splice(index, 1);
+        uploadTaskStore.set(uploadTasks);
+      } else {
+        const hashToRemove = uploadTasks[index].hash;
+        terminateWorkers();
+        uploadTasks.splice(index, 1);
+        uploadTaskStore.set(uploadTasks);
 
-      if (hashToRemove) {
-        try {
-          const payload = { hashes: [hashToRemove] };
-          await api.remove(`/api/upload`, payload, false);
-        } catch (e) {
-          console.error(e);
+        if (hashToRemove) {
+          try {
+            const payload = { hashes: [hashToRemove] };
+            await api.remove(`/api/upload`, payload, false);
+          } catch (e) {
+            console.error(e);
+          }
         }
       }
     }
@@ -144,6 +153,15 @@
     const value = (Math.round(progress * 10000) / 100).toFixed(1);
     return `${value}%`;
   };
+
+  const formatUploadInfo = () => {
+    const successTasks = uploadTasks.filter(
+      (t) => t.status === EUploadStatus.success
+    );
+    const successNumber = successTasks.length;
+    const allTaskNumber = uploadTasks.length;
+    uploadInfo = `(${successNumber} / ${allTaskNumber})`;
+  };
 </script>
 
 {#if showPromptModal}
@@ -159,7 +177,7 @@
     class="fixed w-60 lg:w-72 bottom-2 right-2 lg:bottom-8 lg:right-8 z-20 border rounded shadow bg-white bg-opacity-100"
   >
     <div class="px-2 py-2 flex flex-row justify-between ">
-      <div class="text-lg text-blue-400">Upload list</div>
+      <div class="text-lg text-blue-400">Upload list {uploadInfo}</div>
       <div class="flex flex-row">
         {#if showList}
           <Icon

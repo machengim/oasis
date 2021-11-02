@@ -1,20 +1,17 @@
 self.onmessage = async (e) => {
   const { file, hash, start, end, index } = e.data;
+  const buffer = await file.slice(start, end).arrayBuffer();
+  const xhr = new XMLHttpRequest();
+  const endpoint = `/api/upload/${hash}/${index}`;
+  xhr.open('POST', endpoint);
 
-  let buffer = await file.slice(start, end).arrayBuffer();
-  let data = Array.from(new Uint8Array(buffer));
-  let payload = { hash, index, data };
-
-  let xhr = new XMLHttpRequest();
-  xhr.open('POST', "/api/upload");
-
-  xhr.onload = (e) => {
-    self.postMessage({ type: "progress", data: end });
+  xhr.onload = (_) => {
+    self.postMessage({ type: "done", data: end });
   }
 
   xhr.onerror = (e) => {
-    self.postMessage({ type: "error", data: e });
+    throw e;
   }
 
-  xhr.send(JSON.stringify(payload));
+  xhr.send(buffer);
 }

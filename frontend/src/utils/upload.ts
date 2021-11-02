@@ -48,7 +48,7 @@ async function preUpload(task: IUploadTask, payload: IUploadRequest) {
 async function uploadFile(task: IUploadTask, hash: string) {
   const file = task.file;
   const MB = 1024 * 1024;
-  const sliceLength = file.size > 100 * MB ? 2 * MB : 1 * MB;
+  const sliceLength = 2 * MB;
 
   let start = 0;
   let index = 0;
@@ -60,7 +60,7 @@ async function uploadFile(task: IUploadTask, hash: string) {
   worker.postMessage({ file, hash, start, end, index });
   worker.onmessage = async (e) => {
     const message = e.data;
-    if (message.type === "progress") {
+    if (message.type === "done") {
       const progress = message.data / file.size;
       if (progress >= 1) {
         updateTask(task.file, EUploadStatus.finishing, task.progress);
@@ -81,12 +81,14 @@ async function uploadFile(task: IUploadTask, hash: string) {
         index++;
         worker.postMessage({ file, hash, start, end, index });
       }
-    } else if (e.type === "error") {
-      updateTask(task.file, EUploadStatus.failed, task.progress);
-      worker.terminate();
-      removeWorker(worker);
-      throw e.data;
     }
+  }
+
+  worker.onerror = (e) => {
+    updateTask(task.file, EUploadStatus.failed, task.progress);
+    worker.terminate();
+    removeWorker(worker);
+    throw e;
   }
 }
 

@@ -1,9 +1,10 @@
 use crate::entity::error::Error;
-use crate::entity::request::{CancelUploadRequest, UploadRequest, UploadSliceRequest};
+use crate::entity::request::{CancelUploadRequest, UploadRequest};
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
 use crate::util;
 use anyhow::Result as AnyResult;
+use rocket::fs::TempFile;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
 use rocket::{Route, State};
@@ -40,19 +41,23 @@ async fn pre_upload(
     Ok(())
 }
 
-#[post("/upload", data = "<req_body>")]
+#[post("/upload/<hash>/<index>", data = "<file>")]
 async fn upload_file_slices(
-    req_body: Json<UploadSliceRequest>,
+    hash: &str,
+    index: u64,
+    mut file: TempFile<'_>,
     _user: AuthUser,
 ) -> Result<(), Error> {
-    let temp_upload_dir = PathBuf::from(util::get_temp_path()).join(&req_body.hash);
+    let temp_upload_dir = PathBuf::from(util::get_temp_path()).join(hash);
     if !temp_upload_dir.exists() || !temp_upload_dir.is_dir() {
         return Err(Error::BadRequest);
     }
 
-    let temp_file = temp_upload_dir.join(&req_body.index.to_string());
-    let mut file = File::create(temp_file).await?;
-    file.write_all(&req_body.data).await?;
+    let temp_file = temp_upload_dir.join(index.to_string());
+    if let Err(e) = file.copy_to(temp_file).await {
+        eprintln!("File slice copy error: {:?}", e);
+        return Err(Error::InternalServerError);
+    }
 
     Ok(())
 }
@@ -76,33 +81,14 @@ async fn finish_upload(
     }
 
     let target_file_path = target_dir.join(&req_body.filename);
-
     if target_file_path.exists() {
         fs::remove_file(&target_file_path).await?;
     }
 
-    let mut target_file = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(&target_file_path)
-        .await?;
-
-    let mut index = 0;
-    let mut file_slice = temp_upload_dir.join(index.to_string());
-
-    while file_slice.exists() {
-        let mut buffer = vec![];
-        let mut source_file = File::open(&file_slice).await?;
-        source_file.read_to_end(&mut buffer).await?;
-        target_file.write_all(&buffer).await?;
-
-        index += 1;
-        file_slice = temp_upload_dir.join(index.to_string());
-    }
-
-    let filesize = fs::metadata(&target_file_path).await?.len();
-    if filesize != req_body.size {
-        return Err(Error::BadRequest);
+    if let Err(e) = combine_file_slices(&target_file_path, &temp_upload_dir, req_body.size).await {
+        eprintln!("Error when combining file slices: {}", e);
+        fs::remove_file(&target_file_path).await?;
+        return Err(Error::InternalServerError);
     }
 
     fs::remove_dir_all(temp_upload_dir).await?;
@@ -123,6 +109,38 @@ async fn remove_temp_files(hash: &str) -> AnyResult<()> {
     let temp_upload_dir = PathBuf::from(util::get_temp_path()).join(hash);
     if temp_upload_dir.exists() && temp_upload_dir.is_dir() {
         fs::remove_dir_all(temp_upload_dir).await?;
+    }
+
+    Ok(())
+}
+
+async fn combine_file_slices(
+    target_file_path: &PathBuf,
+    temp_upload_dir: &PathBuf,
+    req_file_size: u64,
+) -> AnyResult<()> {
+    let mut target_file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(&target_file_path)
+        .await?;
+
+    let mut index = 0;
+    let mut file_slice = temp_upload_dir.join(index.to_string());
+
+    while file_slice.exists() {
+        let mut buffer = vec![];
+        let mut source_file = File::open(&file_slice).await?;
+        source_file.read_to_end(&mut buffer).await?;
+        target_file.write_all(&buffer).await?;
+
+        index += 1;
+        file_slice = temp_upload_dir.join(index.to_string());
+    }
+
+    let filesize = fs::metadata(&target_file_path).await?.len();
+    if filesize != req_file_size {
+        return Err(anyhow::anyhow!("File size not match"));
     }
 
     Ok(())

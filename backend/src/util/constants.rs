@@ -12,7 +12,7 @@ pub const ACCESS_TOKEN: &'static str = "oa_access";
 pub const ACCESS_TOKEN_MINS: i64 = 20;
 pub const REFRESH_TOKEN: &'static str = "oa_refresh";
 pub const REFRESH_TOKEN_DAYS: i64 = 7;
-pub const CACHE_MAX_AGE: i64 = 24 * 60 * 60;
+pub const CACHE_MAX_AGE: i64 = 2 * 60 * 60;
 #[allow(dead_code)]
 pub const APP_VERSION_URL_RELEASE: &'static str =
     "https://raw.githubusercontent.com/machengim/oasis/main/version.txt";
