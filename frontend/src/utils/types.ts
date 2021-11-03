@@ -47,6 +47,7 @@ export interface IChangePasswordRequest {
 }
 
 export interface IFile {
+  dir?: Array<string>,
   filename: string,
   file_type: FileType,
   size: number,
@@ -99,7 +100,7 @@ export interface IUser {
 export interface IUploadTask {
   uuid?: string;
   file: File;
-  targetDir: string;
+  targetDir: Array<string>;
   status: EUploadStatus;
   progress: number;
   hash?: string;

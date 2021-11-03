@@ -1,6 +1,7 @@
-import { EUploadStatus, IUploadRequest, IUploadTask } from "./types";
+import { EUploadStatus, IFile, IUploadRequest, IUploadTask } from "./types";
 import * as api from './api';
-import { updateTask, completeTaskStore, pushWorker, removeWorker, terminateWorkers, uploadTaskStore } from "./store";
+import { updateTask, pushWorker, removeWorker, terminateWorkers, pushFile } from "./store";
+import { inferFileType } from "./util";
 
 export async function upload(task: IUploadTask) {
   const worker = new Worker("/js/md5_worker.js");
@@ -28,7 +29,7 @@ function buildUploadRequest(task: IUploadTask) {
   const payload: IUploadRequest = {
     filename: task.file.name,
     size: task.file.size,
-    target: task.targetDir,
+    target: encodeURIComponent(task.targetDir.join("/")),
     hash: task.hash,
   };
 
@@ -88,7 +89,15 @@ async function finishUpload(task: IUploadTask) {
   try {
     await api.post(`/api/finish-upload/${task.uuid}`, null, false);
     updateTask(task.file, EUploadStatus.success, task.progress);
-    completeTaskStore.set(task);
+
+    const newFile: IFile = {
+      dir: task.targetDir,
+      file_type: inferFileType(task.file.name),
+      size: task.file.size,
+      filename: task.file.name
+    };
+
+    pushFile(newFile);
   } catch (e) {
     updateTask(task.file, EUploadStatus.failed, task.progress);
     throw e;

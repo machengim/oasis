@@ -121,6 +121,10 @@ export function inferFileType(filename: string) {
   }
 }
 
+export function compareDir(a: Array<string>, b: Array<string>) {
+  return encodeURIComponent(a.join('/')) === encodeURIComponent(b.join("/"));
+}
+
 export function compareFile(a: IFile, b: IFile, order: IFileOrder) {
   let ascFactor = order.asc ? 1 : -1;
   let result = 0;

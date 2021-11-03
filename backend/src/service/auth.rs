@@ -13,7 +13,9 @@ pub struct AuthUser {
 }
 
 #[derive(Default)]
-pub struct AuthAdmin;
+pub struct AuthAdmin {
+    pub uid: i64,
+}
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AuthUser {
@@ -48,7 +50,7 @@ impl<'r> FromRequest<'r> for AuthAdmin {
                 if let Ok(secret) = state.get_secret() {
                     if let Ok(token) = AccessToken::decode(token_str.value(), &secret) {
                         if token.uid > 0 && token.permission == 9 {
-                            return Outcome::Success(AuthAdmin::default());
+                            return Outcome::Success(AuthAdmin { uid: token.uid });
                         } else {
                             return Outcome::Failure((Status::Unauthorized, Error::Unauthorized));
                         }

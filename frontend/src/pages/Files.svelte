@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useLocation } from "svelte-navigator";
-  import { resetTitle, sectionStore } from "../utils/store";
+  import { dirsStore, resetTitle, sectionStore } from "../utils/store";
   import DirList from "./DirList.svelte";
   import FileView from "./FileView.svelte";
 
@@ -38,11 +38,13 @@
       .filter((s) => s.length > 0)
       .map((s) => decodeURIComponent(s))
       .slice(1);
+
+    dirsStore.set(dirs);
   };
 </script>
 
 {#if filename}
-  <FileView {dirs} {filename} />
+  <FileView {filename} />
 {:else}
-  <DirList {dirs} />
+  <DirList />
 {/if}

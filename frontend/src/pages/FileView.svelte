@@ -23,8 +23,8 @@
   import FileLinkModal from "../modals/FileLinkModal.svelte";
 
   const navigate = useNavigate();
-  export let dirs: Array<string>;
   export let filename: string;
+  let dirs = $dirsStore;
   let filePath: string;
   let trackPath: string;
   let siblings: Array<IFile>;

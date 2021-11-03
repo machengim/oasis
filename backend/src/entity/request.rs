@@ -63,3 +63,10 @@ pub struct UploadSliceRequest {
 pub struct CancelUploadRequest {
     pub uuids: Vec<String>,
 }
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct CreateDirRequest {
+    pub parent: String,
+    pub name: String,
+}

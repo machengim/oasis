@@ -7,8 +7,8 @@
     filesStore,
     titleStore,
     uploadTaskStore,
-    completeTaskStore,
     resetTitle,
+    clickStore,
   } from "../utils/store";
   import type { IFile, IFileOrder, IUploadTask } from "../utils/types";
   import { EUploadStatus } from "../utils/types";
@@ -21,11 +21,12 @@
   import FileIcon from "../components/FileIcon.svelte";
   import Button from "../components/Button.svelte";
   import PromptModal from "../modals/PromptModal.svelte";
+  import CreateDirModal from "../modals/CreateDirModal.svelte";
   import { onDestroy } from "svelte";
 
   const navigate = useNavigate();
-  export let dirs: Array<string>;
-  let files: Array<IFile> = [];
+  let dirs = $dirsStore;
+  let files: Array<IFile> = $filesStore;
   let order: IFileOrder = { key: "name", asc: true };
   let isLoading = false;
   let fileSelector: HTMLInputElement;
@@ -34,27 +35,23 @@
   let result = false;
   let resultForAll = false;
   let showPromptModal = false;
+  let showNewMenu = false;
+  let showCreateDirModal = false;
 
-  const unsubscribeTaskUpdate = completeTaskStore.subscribe((task) => {
-    if (task && task.status === EUploadStatus.success) {
-      let encodedDir = encodeURIComponent(dirs.join("/"));
-      if (encodedDir === task.targetDir) {
-        const file = task.file;
-        // Files with the same name should not exist in the same dir.
-        const newFiles = files.filter((f) => f.filename !== file.name);
-        const fileEntry: IFile = {
-          file_type: inferFileType(file.name),
-          filename: file.name,
-          size: file.size,
-        };
-        newFiles.push(fileEntry);
-        files = newFiles;
-      }
+  const unsubscribeDirs = dirsStore.subscribe((d) => (dirs = d));
+
+  const unsubscribeFiles = filesStore.subscribe((f) => (files = f));
+
+  const unsubscribeClick = clickStore.subscribe((click) => {
+    if (click > 0 && showNewMenu) {
+      showNewMenu = false;
     }
   });
 
   onDestroy(() => {
-    unsubscribeTaskUpdate();
+    unsubscribeDirs();
+    unsubscribeFiles();
+    unsubscribeClick();
   });
 
   $: if (dirs.length >= 1) {
@@ -69,17 +66,19 @@
     orderFiles();
   }
 
-  const fetchDirContent = async (dirs: Array<string>) => {
+  const fetchDirContent = async (targetDirs: Array<string>) => {
+    isLoading = true;
+
     let endpoint = "/api/dir";
-    if (dirs.length > 0) {
-      endpoint += "?path=" + encodeURIComponent(dirs.join("/"));
+    if (targetDirs.length > 0) {
+      endpoint += "?path=" + encodeURIComponent(targetDirs.join("/"));
     }
 
-    isLoading = true;
     try {
-      files = await api.get(endpoint);
-      dirsStore.set(dirs);
-      filesStore.set(files);
+      const newFiles: Array<IFile> = await api.get(endpoint);
+      if (dirs === targetDirs) {
+        filesStore.set(newFiles);
+      }
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.read_dir_error"));
@@ -142,7 +141,6 @@
   const selectUploadFile = async (e: Event) => {
     const target = e.target as HTMLInputElement;
     const filelist = target.files as FileList;
-    const targetDir = encodeURIComponent(dirs.join("/"));
 
     for (const file of filelist) {
       if (
@@ -165,7 +163,7 @@
 
       const upload: IUploadTask = {
         file,
-        targetDir,
+        targetDir: dirs,
         status: EUploadStatus.waiting,
         progress: 0,
       };
@@ -189,6 +187,19 @@
   const closePrompModal = () => {
     showPromptModal = false;
   };
+
+  const openCreateDirModal = () => {
+    showCreateDirModal = true;
+  };
+
+  const closeCreateDirModal = () => {
+    showCreateDirModal = false;
+  };
+
+  const toggleShowNewMenu = (e: Event) => {
+    e.stopPropagation();
+    showNewMenu = !showNewMenu;
+  };
 </script>
 
 {#if showPromptModal}
@@ -201,16 +212,15 @@
     setExtraResult={(r) => setResultAll(r)}
   />
 {/if}
+{#if showCreateDirModal}
+  <CreateDirModal {dirs} {files} onClose={closeCreateDirModal} />
+{/if}
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
     <div class="flex flex-row items-center justify-between">
       <BreadCrum {dirs} className="py-1" />
-      <div>
-        <Button
-          onClick={openSelectFileDialog}
-          color="blue"
-          value={$t("button.upload")}
-        />
+      <div class="relative w-32 flex flex-row justify-end">
+        <Button onClick={toggleShowNewMenu} value="+ New" color="blue" />
         <input
           type="file"
           class="hidden"
@@ -218,6 +228,24 @@
           multiple
           on:change={selectUploadFile}
         />
+        {#if showNewMenu}
+          <div
+            class="absolute top-9 right-0 py-1 shadow-sm rounded-sm bg-white border"
+          >
+            <div
+              class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer"
+              on:click={openCreateDirModal}
+            >
+              Create folder
+            </div>
+            <div
+              class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer"
+              on:click={openSelectFileDialog}
+            >
+              Upload file(s)
+            </div>
+          </div>
+        {/if}
       </div>
     </div>
     {#if isLoading}

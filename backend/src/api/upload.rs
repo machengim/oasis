@@ -2,7 +2,7 @@ use crate::entity::error::Error;
 use crate::entity::request::{CancelUploadRequest, UploadRequest};
 use crate::entity::upload_task::UploadTask;
 use crate::service::app_state::AppState;
-use crate::service::auth::AuthUser;
+use crate::service::auth::AuthAdmin;
 use crate::util;
 use anyhow::Result as AnyResult;
 use rocket::fs::TempFile;
@@ -23,7 +23,7 @@ pub fn route() -> Vec<Route> {
 async fn pre_upload(
     state: &State<AppState>,
     req_body: Json<UploadRequest>,
-    user: AuthUser,
+    user: AuthAdmin,
 ) -> Result<String, Error> {
     let storage = state.get_site()?.storage.clone();
     let target_dir = PathBuf::from(&storage).join(&util::parse_encoded_url(&req_body.target)?);
@@ -51,7 +51,7 @@ async fn upload_file_slices(
     uuid: &str,
     index: u64,
     mut file: TempFile<'_>,
-    user: AuthUser,
+    user: AuthAdmin,
 ) -> Result<(), Error> {
     let task = match state.find_upload_uuid(uuid)? {
         Some(v) => v,
@@ -77,7 +77,7 @@ async fn upload_file_slices(
 }
 
 #[post("/finish-upload/<uuid>")]
-async fn finish_upload(state: &State<AppState>, uuid: &str, _user: AuthUser) -> Result<(), Error> {
+async fn finish_upload(state: &State<AppState>, uuid: &str, _user: AuthAdmin) -> Result<(), Error> {
     let temp_upload_dir = PathBuf::from(util::get_temp_path()).join(uuid);
     if !temp_upload_dir.exists() || !temp_upload_dir.is_dir() {
         return Err(Error::BadRequest);
@@ -110,7 +110,7 @@ async fn finish_upload(state: &State<AppState>, uuid: &str, _user: AuthUser) -> 
 async fn cancel_upload(
     state: &State<AppState>,
     req_body: Json<CancelUploadRequest>,
-    user: AuthUser,
+    user: AuthAdmin,
 ) -> Result<(), Error> {
     for uuid in req_body.uuids.iter() {
         remove_upload_task(state, uuid, &user).await?;
@@ -119,7 +119,11 @@ async fn cancel_upload(
     Ok(())
 }
 
-async fn remove_upload_task(state: &State<AppState>, uuid: &str, user: &AuthUser) -> AnyResult<()> {
+async fn remove_upload_task(
+    state: &State<AppState>,
+    uuid: &str,
+    user: &AuthAdmin,
+) -> AnyResult<()> {
     if let Some(task) = state.find_upload_uuid(uuid)? {
         if task.userid != user.uid {
             return Err(anyhow::anyhow!("User id not match to remove task"));

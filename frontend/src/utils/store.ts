@@ -1,6 +1,7 @@
 import { get, Writable, writable } from 'svelte/store';
 import type { IFile, INotification, ELoopMethod, IUser, ISiteFull, IUploadTask, EUploadStatus } from './types';
 import * as constants from '../assets/constants.json';
+import { compareArray } from './util';
 
 export const siteStore: Writable<ISiteFull> = writable(null);
 
@@ -28,11 +29,24 @@ export function setNotification(type: 'success' | 'error', msg: string) {
   notificationStore.set(newNotification);
 }
 
+export const clickStore: Writable<number> = writable(0);
+
 export const sectionStore: Writable<string> = writable(null);
 
 export const dirsStore: Writable<Array<string>> = writable([]);
 
 export const filesStore: Writable<Array<IFile>> = writable([]);
+
+export function pushFile(file: IFile) {
+  if (!file.dir) return;
+
+  const currentDir = get(dirsStore);
+  if (compareArray(currentDir, file.dir)) {
+    const newFiles = get(filesStore);
+    newFiles.push(file);
+    filesStore.set(newFiles);
+  }
+}
 
 export const loopStore: Writable<ELoopMethod> = writable(null);
 
@@ -48,8 +62,6 @@ export function resetTitle() {
 }
 
 export const uploadTaskStore: Writable<Array<IUploadTask>> = writable([]);
-
-export const completeTaskStore: Writable<IUploadTask> = writable(null);
 
 export function updateTask(file: File, status: EUploadStatus, progress: number) {
   const tasks = get(uploadTaskStore);

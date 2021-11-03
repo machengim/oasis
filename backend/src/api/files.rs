@@ -1,9 +1,9 @@
 use crate::entity::error::Error;
 use crate::entity::file::File;
-use crate::entity::request::GenerateLinkRequest;
+use crate::entity::request::{CreateDirRequest, GenerateLinkRequest};
 use crate::entity::response::FileResponse;
 use crate::service::app_state::AppState;
-use crate::service::auth::AuthUser;
+use crate::service::auth::{AuthAdmin, AuthUser};
 use crate::service::range::{Range, RangedFile};
 use crate::service::track;
 use crate::util;
@@ -16,6 +16,7 @@ use std::path::PathBuf;
 pub fn route() -> Vec<Route> {
     routes![
         dir_content,
+        create_dir,
         file_content,
         video_track,
         generate_share_link,
@@ -48,6 +49,24 @@ async fn dir_content(
     }
 
     Ok(Json(content))
+}
+
+#[post("/dir", data = "<req_body>")]
+async fn create_dir(
+    state: &State<AppState>,
+    req_body: Json<CreateDirRequest>,
+    _user: AuthAdmin,
+) -> Result<(), Error> {
+    let storage = state.get_site()?.storage.clone();
+    let parent = util::parse_encoded_url(&req_body.parent)?;
+    let parent_path = PathBuf::from(storage).join(&parent);
+    let target_path = parent_path.join(&req_body.name);
+
+    if !parent_path.exists() || target_path.exists() {
+        return Err(Error::BadRequest);
+    }
+
+    Ok(fs::create_dir(target_path).await?)
 }
 
 #[get("/file/<path>")]
