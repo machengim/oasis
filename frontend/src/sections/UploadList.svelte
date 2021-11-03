@@ -156,7 +156,7 @@
 {/if}
 {#if uploadTasks.length > 0}
   <div
-    class="fixed w-60 lg:w-72 bottom-2 right-2 lg:bottom-8 lg:right-8 z-20 border rounded shadow bg-white bg-opacity-100"
+    class="fixed w-60 lg:w-72 bottom-2 right-2 lg:bottom-6 lg:right-6 z-20 border rounded shadow bg-white bg-opacity-100"
   >
     <div class="px-2 py-2 flex flex-row justify-between ">
       <div class="text-lg text-blue-400">

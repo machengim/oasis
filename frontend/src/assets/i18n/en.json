@@ -31,10 +31,9 @@
     "check_update": "Check update",
     "check_updating": "Checking...",
     "copy_link": "Copy link",
-    "link_copied": "Link copied",
+    "link_copied": "Copied",
     "open_download": "Goto download",
-    "download": "Download",
-    "upload": "+ Upload"
+    "download": "Download"
   },
   "filetype": {
     "Code": "Code",
@@ -71,7 +70,10 @@
     "dir_list": {
       "filename": "Filename",
       "type": "Type",
-      "size": "Size"
+      "size": "Size",
+      "new": "+ New",
+      "create_folder": "Create folder",
+      "upload_files": "Upload file(s)"
     },
     "file_view": {
       "filelist": "File list"
@@ -123,6 +125,14 @@
       "title_cancel": "Cancel upload task",
       "cancel_uploads_warn": "There are unfinished upload tasks. Are you sure you want to cancel them?",
       "cancel_upload_file": "Are you sure you want to cancel the upload task:"
+    },
+    "create_folder": {
+      "title": "Create folder",
+      "text_before": "You are creating a folder inside",
+      "text_after": ". Please enter the new folder's name below:",
+      "error_empty": "Folder name should not be empty",
+      "error_used": "This name has been used",
+      "error_long": "The folder name is too long"
     }
   },
   "message": {
@@ -137,7 +147,8 @@
       "update_password": "Update password successfully",
       "update_site": "Update site config successfully",
       "launch": "Launched successfully",
-      "app_up_to_date": "Your app is up to date"
+      "app_up_to_date": "Your app is up to date",
+      "create_dir": "New folder created successfully"
     },
     "error": {
       "no_storage": "Please choose a storage",
@@ -153,7 +164,8 @@
       "username_exist": "Username existed",
       "update_password_fail": "Update password failed",
       "update_site_fail": "Update site config failed",
-      "launch_fail": "Launch failed"
+      "launch_fail": "Launch failed",
+      "create_dir": "New folder create failed"
     }
   }
 }

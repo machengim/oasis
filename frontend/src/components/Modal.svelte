@@ -39,10 +39,10 @@
       width: 12rem;
     }
     .modal-normal {
-      width: 16rem;
+      width: 18rem;
     }
     .modal-large {
-      width: 20rem;
+      width: 22rem;
     }
   }
 

@@ -219,8 +219,12 @@
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
     <div class="flex flex-row items-center justify-between">
       <BreadCrum {dirs} className="py-1" />
-      <div class="relative w-32 flex flex-row justify-end">
-        <Button onClick={toggleShowNewMenu} value="+ New" color="blue" />
+      <div class="relative flex flex-row justify-end">
+        <Button
+          onClick={toggleShowNewMenu}
+          value={$t("component.dir_list.new")}
+          color="blue"
+        />
         <input
           type="file"
           class="hidden"
@@ -230,19 +234,19 @@
         />
         {#if showNewMenu}
           <div
-            class="absolute top-9 right-0 py-1 shadow-sm rounded-sm bg-white border"
+            class="absolute w-32 top-9 right-0 py-1 shadow-sm rounded-sm bg-white border"
           >
             <div
-              class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer"
+              class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer text-center"
               on:click={openCreateDirModal}
             >
-              Create folder
+              {$t("component.dir_list.create_folder")}
             </div>
             <div
-              class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer"
+              class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer text-center"
               on:click={openSelectFileDialog}
             >
-              Upload file(s)
+              {$t("component.dir_list.upload_files")}
             </div>
           </div>
         {/if}

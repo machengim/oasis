@@ -20,19 +20,14 @@
     error = null;
 
     if (!newFolderName) {
-      error = "Folder name should not be empty";
-      return;
+      error = $t("modal.create_folder.error_empty");
+    } else if (newFolderName.length > 255) {
+      error = $t("modal.create_folder.error_long");
+    } else if (files.findIndex((f) => f.filename === newFolderName) >= 0) {
+      error = $t("modal.create_folder.error_used");
     }
 
-    if (newFolderName.length > 255) {
-      error = "Folder name too long";
-      return;
-    }
-
-    if (files.findIndex((f) => f.filename === newFolderName) >= 0) {
-      error = "This name has been used";
-      return;
-    }
+    if (error) return;
 
     await sendNewDirRequest();
   };
@@ -52,9 +47,9 @@
       };
       pushFile(newFile);
 
-      setNotification("success", "New folder created successfully");
+      setNotification("success", $t("message.success.create_dir"));
     } catch (e) {
-      setNotification("error", "New folder create failed");
+      setNotification("error", $t("message.error.create_dir"));
       console.error(e);
     }
 
@@ -63,11 +58,11 @@
   };
 </script>
 
-<Modal {onClose} title="Create Folder">
+<Modal {onClose} title={$t("modal.create_folder.title")}>
   <div class="p-4 text-lg">
     <p>
-      You are creating a folder inside <b>{parent}</b>. Please enter the new
-      folder's name below:
+      {$t("modal.create_folder.text_before")} <b>{parent}</b>
+      {$t("modal.create_folder.text_after")}
     </p>
     <input
       type="text"
