@@ -1,6 +1,7 @@
 use crate::util;
 use crate::util::constants::DEFAULT_IP;
 use anyhow::Result as AnyResult;
+use std::cmp::Ordering;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::net::{IpAddr, Ipv4Addr};
@@ -71,65 +72,58 @@ impl LocalIpRange {
 }
 
 pub fn show(config: &ServerConfig) -> AnyResult<()> {
-    let (ip, multiple) = if config.ip == DEFAULT_IP {
-        retrieve_ip()?
-    } else {
-        (config.ip, false)
+    let ips = match std::env::consts::OS {
+        "linux" => retrieve_ip_linux(),
+        "macos" | "windows" => retrieve_ip_win_mac(),
+        _ => vec![],
     };
 
-    if multiple {
+    if ips.len() == 1 {
+        println!("Server running on {}:{}", ips[0], config.port);
+    } else {
         println!(
-            "Multiple IPs detected, please visit your server via its ip and port {}",
+            "Cannot detect the correct IP automatically, please visit your server via its ip and port {}",
             config.port
         );
-        println!("You can also specify the server ip in the `oasis.conf` file");
-    } else {
-        println!("Server running on {}:{}", ip, config.port);
+        println!("You can also specify the server IP in the config file");
     }
 
     Ok(())
 }
 
-fn retrieve_ip() -> AnyResult<(IpAddr, bool)> {
-    #[cfg(target_os = "linux")]
-    {
-        match local_ip_address::local_ip() {
-            Ok(ip) => Ok((ip, false)),
-            Err(_) => Err(anyhow::anyhow!("Cannot retreive local ip address")),
+fn retrieve_ip_linux() -> Vec<IpAddr> {
+    let mut ips = vec![];
+
+    if let Ok(ip) = local_ip_address::local_ip() {
+        ips.push(ip);
+    }
+
+    ips
+}
+
+fn retrieve_ip_win_mac() -> Vec<IpAddr> {
+    let mut ranges = vec![];
+    ranges.push(LocalIpRange::new([192, 168, 0, 0], [192, 168, 255, 255]));
+    ranges.push(LocalIpRange::new([172, 16, 0, 0], [172, 31, 255, 255]));
+    ranges.push(LocalIpRange::new([10, 0, 0, 0], [10, 255, 255, 255]));
+
+    // the name is not sure, it could be "wlan" or "以太网" on some devices.
+    // let names = vec!["ethernet", "wi-fi", "en0"];
+    let network_interfaces = local_ip_address::list_afinet_netifas().unwrap();
+    let mut ips = vec![];
+    for (_name, ip) in network_interfaces.iter() {
+        if !ip.is_ipv4() {
+            continue;
+        }
+
+        for range in ranges.iter() {
+            if ip.cmp(&range.start) == Ordering::Greater && ip.cmp(&range.end) == Ordering::Less
+            // && names.contains(&name.to_lowercase().as_str())
+            {
+                ips.push(*ip);
+            }
         }
     }
 
-    #[cfg(not(target_os = "linux"))]
-    {
-        use std::cmp::Ordering;
-
-        let mut ranges = vec![];
-        ranges.push(LocalIpRange::new([192, 168, 0, 0], [192, 168, 255, 255]));
-        ranges.push(LocalIpRange::new([172, 16, 0, 0], [172, 31, 255, 255]));
-        ranges.push(LocalIpRange::new([10, 0, 0, 0], [10, 255, 255, 255]));
-
-        // the name is not sure, it could be "wlan" or "以太网" on some devices.
-        // let names = vec!["ethernet", "wi-fi", "en0"];
-        let network_interfaces = local_ip_address::list_afinet_netifas().unwrap();
-        let mut ips = vec![];
-        for (_name, ip) in network_interfaces.iter() {
-            if !ip.is_ipv4() {
-                continue;
-            }
-
-            for range in ranges.iter() {
-                if ip.cmp(&range.start) == Ordering::Greater && ip.cmp(&range.end) == Ordering::Less
-                // && names.contains(&name.to_lowercase().as_str())
-                {
-                    ips.push(*ip);
-                }
-            }
-        }
-
-        match ips.len() {
-            0 => Err(anyhow::anyhow!("Cannot retrieve local ip")),
-            1 => Ok((ips[0], false)),
-            _ => Ok((ips[0], true)),
-        }
-    }
+    ips
 }

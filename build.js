@@ -20,7 +20,7 @@ const copyRecursiveSync = (src, dest) => {
 
 const runCommand = (cmd) => {
   console.log("\n", cmd);
-  child_process.execSync(cmd);
+  child_process.execSync(cmd, { stdio: 'inherit' });
 }
 
 const createReleaseDir = () => {
@@ -47,7 +47,7 @@ copyRecursiveSync("public", "../release/public");
 process.chdir("../backend");
 runCommand("cargo build --release");
 copyRecursiveSync("target/release/" + filename, "../release/" + filename);
-copyRecursiveSync("assets/oasis.conf", "../release/oasis.conf");
+copyRecursiveSync("assets/oasis.conf.sample", "../release/oasis.conf.sample");
 
 process.chdir("../release");
 fs.chmodSync(filename, "755");
