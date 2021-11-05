@@ -1,6 +1,6 @@
 ## OASIS
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/master/LICENSE-MIT) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/main/LICENSE-MIT) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)
 
 [English README](https://github.com/machengim/oasis/blob/main/README.md)
 
@@ -12,6 +12,7 @@
 
 1. 从 [release](https://github.com/machengim/oasis/releases) 页面下载
 2. 解压缩
+3. 在 `oasis.conf` 中设置服务器的IP和端口
 3. 运行 `oasis` 或 `oasis.exe`
 4. 从浏览器访问服务器的 IP 地址
 
@@ -20,6 +21,7 @@
 - 用户验证
 - 文件预览
 - 文件下载
+- 文件上传
 - 播放列表
 - 移动端适配
 - 临时分享链接
@@ -38,11 +40,9 @@
 
 ### 规划
 
-- [ ] 定制媒体播放器
 - [ ] 多用户管理
 - [ ] HTTPS
 - [ ] 更多文件格式支持
-- [ ] 文件上传
 
 ### 技术栈
 

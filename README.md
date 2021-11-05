@@ -1,6 +1,6 @@
 ## OASIS
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/master/LICENSE-MIT) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/main/LICENSE-MIT) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)
 
 [中文 README](https://github.com/machengim/oasis/blob/main/README_cn.md)
 
@@ -12,6 +12,7 @@ A self-hosted file server.
 
 1. Download from the [release](https://github.com/machengim/oasis/releases) page
 2. Uncompress
+3. (Optional) Config server IP and port number in `oasis.conf` file
 3. Run `oasis` or `oasis.exe`
 4. Visit the server's IP address in your favorite browser
 
@@ -20,6 +21,7 @@ A self-hosted file server.
 - User authentication
 - File preview
 - File download
+- File upload
 - Play list
 - Mobile compatibility
 - Temporary sharing link
@@ -38,11 +40,9 @@ A self-hosted file server.
 
 ### Roadmap
 
-- [ ] Custom media player
 - [ ] Multiple users management
 - [ ] HTTPS
 - [ ] More file format support
-- [ ] File upload
 
 ### Tech stack
 

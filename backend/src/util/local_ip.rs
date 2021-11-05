@@ -72,20 +72,25 @@ impl LocalIpRange {
 }
 
 pub fn show(config: &ServerConfig) -> AnyResult<()> {
-    let ips = match std::env::consts::OS {
-        "linux" => retrieve_ip_linux(),
-        "macos" | "windows" => retrieve_ip_win_mac(),
-        _ => vec![],
-    };
+    let mut ips = vec![];
+    if config.ip != DEFAULT_IP {
+        ips.push(config.ip.clone());
+    } else {
+        match std::env::consts::OS {
+            "linux" => ips = retrieve_ip_linux(),
+            "macos" | "windows" => ips = retrieve_ip_win_mac(),
+            _ => {},
+        };
+    }
 
     if ips.len() == 1 {
         println!("Server running on {}:{}", ips[0], config.port);
     } else {
         println!(
-            "Cannot detect the correct IP automatically, please visit your server via its ip and port {}",
+            "Cannot detect local IP automatically, please visit your server via its ip and port {}",
             config.port
         );
-        println!("You can also specify the server IP in the config file");
+        println!("You can also specify them in the config file");
     }
 
     Ok(())

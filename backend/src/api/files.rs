@@ -1,17 +1,18 @@
 use crate::entity::error::Error;
-use crate::entity::file::File;
+use crate::entity::file::{File, FileType};
 use crate::entity::request::{CreateDirRequest, GenerateLinkRequest};
 use crate::entity::response::FileResponse;
 use crate::service::app_state::AppState;
 use crate::service::auth::{AuthAdmin, AuthUser};
 use crate::service::range::{Range, RangedFile};
 use crate::service::track;
-use crate::util;
+use crate::util::{self, file_system};
 use rocket::fs::NamedFile;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
 use rocket::{Route, State};
 use std::path::PathBuf;
+use anyhow::Result as AnyResult;
 
 pub fn route() -> Vec<Route> {
     routes![
@@ -76,20 +77,20 @@ async fn file_content(
     state: &State<AppState>,
     range_header: Range,
 ) -> Result<FileResponse, Error> {
-    let storage = state.get_site()?.storage.clone();
-    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+    let target_path = get_target_path(state, path).map_err(|e| {
+        eprintln!("{}", e);
+        return 400;
+    })?;
 
-    if !target_path.exists() || !target_path.is_file() {
-        eprintln!("Invalid file path: {:?}", &target_path);
-        return Err(Error::BadRequest);
-    }
+    let is_text = FileType::get_file_type(&target_path) == FileType::Text;
 
-    match range_header.range {
-        Some(range) => {
+    match (range_header.range, is_text) {
+        (Some(range), _) => {
             let ranged_file = RangedFile::new(range, target_path).await?;
             Ok(FileResponse::Range(ranged_file))
-        }
-        None => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
+        },
+        (None, true) => Ok(FileResponse::Text(file_system::read_text_file(target_path).await?)),
+        (None, false) => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
     }
 }
 
@@ -145,7 +146,29 @@ async fn get_share_link(
         return Err(Error::BadRequest);
     }
 
-    let user = AuthUser::default();
+    let target_path = get_target_path(state, path).map_err(|e| {
+        eprintln!("{}", e);
+        return 400;
+    })?;
 
-    Ok(file_content(path, user, state, range_header).await?)
+    // Ok(file_content(path, user, state, range_header).await?)
+    match range_header.range {
+        Some(range) => {
+            let ranged_file = RangedFile::new(range, target_path).await?;
+            Ok(FileResponse::Range(ranged_file))
+        },
+        None => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
+    }
+}
+
+
+fn get_target_path(state: &State<AppState>, path: &str) -> AnyResult<PathBuf> {
+    let storage = state.get_site()?.storage.clone();
+    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+
+    if !target_path.exists() || !target_path.is_file() {
+        return Err(anyhow::anyhow!("Invalid file path: {:?}", target_path));
+    }
+
+    Ok(target_path)
 }
