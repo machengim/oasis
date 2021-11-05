@@ -13,8 +13,8 @@ A self-hosted file server.
 1. Download from the [release](https://github.com/machengim/oasis/releases) page
 2. Uncompress
 3. (Optional) Config server IP and port number in `oasis.conf` file
-3. Run `oasis` or `oasis.exe`
-4. Visit the server's IP address in your favorite browser
+4. Run `oasis` or `oasis.exe`
+5. Visit the server's IP address in your favorite browser
 
 ### Features
 
@@ -26,7 +26,7 @@ A self-hosted file server.
 - Mobile compatibility
 - Temporary sharing link
 - External media player support via sharing link
-- Multiple platform support
+- Multiple platform support (Linux, MacOS, Windows, Docker)
 - I18n (English, Chinese)
 
 ### File format support
@@ -50,7 +50,7 @@ A self-hosted file server.
 - [Rocket](https://rocket.rs)
 - [Tailwind](https://tailwindcss.com)
 
-### Credit
+### Credits
 
 - [Pdf.js](https://mozilla.github.io/pdf.js)
 - [Plyr](https://plyr.io)
@@ -63,4 +63,15 @@ A self-hosted file server.
 ```
 cd path/to/oasis
 node build.js
+```
+
+### Docker
+
+```
+docker pull machengim/oasis
+
+docker run --name oasis -t -d \
+-v <db>:/opt/oasis/db \
+-v <storage>:/home/storage \
+-p <port>:8000 machengim/oasis
 ```
