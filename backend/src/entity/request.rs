@@ -40,3 +40,33 @@ pub struct ChangePasswordRequest {
     pub old_password: String,
     pub new_password: String,
 }
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct UploadRequest {
+    pub filename: String,
+    pub size: u64,
+    pub target: String,
+    pub hash: String,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct UploadSliceRequest {
+    pub hash: String,
+    pub index: u64,
+    pub data: Vec<u8>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct CancelUploadRequest {
+    pub uuids: Vec<String>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct CreateDirRequest {
+    pub parent: String,
+    pub name: String,
+}

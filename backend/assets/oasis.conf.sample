@@ -1,3 +1,4 @@
+# Rename this file to `oasis.conf` to make it effective.
 # Uncomment following lines to config ip and port.
 # ip=0.0.0.0
 # port=8000

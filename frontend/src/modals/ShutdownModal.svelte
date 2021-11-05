@@ -4,8 +4,9 @@
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification } from "../utils/store";
+  import { setNotification, uploadTaskStore } from "../utils/store";
   import Spinner from "../components/Spinner.svelte";
+  import { cancelUploads } from "../utils/upload";
 
   const navigate = useNavigate();
   export let onClose = () => {};
@@ -14,6 +15,9 @@
   const shutdown = async () => {
     isLoading = true;
     try {
+      const uploadingTasks = $uploadTaskStore;
+      await cancelUploads(uploadingTasks);
+      uploadTaskStore.set([]);
       await api.get("/shutdown", "raw");
       setNotification("success", $t("message.success.goodbye"));
       onClose();

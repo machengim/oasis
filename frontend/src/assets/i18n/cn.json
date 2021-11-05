@@ -70,7 +70,10 @@
     "dir_list": {
       "filename": "文件名",
       "type": "类型",
-      "size": "大小"
+      "size": "大小",      
+      "new": "+ 新建",      
+      "create_folder": "创建目录",
+      "upload_files": "上传文件"
     },
     "file_view": {
       "filelist": "文件列表"
@@ -85,6 +88,9 @@
     },
     "login": {
       "title": "用户登录"
+    },
+    "upload_list": {
+      "title": "上传列表"
     }
   },
   "modal": {
@@ -114,6 +120,19 @@
       "version": "版本",
       "description": "描述",
       "url": "下载链接"
+    },
+    "upload": {
+      "title_cancel": "取消上传任务",
+      "cancel_uploads_warn": "有未完成的上传任务. 确定要取消它们吗?",
+      "cancel_upload_file": "确定要取消正在上传的文件:"
+    },
+    "create_folder": {
+      "title": "创建目录",
+      "text_before": "你正在",
+      "text_after": "下创建一个新目录. 请在下方输入新目录的名字:",
+      "error_empty": "目录名不能为空",
+      "error_used": "该名称已被使用",
+      "error_long": "目录名太长"
     }
   },
   "message": {
@@ -128,7 +147,8 @@
       "update_password": "密码更新成功",
       "update_site": "站点配置更新成功",
       "launch": "站点启动成功",
-      "app_up_to_date": "您的软件是最新版本"
+      "app_up_to_date": "您的软件是最新版本",
+      "create_dir": "新目录创建成功"
     },
     "error": {
       "no_storage": "请选择存储位置",
@@ -144,7 +164,8 @@
       "username_exist": "用户名已存在",
       "update_password_fail": "更新密码失败",
       "update_site_fail": "更新站点设置失败",
-      "launch_fail": "站点启动失败"
+      "launch_fail": "站点启动失败",
+      "create_dir": "新目录创建失败"
     }
   }
 }

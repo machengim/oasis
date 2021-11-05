@@ -1,13 +1,13 @@
 {
-    "version": "0.1.2",
+    "version": "0.2",
     "descriptions": [
         {
             "lang": "en",
-            "detail": "Config file for specifying IP and port"
+            "detail": "File upload"
         },
         {
             "lang": "cn",
-            "detail": "在设置文件中指定IP和端口"
+            "detail": "文件上传"
         }
     ],
     "url": "https://github.com/machengim/oasis/releases"

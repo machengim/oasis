@@ -1,4 +1,5 @@
 use super::constants;
+use crate::util;
 use crate::{entity::site::Site, service::migrate_dir::MigrationDir};
 use anyhow::Result as AnyResult;
 use include_dir::{include_dir, Dir};
@@ -10,6 +11,18 @@ use sqlx::{
 use std::path::PathBuf;
 
 pub async fn init_app() -> AnyResult<()> {
+    // Remove temp dir and create it again at every startup.
+    let temp_dir = util::get_temp_path();
+    if !temp_dir.exists() {
+        fs::create_dir_all(&temp_dir).await?;
+    } else if temp_dir.is_file() {
+        return Err(anyhow::anyhow!("temp dir location occupied as a file"));
+    } else {
+        fs::remove_dir_all(&temp_dir).await?;
+        fs::create_dir_all(&temp_dir).await?;
+    }
+
+    // Create db and run migration files if db not existed.
     let db_file = get_db_file_location();
     if !db_file.exists() {
         let db_dir = db_file.parent().unwrap();
@@ -40,9 +53,9 @@ pub async fn check_update(conn: &mut PoolConnection<Sqlite>) -> AnyResult<()> {
         let mut tx = conn.begin().await?;
         site.update(&mut tx).await?;
         tx.commit().await?;
-        println!("Update to version: {}", version_app);
     }
 
+    println!("Oasis version {}", constants::VERSION);
     Ok(())
 }
 

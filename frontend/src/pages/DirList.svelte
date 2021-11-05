@@ -6,24 +6,58 @@
     dirsStore,
     filesStore,
     titleStore,
+    uploadTaskStore,
+    resetTitle,
+    clickStore,
   } from "../utils/store";
-  import type { IFile, IFileOrder } from "../utils/types";
+  import type { IFile, IFileOrder, IUploadTask } from "../utils/types";
+  import { EUploadStatus } from "../utils/types";
   import { EIconType } from "../utils/types";
   import * as api from "../utils/api";
   import Icon from "../components/Icon.svelte";
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
-  import { formatSize, compareFile } from "../utils/util";
+  import { formatSize, compareFile, inferFileType } from "../utils/util";
   import FileIcon from "../components/FileIcon.svelte";
+  import Button from "../components/Button.svelte";
+  import PromptModal from "../modals/PromptModal.svelte";
+  import CreateDirModal from "../modals/CreateDirModal.svelte";
+  import { onDestroy } from "svelte";
 
   const navigate = useNavigate();
-  export let dirs: Array<string>;
-  let files: Array<IFile> = [];
+  let dirs = $dirsStore;
+  let files: Array<IFile> = $filesStore;
   let order: IFileOrder = { key: "name", asc: true };
   let isLoading = false;
+  let fileSelector: HTMLInputElement;
+  let title: string;
+  let text: string;
+  let result = false;
+  let resultForAll = false;
+  let showPromptModal = false;
+  let showNewMenu = false;
+  let showCreateDirModal = false;
+
+  const unsubscribeDirs = dirsStore.subscribe((d) => (dirs = d));
+
+  const unsubscribeFiles = filesStore.subscribe((f) => (files = f));
+
+  const unsubscribeClick = clickStore.subscribe((click) => {
+    if (click > 0 && showNewMenu) {
+      showNewMenu = false;
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribeDirs();
+    unsubscribeFiles();
+    unsubscribeClick();
+  });
 
   $: if (dirs.length >= 1) {
     titleStore.set(dirs[dirs.length - 1]);
+  } else {
+    resetTitle();
   }
 
   $: fetchDirContent(dirs);
@@ -32,17 +66,19 @@
     orderFiles();
   }
 
-  const fetchDirContent = async (dirs: Array<string>) => {
+  const fetchDirContent = async (targetDirs: Array<string>) => {
+    isLoading = true;
+
     let endpoint = "/api/dir";
-    if (dirs.length > 0) {
-      endpoint += "?path=" + encodeURIComponent(dirs.join("/"));
+    if (targetDirs.length > 0) {
+      endpoint += "?path=" + encodeURIComponent(targetDirs.join("/"));
     }
 
-    isLoading = true;
     try {
-      files = await api.get(endpoint);
-      dirsStore.set(dirs);
-      filesStore.set(files);
+      const newFiles: Array<IFile> = await api.get(endpoint);
+      if (dirs === targetDirs) {
+        filesStore.set(newFiles);
+      }
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.read_dir_error"));
@@ -95,11 +131,127 @@
 
     navigate(targetPath);
   };
+
+  const openSelectFileDialog = () => {
+    if (fileSelector) {
+      fileSelector.click();
+    }
+  };
+
+  const selectUploadFile = async (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const filelist = target.files as FileList;
+
+    for (const file of filelist) {
+      if (
+        !resultForAll &&
+        files.findIndex((f) => f.filename === file.name) >= 0
+      ) {
+        title = "Filename existed";
+        text = `File <b>${file.name}</b> already existed. Are you sure you want to overwrite it?`;
+        result = false;
+        showPromptModal = true;
+
+        while (showPromptModal) {
+          await new Promise((r) => setTimeout(r, 200));
+        }
+
+        if (!result && !resultForAll) {
+          continue;
+        }
+      }
+
+      const upload: IUploadTask = {
+        file,
+        targetDir: dirs,
+        status: EUploadStatus.waiting,
+        progress: 0,
+      };
+
+      const tasks = $uploadTaskStore;
+      tasks.push(upload);
+      uploadTaskStore.set(tasks);
+    }
+
+    resultForAll = false;
+  };
+
+  const setResult = (r: boolean) => {
+    result = r;
+  };
+
+  const setResultAll = (r: boolean) => {
+    resultForAll = r;
+  };
+
+  const closePrompModal = () => {
+    showPromptModal = false;
+  };
+
+  const openCreateDirModal = () => {
+    showCreateDirModal = true;
+  };
+
+  const closeCreateDirModal = () => {
+    showCreateDirModal = false;
+  };
+
+  const toggleShowNewMenu = (e: Event) => {
+    e.stopPropagation();
+    showNewMenu = !showNewMenu;
+  };
 </script>
 
+{#if showPromptModal}
+  <PromptModal
+    {title}
+    {text}
+    onClose={closePrompModal}
+    setResult={(r) => setResult(r)}
+    hasExtraResult={true}
+    setExtraResult={(r) => setResultAll(r)}
+  />
+{/if}
+{#if showCreateDirModal}
+  <CreateDirModal {dirs} {files} onClose={closeCreateDirModal} />
+{/if}
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
-    <BreadCrum {dirs} className="py-1" />
+    <div class="flex flex-row items-center justify-between">
+      <BreadCrum {dirs} className="py-1" />
+      <div class="relative flex flex-row justify-end">
+        <Button
+          onClick={toggleShowNewMenu}
+          value={$t("component.dir_list.new")}
+          color="blue"
+        />
+        <input
+          type="file"
+          class="hidden"
+          bind:this={fileSelector}
+          multiple
+          on:change={selectUploadFile}
+        />
+        {#if showNewMenu}
+          <div
+            class="absolute w-32 top-9 right-0 py-1 shadow-sm rounded-sm bg-white border"
+          >
+            <div
+              class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer text-center"
+              on:click={openCreateDirModal}
+            >
+              {$t("component.dir_list.create_folder")}
+            </div>
+            <div
+              class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer text-center"
+              on:click={openSelectFileDialog}
+            >
+              {$t("component.dir_list.upload_files")}
+            </div>
+          </div>
+        {/if}
+      </div>
+    </div>
     {#if isLoading}
       <Spinner />
     {:else}

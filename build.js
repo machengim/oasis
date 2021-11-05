@@ -4,9 +4,9 @@ const child_process = require("child_process");
 const path = require("path");
 
 const copyRecursiveSync = (src, dest) => {
-  var exists = fs.existsSync(src);
-  var stats = exists && fs.statSync(src);
-  var isDirectory = exists && stats.isDirectory();
+  const exists = fs.existsSync(src);
+  const stats = exists && fs.statSync(src);
+  const isDirectory = exists && stats.isDirectory();
   if (isDirectory) {
     fs.mkdirSync(dest);
     fs.readdirSync(src).forEach(function (childItemName) {
@@ -20,7 +20,7 @@ const copyRecursiveSync = (src, dest) => {
 
 const runCommand = (cmd) => {
   console.log("\n", cmd);
-  child_process.execSync(cmd);
+  child_process.execSync(cmd, { stdio: 'inherit' });
 }
 
 const createReleaseDir = () => {
@@ -47,7 +47,7 @@ copyRecursiveSync("public", "../release/public");
 process.chdir("../backend");
 runCommand("cargo build --release");
 copyRecursiveSync("target/release/" + filename, "../release/" + filename);
-copyRecursiveSync("assets/oasis.conf", "../release/oasis.conf");
+copyRecursiveSync("assets/oasis.conf.sample", "../release/oasis.conf.sample");
 
 process.chdir("../release");
 fs.chmodSync(filename, "755");

@@ -1,21 +1,23 @@
 use crate::entity::error::Error;
-use crate::entity::file::File;
-use crate::entity::request::GenerateLinkRequest;
+use crate::entity::file::{File, FileType};
+use crate::entity::request::{CreateDirRequest, GenerateLinkRequest};
 use crate::entity::response::FileResponse;
 use crate::service::app_state::AppState;
-use crate::service::auth::AuthUser;
+use crate::service::auth::{AuthAdmin, AuthUser};
 use crate::service::range::{Range, RangedFile};
 use crate::service::track;
-use crate::util;
+use crate::util::{self, file_system};
 use rocket::fs::NamedFile;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
 use rocket::{Route, State};
 use std::path::PathBuf;
+use anyhow::Result as AnyResult;
 
 pub fn route() -> Vec<Route> {
     routes![
         dir_content,
+        create_dir,
         file_content,
         video_track,
         generate_share_link,
@@ -50,6 +52,24 @@ async fn dir_content(
     Ok(Json(content))
 }
 
+#[post("/dir", data = "<req_body>")]
+async fn create_dir(
+    state: &State<AppState>,
+    req_body: Json<CreateDirRequest>,
+    _user: AuthAdmin,
+) -> Result<(), Error> {
+    let storage = state.get_site()?.storage.clone();
+    let parent = util::parse_encoded_url(&req_body.parent)?;
+    let parent_path = PathBuf::from(storage).join(&parent);
+    let target_path = parent_path.join(&req_body.name);
+
+    if !parent_path.exists() || target_path.exists() {
+        return Err(Error::BadRequest);
+    }
+
+    Ok(fs::create_dir(target_path).await?)
+}
+
 #[get("/file/<path>")]
 async fn file_content(
     path: &str,
@@ -57,20 +77,20 @@ async fn file_content(
     state: &State<AppState>,
     range_header: Range,
 ) -> Result<FileResponse, Error> {
-    let storage = state.get_site()?.storage.clone();
-    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+    let target_path = get_target_path(state, path).map_err(|e| {
+        eprintln!("{}", e);
+        return 400;
+    })?;
 
-    if !target_path.exists() || !target_path.is_file() {
-        eprintln!("Invalid file path: {:?}", &target_path);
-        return Err(Error::BadRequest);
-    }
+    let is_text = FileType::get_file_type(&target_path) == FileType::Text;
 
-    match range_header.range {
-        Some(range) => {
+    match (range_header.range, is_text) {
+        (Some(range), _) => {
             let ranged_file = RangedFile::new(range, target_path).await?;
             Ok(FileResponse::Range(ranged_file))
-        }
-        None => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
+        },
+        (None, true) => Ok(FileResponse::Text(file_system::read_text_file(target_path).await?)),
+        (None, false) => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
     }
 }
 
@@ -126,7 +146,29 @@ async fn get_share_link(
         return Err(Error::BadRequest);
     }
 
-    let user = AuthUser::default();
+    let target_path = get_target_path(state, path).map_err(|e| {
+        eprintln!("{}", e);
+        return 400;
+    })?;
 
-    Ok(file_content(path, user, state, range_header).await?)
+    // Ok(file_content(path, user, state, range_header).await?)
+    match range_header.range {
+        Some(range) => {
+            let ranged_file = RangedFile::new(range, target_path).await?;
+            Ok(FileResponse::Range(ranged_file))
+        },
+        None => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
+    }
+}
+
+
+fn get_target_path(state: &State<AppState>, path: &str) -> AnyResult<PathBuf> {
+    let storage = state.get_site()?.storage.clone();
+    let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
+
+    if !target_path.exists() || !target_path.is_file() {
+        return Err(anyhow::anyhow!("Invalid file path: {:?}", target_path));
+    }
+
+    Ok(target_path)
 }

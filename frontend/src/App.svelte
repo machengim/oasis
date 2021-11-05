@@ -24,9 +24,11 @@
     setNotification,
     userStore,
     titleStore,
+    clickStore,
   } from "./utils/store";
   import { compareVersion, getLocale } from "./utils/util";
   import UpdateModal from "./modals/UpdateModal.svelte";
+  import UploadList from "./sections/UploadList.svelte";
 
   let language = "";
   let isLoading = true;
@@ -128,15 +130,20 @@
       showUpdateModal = true;
     }
   };
+
+  const onClickEvent = () => {
+    clickStore.set(new Date().getTime());
+  };
 </script>
 
 {#if isLoading}
   <Spinner />
 {:else}
-  <main>
+  <main class="min-h-screen" on:click={onClickEvent}>
     <Router>
       <Header />
       <Notification />
+      <UploadList />
 
       {#if showUpdateModal}
         <UpdateModal onClose={() => (showUpdateModal = false)} {updateInfo} />

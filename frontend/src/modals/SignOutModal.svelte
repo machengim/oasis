@@ -4,8 +4,9 @@
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
   import * as api from "../utils/api";
-  import { setNotification, userStore } from "../utils/store";
+  import { setNotification, userStore, uploadTaskStore } from "../utils/store";
   import Spinner from "../components/Spinner.svelte";
+  import { cancelUploads } from "../utils/upload";
 
   const navigate = useNavigate();
   export let onClose = () => {};
@@ -13,7 +14,11 @@
 
   const signOut = async () => {
     isLoading = true;
+
     try {
+      const uploadingTasks = $uploadTaskStore;
+      await cancelUploads(uploadingTasks);
+      uploadTaskStore.set([]);
       await api.get("/api/user/signout", "raw");
       userStore.set(null);
       setNotification("success", $t("message.success.signout"));

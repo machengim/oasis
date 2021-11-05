@@ -20,6 +20,7 @@ impl<'a> RocketEnv<'a> {
         vars.insert("ROCKET_WORKERS", "8");
         vars.insert("ROCKET_KEEP_ALIVE", "4");
         vars.insert("ROCKET_LOG_LEVEL", "off");
+        vars.insert("ROCKET_LIMITS", "{file=\"8 MiB\"}");
 
         let env = RocketEnv { vars };
         env.set_var();
@@ -36,6 +37,7 @@ impl<'a> RocketEnv<'a> {
         vars.insert("ROCKET_WORKERS", "2");
         vars.insert("ROCKET_KEEP_ALIVE", "1");
         vars.insert("ROCKET_LOG_LEVEL", "debug");
+        vars.insert("ROCKET_LIMITS", "{file=\"8 MiB\"}");
 
         let env = RocketEnv { vars };
         env.set_var();

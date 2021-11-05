@@ -47,6 +47,7 @@ export interface IChangePasswordRequest {
 }
 
 export interface IFile {
+  dir?: Array<string>,
   filename: string,
   file_type: FileType,
   size: number,
@@ -94,6 +95,22 @@ export interface IUser {
   username: string;
   permission: number;
   expire: number;
+}
+
+export interface IUploadTask {
+  uuid?: string;
+  file: File;
+  targetDir: Array<string>;
+  status: EUploadStatus;
+  progress: number;
+  hash?: string;
+}
+
+export interface IUploadRequest {
+  filename: string;
+  size: number;
+  target: string; // target directory to store the uploading file
+  hash: string;   // the md5 value of the file
 }
 
 export enum FileType {
@@ -155,4 +172,13 @@ export enum ELoopMethod {
   repeat = "repeat",  // repeat single file
   shuffle = "shuffle",  // random shuffle play list
   loop = "loop"     // loop play list in sequence
+}
+
+export enum EUploadStatus {
+  waiting = "waiting",
+  preparing = "preparing",
+  uploading = "uploading",
+  finishing = "finishing",
+  success = "success",
+  failed = "failed"
 }

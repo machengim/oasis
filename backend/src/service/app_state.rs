@@ -1,13 +1,14 @@
-use crate::entity::site::Site;
+use crate::entity::{site::Site, upload_task::UploadTask};
 use anyhow::Result as AnyResult;
 use sqlx::{pool::PoolConnection, Pool, Sqlite};
-use std::sync::{atomic::AtomicBool, atomic::Ordering, Arc, Mutex};
+use std::sync::{atomic::AtomicBool, atomic::Ordering, Arc, Mutex, MutexGuard};
 
 #[derive(Debug)]
 pub struct AppState {
     pub first_run: AtomicBool,
     pub site: Arc<Mutex<Site>>,
     pub pool: Pool<Sqlite>,
+    pub uploads: Arc<Mutex<Vec<UploadTask>>>,
 }
 
 impl AppState {
@@ -22,6 +23,7 @@ impl AppState {
             first_run: AtomicBool::new(first_run),
             site: Arc::new(Mutex::new(site)),
             pool,
+            uploads: Arc::new(Mutex::new(vec![])),
         }
     }
 
@@ -41,7 +43,7 @@ impl AppState {
         Ok(self.pool.acquire().await?)
     }
 
-    pub fn get_site(&self) -> AnyResult<std::sync::MutexGuard<Site>> {
+    pub fn get_site(&self) -> AnyResult<MutexGuard<Site>> {
         match self.site.lock() {
             Ok(v) => Ok(v),
             Err(e) => return Err(anyhow::anyhow!("Cannot retrieve site from state: {}", e)),
@@ -51,6 +53,38 @@ impl AppState {
     pub fn set_site(&self, new_site: Site) -> AnyResult<()> {
         let mut site = self.get_site()?;
         *site = new_site;
+
+        Ok(())
+    }
+
+    pub fn get_upload_tasks(&self) -> AnyResult<MutexGuard<Vec<UploadTask>>> {
+        match self.uploads.lock() {
+            Ok(v) => Ok(v),
+            Err(e) => return Err(anyhow::anyhow!("Cannot retrieve site from state: {}", e)),
+        }
+    }
+
+    pub fn find_upload_uuid(&self, uuid: &str) -> AnyResult<Option<UploadTask>> {
+        let uploads = self.get_upload_tasks()?;
+        for task in uploads.iter() {
+            if task.uuid == uuid {
+                return Ok(Some(task.to_owned()));
+            }
+        }
+
+        Ok(None)
+    }
+
+    pub fn push_upload_task(&self, target_task: UploadTask) -> AnyResult<()> {
+        let mut uploads = self.get_upload_tasks()?;
+        (*uploads).push(target_task);
+
+        Ok(())
+    }
+
+    pub fn remove_upload_task(&self, target_task: UploadTask) -> AnyResult<()> {
+        let mut uploads = self.get_upload_tasks()?;
+        (*uploads).retain(|upload| upload.uuid != target_task.uuid);
 
         Ok(())
     }

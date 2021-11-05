@@ -23,8 +23,8 @@
   import FileLinkModal from "../modals/FileLinkModal.svelte";
 
   const navigate = useNavigate();
-  export let dirs: Array<string>;
   export let filename: string;
+  let dirs = $dirsStore;
   let filePath: string;
   let trackPath: string;
   let siblings: Array<IFile>;
@@ -50,7 +50,7 @@
 
   $: if (filename) {
     titleStore.set(filename);
-    fileType = extractFileType();
+    fileType = inferFileType(filename);
     filePath = buildFilePath();
   }
 
@@ -128,19 +128,6 @@
     const filePath = dir ? dir + "/" + vttTrackName : vttTrackName;
 
     return "/api/file/track/" + encodeURIComponent(filePath);
-  };
-
-  const extractFileType = () => {
-    const splits = filename.split(".");
-    let file_ext: string;
-
-    if (splits.length < 2) {
-      file_ext = null;
-    } else {
-      file_ext = splits.slice(-1)[0].toLowerCase();
-    }
-
-    return inferFileType(file_ext);
   };
 
   const selectSibling = (index: number) => {

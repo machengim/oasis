@@ -35,6 +35,19 @@ pub async fn get_sub_dirs(dir: &PathBuf) -> AnyResult<Vec<PathBuf>> {
     Ok(sub_dirs)
 }
 
+pub fn get_available_space(storage: &str) -> u64 {
+    let mut sys = System::new_all();
+    sys.refresh_all();
+
+    for disk in sys.disks() {
+        if storage.starts_with(&disk.mount_point().to_string_lossy().to_string()) {
+            return disk.available_space();
+        }
+    }
+
+    return 0;
+}
+
 // All text file needs to check the encoding method.
 pub async fn read_text_file(path: PathBuf) -> AnyResult<String> {
     let mut buffer = vec![];
@@ -86,5 +99,14 @@ mod tests {
         let decoded_str = rt.block_on(read_text_file(path)).unwrap();
         println!("Decoded string: {}", &decoded_str);
         assert!(decoded_str.len() > 0);
+    }
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn test_disk_space() {
+        let storage = "/home";
+        let space = get_available_space(storage);
+        println!("Space in {} is {}", storage, space);
+        assert!(space > 0);
     }
 }
