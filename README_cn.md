@@ -1,6 +1,6 @@
 ## OASIS
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/main/LICENSE-MIT) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/main/LICENSE-MIT) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)](https://github.com/machengim/oasis/releases) [![Docker](https://img.shields.io/badge/docker-v0.2-orange)](https://hub.docker.com/r/machengim/oasis)
 
 [English README](https://github.com/machengim/oasis/blob/main/README.md)
 
@@ -66,6 +66,8 @@ node build.js
 ```
 
 ### Docker
+
+https://hub.docker.com/r/machengim/oasis
 
 ```
 docker pull machengim/oasis
