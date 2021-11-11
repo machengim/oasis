@@ -11,6 +11,8 @@ use std::str::FromStr;
 pub struct ServerConfig {
     pub ip: IpAddr,
     pub port: u16,
+    pub certs: Option<String>,
+    pub key: Option<String>,
 }
 
 impl Default for ServerConfig {
@@ -18,6 +20,8 @@ impl Default for ServerConfig {
         Self {
             ip: DEFAULT_IP,
             port: 8000,
+            certs: None,
+            key: None,
         }
     }
 }
@@ -33,7 +37,7 @@ impl ServerConfig {
             let lines = BufReader::new(file).lines();
             for line in lines {
                 if let Ok(content) = line {
-                    if content.starts_with("#") {
+                    if content.starts_with("#") || content.trim().len() == 0 {
                         continue;
                     }
 
@@ -45,6 +49,8 @@ impl ServerConfig {
                     match parts[0].trim() {
                         "ip" => server.ip = IpAddr::from_str(parts[1].trim())?,
                         "port" => server.port = parts[1].trim().parse()?,
+                        "certs" => server.certs = Some(parts[1].trim().to_string()),
+                        "key" => server.key = Some(parts[1].trim().to_string()),
                         _ => return Err(malform),
                     }
                 }
@@ -52,6 +58,20 @@ impl ServerConfig {
         }
 
         Ok(server)
+    }
+
+    pub fn get_tls_str(&self) -> String {
+        if self.certs.is_none() || self.key.is_none() {
+            return String::new();
+        }
+
+        let tls_str = format!(
+            "{{certs={:?},key={:?}}}",
+            &self.certs.clone().unwrap(),
+            &self.key.clone().unwrap()
+        );
+
+        tls_str
     }
 }
 
@@ -79,7 +99,7 @@ pub fn show(config: &ServerConfig) -> AnyResult<()> {
         match std::env::consts::OS {
             "linux" => ips = retrieve_ip_linux(),
             "macos" | "windows" => ips = retrieve_ip_win_mac(),
-            _ => {},
+            _ => {}
         };
     }
 

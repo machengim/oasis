@@ -1,4 +1,10 @@
 # Rename this file to `oasis.conf` to make it effective.
+
 # Uncomment following lines to config ip and port.
 # ip=0.0.0.0
 # port=8000
+
+# Uncomment following lines to config TLS certificate.
+# Could be relative or absolute path
+# certs = assets/tests/tls/rsa_sha256_cert.pem
+# key = /home/cheng/oasis/backend/assets/tests/tls/rsa_sha256_key.pem

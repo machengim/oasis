@@ -1005,7 +1005,7 @@ dependencies = [
 
 [[package]]
 name = "oasis"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "bcrypt",
@@ -1386,6 +1386,7 @@ dependencies = [
  "state",
  "time 0.2.27",
  "tokio",
+ "tokio-rustls",
  "uncased",
 ]
 
