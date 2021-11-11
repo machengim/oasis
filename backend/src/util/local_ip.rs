@@ -61,17 +61,12 @@ impl ServerConfig {
     }
 
     pub fn get_tls_str(&self) -> String {
-        if self.certs.is_none() || self.key.is_none() {
-            return String::new();
+        match (&self.certs, &self.key) {
+            (Some(certs), Some(key)) => {
+                format!("{{certs={:?},key={:?}}}", certs, key)
+            }
+            _ => String::new(),
         }
-
-        let tls_str = format!(
-            "{{certs={:?},key={:?}}}",
-            &self.certs.clone().unwrap(),
-            &self.key.clone().unwrap()
-        );
-
-        tls_str
     }
 }
 
