@@ -11,9 +11,12 @@
   export let onClose: () => void;
   export let dirs: Array<string>;
   export let contextFile: IFile;
-  let fileType = contextFile.file_type === FileType.Dir ? "folder" : "file";
+  let fileType =
+    contextFile.file_type === FileType.Dir
+      ? $t("common.folder")
+      : $t("common.file");
   let isLoading = false;
-  let title = "Delete " + fileType;
+  let title = $t("modal.delete_file.title") + fileType;
 
   const onConfirm = async () => {
     isLoading = true;
@@ -24,9 +27,9 @@
       await api.remove(endpoint, null, false);
       contextFile.dir = dirs;
       deleteFile(contextFile);
-      setNotification("success", "Delete successfully");
+      setNotification("success", $t("message.success.delete_file"));
     } catch (e) {
-      setNotification("error", "Delete failed");
+      setNotification("error", $t("message.error.delete_file"));
       console.error(e);
     }
 
@@ -37,8 +40,8 @@
 
 <Modal {onClose} {title}>
   <div class="p-4 text-lg">
-    You are deleting {fileType} <b>{contextFile.filename}</b>. This action is
-    permanent and cannot be undo. Are you sure you want to continue?
+    {$t("modal.delete_file.text_before")}{fileType}
+    <b>{contextFile.filename}</b>{$t("modal.delete_file.text_after")}
   </div>
 
   <div class="w-full p-4 flex flex-row justify-end">

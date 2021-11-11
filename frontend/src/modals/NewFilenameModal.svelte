@@ -6,14 +6,14 @@
   import { FileType } from "../utils/types";
   import * as api from "../utils/api";
   import { pushFile, setNotification, updateFile } from "../utils/store";
-  import { buildEncodeFilePath } from "../utils/util";
+  import { buildEncodeFilePath, inferFileType } from "../utils/util";
 
   export let onClose = () => {};
   export let dirs: Array<string>;
   export let files: Array<IFile> = [];
   export let contextFile: IFile = null;
 
-  let parent = dirs.join("/") || "storage root";
+  let parent = dirs.join("/") || $t("modal.create_folder.storage_root");
   let isLoading = false;
   let newFilename = contextFile ? contextFile.filename : "";
   let error: string;
@@ -22,20 +22,23 @@
   let fileType: string;
 
   $: if (contextFile) {
-    fileType = contextFile.file_type === FileType.Dir ? "folder" : "file";
+    fileType =
+      contextFile.file_type === FileType.Dir
+        ? $t("common.folder")
+        : $t("common.file");
   }
 
   $: title = contextFile
-    ? "Rename " + fileType
+    ? $t("modal.rename_file.title") + fileType
     : $t("modal.create_folder.title");
 
   $: text = contextFile
-    ? "You are renaming " +
+    ? $t("modal.rename_file.text_before") +
       fileType +
       " <b>" +
       contextFile.filename +
       "</b>" +
-      ", Please enter the name below:"
+      $t("modal.rename_file.text_after")
     : $t("modal.create_folder.text_before") +
       "<b>" +
       parent +
@@ -99,11 +102,20 @@
     try {
       await api.put(endpoint, payload, false);
       contextFile.dir = dirs;
-      const newFile: IFile = { ...contextFile, filename: newFilename };
+      const newFileType =
+        contextFile.file_type === FileType.Dir
+          ? FileType.Dir
+          : inferFileType(newFilename);
+
+      const newFile: IFile = {
+        ...contextFile,
+        filename: newFilename,
+        file_type: newFileType,
+      };
       updateFile(contextFile, newFile);
-      setNotification("success", "Rename successfully");
+      setNotification("success", $t("message.success.rename_file"));
     } catch (e) {
-      setNotification("error", "Rename failed");
+      setNotification("error", $t("message.error.rename_file"));
       console.error(e);
     }
 
@@ -119,7 +131,7 @@
     </p>
     <input
       type="text"
-      class="mt-2 w-40 lg:w-60 border rounded focus:outline-none px-2"
+      class="mt-2 w-48 lg:w-64 border rounded focus:outline-none px-2"
       bind:value={newFilename}
     />
     <p class="text-sm text-red-500 {error ? 'visible' : 'invisible'}">

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { onMount } from "svelte";
   import type { IMousePosition } from "../utils/types";
 
@@ -30,19 +31,19 @@
     class="px-2 py-1 text-black hover:bg-gray-400 cursor-pointer"
     on:click={() => onContextAction("rename")}
   >
-    Rename
+    {$t("component.context_menu.rename")}
   </div>
   <div
     class="px-2 py-1 text-red-500 hover:bg-gray-400 cursor-pointer"
     on:click={() => onContextAction("delete")}
   >
-    Delete
+    {$t("component.context_menu.delete")}
   </div>
   <hr />
   <div
     class="px-2 py-1 text-black hover:bg-gray-400 cursor-pointer"
     on:click={() => onContextAction("close")}
   >
-    Close
+    {$t("component.context_menu.close")}
   </div>
 </div>

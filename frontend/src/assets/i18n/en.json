@@ -1,4 +1,8 @@
 {
+  "common": {
+    "file": "file",
+    "folder": "folder"
+  },
   "section": {
     "files": "Files",
     "setup": "Setup",
@@ -91,6 +95,11 @@
     },
     "upload_list": {
       "title": "Upload List"
+    },
+    "context_menu": {
+      "rename": "Rename",
+      "delete": "Delete",
+      "close": "Close"
     }
   },
   "modal": {
@@ -132,7 +141,19 @@
       "text_after": ". Please enter the new folder's name below:",
       "error_empty": "Folder name should not be empty",
       "error_used": "This name has been used",
-      "error_long": "The folder name is too long"
+      "error_long": "The folder name is too long",
+      "storage_root": "Storage root",
+      "delete": "Delete "
+    },
+    "rename_file": {
+      "title": "Rename ",
+      "text_before": "You are renaming ",
+      "text_after": ". Please enter the name below: "
+    },
+    "delete_file": {
+      "title": "Delete ",
+      "text_before": "You are deleting ",
+      "text_after": ". This action is permanent and cannot undo. Are you sure you want to continue?"
     }
   },
   "message": {
@@ -148,7 +169,9 @@
       "update_site": "Update site config successfully",
       "launch": "Launched successfully",
       "app_up_to_date": "Your app is up to date",
-      "create_dir": "New folder created successfully"
+      "create_dir": "New folder created successfully",
+      "rename_file": "Rename successfully",
+      "delete_file": "Delete successfully"
     },
     "error": {
       "no_storage": "Please choose a storage",
@@ -165,7 +188,9 @@
       "update_password_fail": "Update password failed",
       "update_site_fail": "Update site config failed",
       "launch_fail": "Launch failed",
-      "create_dir": "New folder create failed"
+      "create_dir": "New folder create failed",
+      "rename_file": "Rename failed",
+      "delete_file": "Delete failed"
     }
   }
 }

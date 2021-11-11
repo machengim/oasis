@@ -26,7 +26,7 @@
   import FileIcon from "../components/FileIcon.svelte";
   import Button from "../components/Button.svelte";
   import PromptModal from "../modals/PromptModal.svelte";
-  import NewDirNameModal from "../modals/NewDirNameModal.svelte";
+  import NewFilenameModal from "../modals/NewFilenameModal.svelte";
   import DeleteFileModal from "../modals/DeleteFileModal.svelte";
   import ContextMenu from "../sections/ContextMenu.svelte";
   import { onDestroy } from "svelte";
@@ -43,7 +43,7 @@
   let resultForAll = false;
   let showPromptModal = false;
   let showNewMenu = false;
-  let showNewDirNameModal = false;
+  let showNewFilenameModal = false;
   let showContextMenu = false;
   let showDeleteFileModal = false;
   let contextPos: IMousePosition;
@@ -205,12 +205,12 @@
     showPromptModal = false;
   };
 
-  const openNewDirNameModal = () => {
-    showNewDirNameModal = true;
+  const openNewFilenameModal = () => {
+    showNewFilenameModal = true;
   };
 
-  const closeNewDirNameModal = () => {
-    showNewDirNameModal = false;
+  const closeNewFilenameModal = () => {
+    showNewFilenameModal = false;
     contextFile = null;
   };
 
@@ -230,7 +230,7 @@
 
     switch (action) {
       case "rename":
-        showNewDirNameModal = true;
+        showNewFilenameModal = true;
         break;
       case "delete":
         showDeleteFileModal = true;
@@ -262,12 +262,12 @@
     setExtraResult={(r) => setResultAll(r)}
   />
 {/if}
-{#if showNewDirNameModal}
-  <NewDirNameModal
+{#if showNewFilenameModal}
+  <NewFilenameModal
     {dirs}
     {files}
     {contextFile}
-    onClose={closeNewDirNameModal}
+    onClose={closeNewFilenameModal}
   />
 {/if}
 {#if showDeleteFileModal}
@@ -296,7 +296,7 @@
           >
             <div
               class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer text-center"
-              on:click={openNewDirNameModal}
+              on:click={openNewFilenameModal}
             >
               {$t("component.dir_list.create_folder")}
             </div>

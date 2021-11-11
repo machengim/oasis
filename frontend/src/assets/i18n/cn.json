@@ -1,4 +1,8 @@
 {
+  "common": {
+    "file": "文件",
+    "folder": "文件夹"
+  },
   "section": {
     "files": "文件",
     "setup": "设置",
@@ -70,8 +74,8 @@
     "dir_list": {
       "filename": "文件名",
       "type": "类型",
-      "size": "大小",      
-      "new": "+ 新建",      
+      "size": "大小",
+      "new": "+ 新建",
       "create_folder": "创建目录",
       "upload_files": "上传文件"
     },
@@ -91,6 +95,11 @@
     },
     "upload_list": {
       "title": "上传列表"
+    },
+    "context_menu": {
+      "rename": "重命名",
+      "delete": "删除",
+      "close": "关闭"
     }
   },
   "modal": {
@@ -129,10 +138,21 @@
     "create_folder": {
       "title": "创建目录",
       "text_before": "你正在",
-      "text_after": "下创建一个新目录. 请在下方输入新目录的名字:",
+      "text_after": "下创建一个新目录. 请在下方输入新目录名:",
       "error_empty": "目录名不能为空",
       "error_used": "该名称已被使用",
-      "error_long": "目录名太长"
+      "error_long": "目录名太长",
+      "storage_root": "存储根目录"
+    },
+    "rename_file": {
+      "title": "重命名",
+      "text_before": "正在重命名",
+      "text_after": ". 请在下方输入新的名字: "
+    },
+    "delete_file": {
+      "title": "删除",
+      "text_before": "正在删除",
+      "text_after": ". 此操作是永久的且不可撤销. 确定要继续?"
     }
   },
   "message": {
@@ -148,7 +168,9 @@
       "update_site": "站点配置更新成功",
       "launch": "站点启动成功",
       "app_up_to_date": "您的软件是最新版本",
-      "create_dir": "新目录创建成功"
+      "create_dir": "新目录创建成功",
+      "rename_file": "重命名成功",
+      "delete_file": "删除成功"
     },
     "error": {
       "no_storage": "请选择存储位置",
@@ -165,7 +187,9 @@
       "update_password_fail": "更新密码失败",
       "update_site_fail": "更新站点设置失败",
       "launch_fail": "站点启动失败",
-      "create_dir": "新目录创建失败"
+      "create_dir": "新目录创建失败",
+      "rename_file": "重命名失败",
+      "delete_file": "删除失败"
     }
   }
 }
