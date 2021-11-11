@@ -1,23 +1,25 @@
 use crate::entity::error::Error;
 use crate::entity::file::{File, FileType};
-use crate::entity::request::{CreateDirRequest, GenerateLinkRequest};
+use crate::entity::request::{CreateDirRequest, GenerateLinkRequest, RenameFileRequest};
 use crate::entity::response::FileResponse;
 use crate::service::app_state::AppState;
 use crate::service::auth::{AuthAdmin, AuthUser};
 use crate::service::range::{Range, RangedFile};
 use crate::service::track;
 use crate::util::{self, file_system};
+use anyhow::Result as AnyResult;
 use rocket::fs::NamedFile;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
 use rocket::{Route, State};
 use std::path::PathBuf;
-use anyhow::Result as AnyResult;
 
 pub fn route() -> Vec<Route> {
     routes![
         dir_content,
         create_dir,
+        change_name,
+        delete_file,
         file_content,
         video_track,
         generate_share_link,
@@ -82,16 +84,60 @@ async fn file_content(
         return 400;
     })?;
 
+    if !target_path.is_file() {
+        return Err(Error::BadRequest);
+    }
+
     let is_text = FileType::get_file_type(&target_path) == FileType::Text;
 
     match (range_header.range, is_text) {
         (Some(range), _) => {
             let ranged_file = RangedFile::new(range, target_path).await?;
             Ok(FileResponse::Range(ranged_file))
-        },
-        (None, true) => Ok(FileResponse::Text(file_system::read_text_file(target_path).await?)),
+        }
+        (None, true) => Ok(FileResponse::Text(
+            file_system::read_text_file(target_path).await?,
+        )),
         (None, false) => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
     }
+}
+
+#[put("/file/<path>", data = "<req_body>")]
+async fn change_name(
+    state: &State<AppState>,
+    path: &str,
+    req_body: Json<RenameFileRequest>,
+    _user: AuthAdmin,
+) -> Result<(), Error> {
+    let current_file = get_target_path(state, path).map_err(|e| {
+        eprintln!("{}", e);
+        return 400;
+    })?;
+
+    let target_file = current_file.parent().unwrap().join(&req_body.new_name);
+
+    if target_file.exists() {
+        return Err(Error::BadRequest);
+    }
+
+    fs::rename(current_file, target_file).await?;
+    Ok(())
+}
+
+#[delete("/file/<path>")]
+async fn delete_file(state: &State<AppState>, path: &str, _user: AuthAdmin) -> Result<(), Error> {
+    let target_path = get_target_path(state, path).map_err(|e| {
+        eprintln!("{}", e);
+        return 400;
+    })?;
+
+    if target_path.is_file() {
+        fs::remove_file(target_path).await?;
+    } else {
+        fs::remove_dir_all(target_path).await?;
+    }
+
+    Ok(())
 }
 
 // Temporary solution for track file searching.
@@ -151,23 +197,25 @@ async fn get_share_link(
         return 400;
     })?;
 
-    // Ok(file_content(path, user, state, range_header).await?)
+    if !target_path.is_file() {
+        return Err(Error::BadRequest);
+    }
+
     match range_header.range {
         Some(range) => {
             let ranged_file = RangedFile::new(range, target_path).await?;
             Ok(FileResponse::Range(ranged_file))
-        },
+        }
         None => Ok(FileResponse::Binary(NamedFile::open(target_path).await?)),
     }
 }
-
 
 fn get_target_path(state: &State<AppState>, path: &str) -> AnyResult<PathBuf> {
     let storage = state.get_site()?.storage.clone();
     let target_path = PathBuf::from(&storage).join(&util::parse_encoded_url(path)?);
 
-    if !target_path.exists() || !target_path.is_file() {
-        return Err(anyhow::anyhow!("Invalid file path: {:?}", target_path));
+    if !target_path.exists() {
+        return Err(anyhow::anyhow!("Invalid path: {:?}", target_path));
     }
 
     Ok(target_path)

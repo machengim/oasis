@@ -215,6 +215,13 @@ export function srtToVtt(input: string): string {
   return output;
 }
 
+export function buildEncodeFilePath(dirs: Array<string>, filename: string) {
+  const dir = dirs.join("/");
+  const path = dir ? dir + "/" + filename : filename;
+
+  return encodeURIComponent(path);
+}
+
 export function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms))
 }

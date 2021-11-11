@@ -14,7 +14,12 @@
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
   import MediaPlayer from "../players/MediaPlayer.svelte";
-  import { inferFileType, compareArray, compareFile } from "../utils/util";
+  import {
+    inferFileType,
+    compareArray,
+    compareFile,
+    buildEncodeFilePath,
+  } from "../utils/util";
   import * as api from "../utils/api";
   import TextViewer from "../players/TextViewer.svelte";
   import ImageViewer from "../players/ImageViewer.svelte";
@@ -51,7 +56,7 @@
   $: if (filename) {
     titleStore.set(filename);
     fileType = inferFileType(filename);
-    filePath = buildFilePath();
+    filePath = "/api/file/" + buildEncodeFilePath(dirs, filename);
   }
 
   $: if (filename && fileType === FileType.Video && filesInStore.length > 0) {
@@ -104,13 +109,6 @@
     }
 
     isLoading = false;
-  };
-
-  const buildFilePath = () => {
-    const dir = dirs.join("/");
-    const path = dir ? dir + "/" + filename : filename;
-
-    return "/api/file/" + encodeURIComponent(path);
   };
 
   const buildTrackPath = () => {

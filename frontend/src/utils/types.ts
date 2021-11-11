@@ -113,6 +113,11 @@ export interface IUploadRequest {
   hash: string;   // the md5 value of the file
 }
 
+export interface IMousePosition {
+  x: number;
+  y: number;
+}
+
 export enum FileType {
   Code = "Code",
   Dir = "Dir",

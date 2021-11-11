@@ -70,3 +70,9 @@ pub struct CreateDirRequest {
     pub parent: String,
     pub name: String,
 }
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct RenameFileRequest {
+    pub new_name: String,
+}

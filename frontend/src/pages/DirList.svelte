@@ -10,18 +10,25 @@
     resetTitle,
     clickStore,
   } from "../utils/store";
-  import type { IFile, IFileOrder, IUploadTask } from "../utils/types";
+  import type {
+    IFile,
+    IFileOrder,
+    IMousePosition,
+    IUploadTask,
+  } from "../utils/types";
   import { EUploadStatus } from "../utils/types";
   import { EIconType } from "../utils/types";
   import * as api from "../utils/api";
   import Icon from "../components/Icon.svelte";
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
-  import { formatSize, compareFile, inferFileType } from "../utils/util";
+  import { formatSize, compareFile } from "../utils/util";
   import FileIcon from "../components/FileIcon.svelte";
   import Button from "../components/Button.svelte";
   import PromptModal from "../modals/PromptModal.svelte";
-  import CreateDirModal from "../modals/CreateDirModal.svelte";
+  import NewDirNameModal from "../modals/NewDirNameModal.svelte";
+  import DeleteFileModal from "../modals/DeleteFileModal.svelte";
+  import ContextMenu from "../sections/ContextMenu.svelte";
   import { onDestroy } from "svelte";
 
   const navigate = useNavigate();
@@ -36,15 +43,25 @@
   let resultForAll = false;
   let showPromptModal = false;
   let showNewMenu = false;
-  let showCreateDirModal = false;
+  let showNewDirNameModal = false;
+  let showContextMenu = false;
+  let showDeleteFileModal = false;
+  let contextPos: IMousePosition;
+  let contextFile: IFile;
 
   const unsubscribeDirs = dirsStore.subscribe((d) => (dirs = d));
 
   const unsubscribeFiles = filesStore.subscribe((f) => (files = f));
 
   const unsubscribeClick = clickStore.subscribe((click) => {
-    if (click > 0 && showNewMenu) {
-      showNewMenu = false;
+    if (click > 0) {
+      if (showNewMenu) {
+        showNewMenu = false;
+      }
+      if (showContextMenu) {
+        showContextMenu = false;
+        contextFile = null;
+      }
     }
   });
 
@@ -188,20 +205,53 @@
     showPromptModal = false;
   };
 
-  const openCreateDirModal = () => {
-    showCreateDirModal = true;
+  const openNewDirNameModal = () => {
+    showNewDirNameModal = true;
   };
 
-  const closeCreateDirModal = () => {
-    showCreateDirModal = false;
+  const closeNewDirNameModal = () => {
+    showNewDirNameModal = false;
+    contextFile = null;
   };
 
   const toggleShowNewMenu = (e: Event) => {
     e.stopPropagation();
     showNewMenu = !showNewMenu;
   };
+
+  const openContextMenu = (e: MouseEvent, file: IFile) => {
+    contextFile = file;
+    contextPos = { x: e.clientX, y: e.clientY };
+    showContextMenu = true;
+  };
+
+  const onContextAction = (action: "rename" | "delete" | "close") => {
+    showContextMenu = false;
+
+    switch (action) {
+      case "rename":
+        showNewDirNameModal = true;
+        break;
+      case "delete":
+        showDeleteFileModal = true;
+        break;
+      case "close":
+        contextFile = null;
+        break;
+      default:
+        break;
+    }
+  };
+
+  const closeDeleteFileModal = () => {
+    showDeleteFileModal = false;
+    contextFile = null;
+  };
 </script>
 
+{#if showContextMenu}
+  <ContextMenu pos={contextPos} {onContextAction} />
+{/if}
 {#if showPromptModal}
   <PromptModal
     {title}
@@ -212,8 +262,16 @@
     setExtraResult={(r) => setResultAll(r)}
   />
 {/if}
-{#if showCreateDirModal}
-  <CreateDirModal {dirs} {files} onClose={closeCreateDirModal} />
+{#if showNewDirNameModal}
+  <NewDirNameModal
+    {dirs}
+    {files}
+    {contextFile}
+    onClose={closeNewDirNameModal}
+  />
+{/if}
+{#if showDeleteFileModal}
+  <DeleteFileModal {dirs} {contextFile} onClose={closeDeleteFileModal} />
 {/if}
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
@@ -238,7 +296,7 @@
           >
             <div
               class="px-2 py-1 hover:bg-gray-400 hover:text-white cursor-pointer text-center"
-              on:click={openCreateDirModal}
+              on:click={openNewDirNameModal}
             >
               {$t("component.dir_list.create_folder")}
             </div>
@@ -307,6 +365,7 @@
       {#each files as file}
         <div
           class="grid grid-cols-5 border-b border-gray-200 py-2 hover:bg-gray-200 cursor-pointer"
+          on:contextmenu|preventDefault={(e) => openContextMenu(e, file)}
           on:click={() => selectFile(file)}
         >
           <div class="col-span-3 px-2 flex flex-row items-center">

@@ -48,6 +48,34 @@ export function pushFile(file: IFile) {
   }
 }
 
+export function updateFile(oldFile: IFile, newFile: IFile) {
+  if (!newFile.dir) return;
+
+  const currentDir = get(dirsStore);
+  if (compareArray(currentDir, newFile.dir)) {
+    const files = get(filesStore);
+    const index = files.findIndex(f => f.filename === oldFile.filename);
+    if (index >= 0) {
+      files[index] = newFile;
+      filesStore.set(files);
+    }
+  }
+}
+
+export function deleteFile(file: IFile) {
+  if (!file.dir) return;
+
+  const currentDir = get(dirsStore);
+  if (compareArray(currentDir, file.dir)) {
+    const files = get(filesStore);
+    const index = files.findIndex(f => f === file);
+    if (index >= 0) {
+      files.splice(index, 1);
+      filesStore.set(files);
+    }
+  }
+}
+
 export const loopStore: Writable<ELoopMethod> = writable(null);
 
 export const titleStore: Writable<string> = writable(null);
