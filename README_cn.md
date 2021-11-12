@@ -12,9 +12,10 @@
 
 1. 从 [release](https://github.com/machengim/oasis/releases) 页面下载
 2. 解压缩
-3. 在 `oasis.conf` 中设置服务器的IP和端口
-4. 运行 `oasis` 或 `oasis.exe`
-5. 从浏览器访问服务器的 IP 地址
+3. 如果运行在 Linux 或 MacOS 中, 授予 `oasis` 文件可执行权限 
+4. (可选) 在 `oasis.conf` 中设置服务器的IP和端口
+5. 运行 `oasis` 或 `oasis.exe`
+6. 从浏览器访问服务器的 IP 地址
 
 ### 功能
 
@@ -24,8 +25,8 @@
 - 文件上传
 - 播放列表
 - 移动端适配
-- 临时分享链接
-- 外部媒体播放器支持(通过分享链接)
+- 外部链接
+- 第三方媒体播放器支持(通过外部链接)
 - 多平台支持 (Linux, MacOS, Windows, Docker)
 - I18n (英语, 中文)
 
@@ -35,14 +36,16 @@
 - 图片 (浏览器支持)
 - 音频 (浏览器支持)
 - 视频 (浏览器支持)
-- 字幕 (srt / vtt 格式, 支持 Chrome, Firefox 和 Edge 浏览器)
+- 字幕 (`srt` / `vtt` 格式, 支持 Chrome, Firefox 和 Edge 浏览器)
 - PDF (由 pdf.js 支持)
 
 ### 规划
 
-- [ ] 多用户管理
-- [ ] HTTPS
-- [ ] 更多文件格式支持
+- [x] HTTPS
+- [ ] 访客模式
+- [ ] 搜索
+- [ ] 高级文件分享
+- [ ] 文本编辑器
 
 ### 技术栈
 
@@ -70,8 +73,6 @@ node build.js
 https://hub.docker.com/r/machengim/oasis
 
 ```
-docker pull machengim/oasis
-
 docker run --name oasis -t -d \
 -v <db>:/opt/oasis/db \
 -v <storage>:/home/storage \

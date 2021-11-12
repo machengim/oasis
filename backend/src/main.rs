@@ -18,7 +18,7 @@ async fn main() {
         eprintln!("{}", e);
 
         // For windows users, persist the window for 5 seconds to read the error message.
-        if std::env::consts::OS.to_lowercase() == "windows" {
+        if std::env::consts::OS == "windows" {
             let five_seconds = time::Duration::from_secs(5);
             thread::sleep(five_seconds);
         }

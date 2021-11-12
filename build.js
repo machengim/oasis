@@ -28,7 +28,7 @@ const createReleaseDir = () => {
     fs.rmSync("release", { recursive: true, force: true });
   }
 
-  fs.mkdirSync("release", { recursive: true }, (e) => {
+  fs.mkdirSync("release/oasis", { recursive: true }, (e) => {
     if (e) {
       throw e;
     }
@@ -42,14 +42,14 @@ createReleaseDir();
 process.chdir("frontend");
 runCommand("npm i");
 runCommand("npm run build");
-copyRecursiveSync("public", "../release/public");
+copyRecursiveSync("public", "../release/oasis/public");
 
 process.chdir("../backend");
 runCommand("cargo build --release");
-copyRecursiveSync("target/release/" + filename, "../release/" + filename);
-copyRecursiveSync("assets/oasis.conf.sample", "../release/oasis.conf.sample");
+copyRecursiveSync("target/release/" + filename, "../release/oasis/" + filename);
+copyRecursiveSync("assets/oasis.conf.sample", "../release/oasis/oasis.conf.sample");
 
-process.chdir("../release");
-fs.chmodSync(filename, "755");
+process.chdir("../release/oasis");
+fs.chmodSync(filename, 0o755);
 
 console.log("\nBuild complete. Please check the 'release' directory.");

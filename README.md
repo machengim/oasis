@@ -12,9 +12,10 @@ A self-hosted file server.
 
 1. Download from the [release](https://github.com/machengim/oasis/releases) page
 2. Uncompress
-3. (Optional) Config server IP and port number in `oasis.conf` file
-4. Run `oasis` or `oasis.exe`
-5. Visit the server's IP address in your favorite browser
+3. Give execute permission to `oasis` file if running in Linux or MacOS
+4. (Optional) Config server IP and port number in `oasis.conf` file
+5. Run `oasis` or `oasis.exe`
+6. Visit the server's IP address in your favorite browser
 
 ### Features
 
@@ -24,8 +25,8 @@ A self-hosted file server.
 - File upload
 - Play list
 - Mobile compatibility
-- Temporary sharing link
-- External media player support via sharing link
+- External link
+- Third-party media player support via external link
 - Multiple platform support (Linux, MacOS, Windows, Docker)
 - I18n (English, Chinese)
 
@@ -35,14 +36,16 @@ A self-hosted file server.
 - Image (browser support)
 - Audio (browser support)
 - Video (browser support)
-- Subtitle (srt / vtt format, supported in Chrome, Firefox and Edge by now)
+- Subtitle (`srt` / `vtt` format, supported in Chrome, Firefox and Edge by now)
 - PDF (supported by pdf.js)
 
 ### Roadmap
 
-- [ ] Multiple users management
-- [ ] HTTPS
-- [ ] More file format support
+- [x] HTTPS
+- [ ] Guest mode
+- [ ] Search
+- [ ] Advanced file sharing
+- [ ] Text editor
 
 ### Tech stack
 
@@ -70,8 +73,6 @@ node build.js
 https://hub.docker.com/r/machengim/oasis
 
 ```
-docker pull machengim/oasis
-
 docker run --name oasis -t -d \
 -v <db>:/opt/oasis/db \
 -v <storage>:/home/storage \
