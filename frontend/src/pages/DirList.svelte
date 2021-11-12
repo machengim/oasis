@@ -221,7 +221,7 @@
 
   const openContextMenu = (e: MouseEvent, file: IFile) => {
     contextFile = file;
-    contextPos = { x: e.clientX, y: e.clientY };
+    contextPos = { x: e.pageX, y: e.pageY };
     showContextMenu = true;
   };
 
