@@ -2,7 +2,7 @@
   import { uploadTaskStore } from "../utils/store";
   import { t } from "svelte-i18n";
   import Icon from "../components/Icon.svelte";
-  import { EIconColor, EIconType, EUploadStatus } from "../utils/types";
+  import { EIconColor, EIconType, EUploadStatus } from "../utils/enums";
   import type { IUploadTask } from "../utils/types";
   import { onDestroy } from "svelte";
   import PromptModal from "../modals/PromptModal.svelte";

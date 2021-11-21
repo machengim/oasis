@@ -1,5 +1,6 @@
 import { getLocaleFromNavigator } from 'svelte-i18n';
-import { FileType, IFile, IFileOrder } from './types';
+import type { IFile, IFileOrder } from './types';
+import { EFileType } from './enums';
 
 export function upperFirstChar(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
@@ -56,7 +57,7 @@ export function compareArray<T>(arrayA: Array<T>, arrayB: Array<T>) {
 
 function extractFileExt(filename: string) {
   if (!filename) {
-    return FileType.Unknown;
+    return EFileType.Unknown;
   }
 
   const splits = filename.split(".");
@@ -85,18 +86,18 @@ export function inferFileType(filename: string) {
     case "html":
     case "css":
     case "sh":
-      return FileType.Code;
+      return EFileType.Code;
     case "png":
     case "gif":
     case "jpg":
     case "jpeg":
-      return FileType.Image;
+      return EFileType.Image;
     case "mp3":
     case "ogg":
     case "flac":
     case "aac":
     case "wav":
-      return FileType.Music;
+      return EFileType.Music;
     case "mp4":
     case "webm":
     case "mkv":
@@ -104,9 +105,9 @@ export function inferFileType(filename: string) {
     case "mov":
     case "flv":
     case "wmv":
-      return FileType.Video;
+      return EFileType.Video;
     case "pdf":
-      return FileType.Pdf;
+      return EFileType.Pdf;
     case "txt":
     case "srt":
     case "vtt":
@@ -115,9 +116,9 @@ export function inferFileType(filename: string) {
     case "yml":
     case "ini":
     case "conf":
-      return FileType.Text;
+      return EFileType.Text;
     default:
-      return FileType.Unknown;
+      return EFileType.Unknown;
   }
 }
 

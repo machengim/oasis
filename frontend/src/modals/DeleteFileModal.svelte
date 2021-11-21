@@ -3,7 +3,7 @@
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
   import type { IFile } from "../utils/types";
-  import { FileType } from "../utils/types";
+  import { EFileType } from "../utils/enums";
   import { buildEncodeFilePath } from "../utils/util";
   import { deleteFile, setNotification } from "../utils/store";
   import * as api from "../utils/api";
@@ -12,7 +12,7 @@
   export let dirs: Array<string>;
   export let contextFile: IFile;
   let fileType =
-    contextFile.file_type === FileType.Dir
+    contextFile.file_type === EFileType.Dir
       ? $t("common.folder")
       : $t("common.file");
   let isLoading = false;

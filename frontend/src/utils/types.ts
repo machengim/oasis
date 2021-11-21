@@ -1,3 +1,5 @@
+import type * as enums from './enums';
+
 export interface INotification {
   type: 'success' | 'error';
   msg: string;
@@ -49,7 +51,7 @@ export interface IChangePasswordRequest {
 export interface IFile {
   dir?: Array<string>,
   filename: string,
-  file_type: FileType,
+  file_type: enums.EFileType,
   size: number,
 }
 
@@ -67,7 +69,7 @@ export interface IPartialBlob {
 }
 
 export interface ILoopIcon {
-  type: ELoopMethod;
+  type: enums.ELoopMethod;
   selected: boolean;
 }
 
@@ -101,7 +103,7 @@ export interface IUploadTask {
   uuid?: string;
   file: File;
   targetDir: Array<string>;
-  status: EUploadStatus;
+  status: enums.EUploadStatus;
   progress: number;
   hash?: string;
 }
@@ -116,74 +118,4 @@ export interface IUploadRequest {
 export interface IMousePosition {
   x: number;
   y: number;
-}
-
-export enum FileType {
-  Code = "Code",
-  Dir = "Dir",
-  Image = "Image",
-  Pdf = "Pdf",
-  Music = "Music",
-  Text = "Text",
-  Video = "Video",
-  Unknown = "Unknown",
-}
-
-export enum EIconType {
-  success = "success",
-  error = "error",
-  profile = "profile",
-  add = "add",
-  close = "close",
-  up = "up",
-  down = "down",
-  folder = "folder",
-  code = "code",
-  pdf = "pdf",
-  image = "image",
-  text = "text",
-  music = "music",
-  video = "video",
-  back = "back",
-  forward = "forward",
-  expand = "expand",
-  shuffle = "shuffle",
-  loop = "loop",
-  repeat = "repeat",
-  unknown = "unknown",
-  closecircle = "closecircle",
-  link = "link",
-  play = "play",
-  play_forward = "play_forward",
-  play_back = "play_back",
-  play_speed = "play_speed",
-  close_caption = "close_caption",
-  play_next = "play_next",
-  list = "list"
-}
-
-export enum EIconColor {
-  green = "green",
-  red = "red",
-  gray = "gray",
-  black = "black",
-  white = "white",
-  blue = "blue",
-  yellow = "yellow",
-  pink = "pink"
-}
-
-export enum ELoopMethod {
-  repeat = "repeat",  // repeat single file
-  shuffle = "shuffle",  // random shuffle play list
-  loop = "loop"     // loop play list in sequence
-}
-
-export enum EUploadStatus {
-  waiting = "waiting",
-  preparing = "preparing",
-  uploading = "uploading",
-  finishing = "finishing",
-  success = "success",
-  failed = "failed"
 }

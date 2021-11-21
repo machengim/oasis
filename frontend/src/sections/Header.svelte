@@ -4,7 +4,7 @@
   import AvatarMenu from "./AvatarMenu.svelte";
   import Icon from "../components/Icon.svelte";
   import Title from "./Title.svelte";
-  import { EIconType } from "../utils/types";
+  import { EIconType } from "../utils/enums";
   import type { IUpdateAppInfo } from "../utils/types";
   import SignOutModal from "../modals/SignOutModal.svelte";
   import ShutdownModal from "../modals/ShutdownModal.svelte";

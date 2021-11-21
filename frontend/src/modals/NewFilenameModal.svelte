@@ -3,7 +3,7 @@
   import Modal from "../components/Modal.svelte";
   import Button from "../components/Button.svelte";
   import type { IFile } from "../utils/types";
-  import { FileType } from "../utils/types";
+  import { EFileType } from "../utils/enums";
   import * as api from "../utils/api";
   import { pushFile, setNotification, updateFile } from "../utils/store";
   import { buildEncodeFilePath, inferFileType } from "../utils/util";
@@ -23,7 +23,7 @@
 
   $: if (contextFile) {
     fileType =
-      contextFile.file_type === FileType.Dir
+      contextFile.file_type === EFileType.Dir
         ? $t("common.folder")
         : $t("common.file");
   }
@@ -75,7 +75,7 @@
       const newFile: IFile = {
         dir: dirs,
         filename: newFilename,
-        file_type: FileType.Dir,
+        file_type: EFileType.Dir,
         size: 0,
       };
       pushFile(newFile);
@@ -103,8 +103,8 @@
       await api.put(endpoint, payload, false);
       contextFile.dir = dirs;
       const newFileType =
-        contextFile.file_type === FileType.Dir
-          ? FileType.Dir
+        contextFile.file_type === EFileType.Dir
+          ? EFileType.Dir
           : inferFileType(newFilename);
 
       const newFile: IFile = {

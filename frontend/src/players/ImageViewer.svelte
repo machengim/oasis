@@ -4,7 +4,7 @@
   import { loopStore } from "../utils/store";
   import Icon from "../components/Icon.svelte";
   import { checkMobile, checkSafari } from "../utils/util";
-  import { EIconType, EIconColor, ELoopMethod } from "../utils/types";
+  import { EIconType, EIconColor, ELoopMethod } from "../utils/enums";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
 

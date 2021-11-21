@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { EIconType } from "../utils/types";
-  import { EIconColor } from "../utils/types";
+  import type { EIconType } from "../utils/enums";
+  import { EIconColor } from "../utils/enums";
 
   export let type: EIconType;
   export let color: EIconColor = EIconColor.gray;

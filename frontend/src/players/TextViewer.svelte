@@ -3,11 +3,11 @@
   import { t } from "svelte-i18n";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
-  import { FileType } from "../utils/types";
+  import { EFileType } from "../utils/enums";
 
   export let dirs: Array<string>;
   export let filename: string;
-  export let fileType: FileType;
+  export let fileType: EFileType;
   let content: string;
   let isLoading = false;
 
@@ -43,7 +43,7 @@
   <div
     class="p-2 viewer-height overflow-y-auto border-2 border-gray-500 shadow"
   >
-    {#if fileType === FileType.Text}
+    {#if fileType === EFileType.Text}
       <pre class="text-lg">
         {content}
       </pre>

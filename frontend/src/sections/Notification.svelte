@@ -2,7 +2,7 @@
   import { onDestroy } from "svelte";
   import { t } from "svelte-i18n";
   import { notificationStore } from "../utils/store";
-  import { EIconType, EIconColor } from "../utils/types";
+  import { EIconType, EIconColor } from "../utils/enums";
   import type { INotification } from "../utils/types";
   import Icon from "../components/Icon.svelte";
 

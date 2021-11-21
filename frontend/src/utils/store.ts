@@ -1,5 +1,6 @@
 import { get, Writable, writable } from 'svelte/store';
-import type { IFile, INotification, ELoopMethod, IUser, ISiteFull, IUploadTask, EUploadStatus } from './types';
+import type { IFile, INotification, IUser, ISiteFull, IUploadTask } from './types';
+import type { ELoopMethod, EUploadStatus } from './enums';
 import * as constants from '../assets/constants.json';
 import { compareArray } from './util';
 

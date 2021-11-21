@@ -1,4 +1,5 @@
-import { EUploadStatus, IFile, IUploadRequest, IUploadTask } from "./types";
+import type { IFile, IUploadRequest, IUploadTask } from "./types";
+import { EUploadStatus } from './enums';
 import * as api from './api';
 import { updateTask, pushWorker, removeWorker, terminateWorkers, pushFile } from "./store";
 import { inferFileType } from "./util";

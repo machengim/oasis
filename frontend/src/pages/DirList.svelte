@@ -16,8 +16,7 @@
     IMousePosition,
     IUploadTask,
   } from "../utils/types";
-  import { EUploadStatus } from "../utils/types";
-  import { EIconType } from "../utils/types";
+  import { EUploadStatus, EIconType } from "../utils/enums";
   import * as api from "../utils/api";
   import Icon from "../components/Icon.svelte";
   import Spinner from "../components/Spinner.svelte";

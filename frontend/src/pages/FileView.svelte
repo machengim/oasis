@@ -9,7 +9,12 @@
     loopStore,
     titleStore,
   } from "../utils/store";
-  import { EIconColor, ELoopMethod, FileType, EIconType } from "../utils/types";
+  import {
+    EIconColor,
+    ELoopMethod,
+    EFileType,
+    EIconType,
+  } from "../utils/enums";
   import type { IFile, IFileOrder, ILoopIcon } from "../utils/types";
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
@@ -35,7 +40,7 @@
   let siblings: Array<IFile>;
   let filesInStore: Array<IFile> = [];
   let isLoading = false;
-  let fileType: FileType;
+  let fileType: EFileType;
   let loopIcons: Array<ILoopIcon> = [];
   let showFileLinkModal = false;
   // Fix compareDir bug when at the root dir.
@@ -59,7 +64,7 @@
     filePath = "/api/file/" + buildEncodeFilePath(dirs, filename);
   }
 
-  $: if (filename && fileType === FileType.Video && filesInStore.length > 0) {
+  $: if (filename && fileType === EFileType.Video && filesInStore.length > 0) {
     trackPath = buildTrackPath();
   }
 
@@ -239,18 +244,18 @@
     {:else}
       <div class="flex flex-row flex-wrap mt-4">
         <div class="w-full lg:w-3/4">
-          {#if fileType === FileType.Video || fileType === FileType.Music}
+          {#if fileType === EFileType.Video || fileType === EFileType.Music}
             <MediaPlayer
               {filePath}
               {fileType}
               {trackPath}
               onComplete={onMediaComplete}
             />
-          {:else if fileType === FileType.Text || fileType === FileType.Code}
+          {:else if fileType === EFileType.Text || fileType === EFileType.Code}
             <TextViewer {dirs} {filename} {fileType} />
-          {:else if fileType === FileType.Pdf}
+          {:else if fileType === EFileType.Pdf}
             <PdfViewer {filePath} />
-          {:else if fileType === FileType.Image}
+          {:else if fileType === EFileType.Image}
             <ImageViewer
               {filePath}
               {filename}
@@ -268,7 +273,7 @@
               class="flex flex-row items-center justify-between px-2 py-1 mb-2 border-b"
             >
               <div class="text-xl">{$t("component.file_view.filelist")}</div>
-              {#if fileType === FileType.Video || fileType === FileType.Music || fileType === FileType.Image}
+              {#if fileType === EFileType.Video || fileType === EFileType.Music || fileType === EFileType.Image}
                 <div class="flex flex-row items-center">
                   {#each loopIcons as icon, i}
                     <Icon

@@ -2,12 +2,12 @@
   import { onMount } from "svelte";
   import { loopStore } from "../utils/store";
   import Plyr from "plyr";
-  import { ELoopMethod, FileType } from "../utils/types";
+  import { ELoopMethod, EFileType } from "../utils/enums";
   import { checkMobile, checkSafari } from "../utils/util";
 
   export let filePath: string;
   export let trackPath: string = null;
-  export let fileType: FileType;
+  export let fileType: EFileType;
   export let onComplete: () => void;
 
   let player: Plyr;
@@ -57,7 +57,7 @@
   }
 
   const getMediaType = () => {
-    return fileType === FileType.Video ? "video" : "audio";
+    return fileType === EFileType.Video ? "video" : "audio";
   };
 
   const initPlayer = () => {
@@ -125,7 +125,7 @@
 </script>
 
 <div>
-  {#if fileType === FileType.Video}
+  {#if fileType === EFileType.Video}
     {#if isSafari}
       <!-- svelte-ignore a11y-media-has-caption -->
       <video

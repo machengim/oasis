@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from "./Icon.svelte";
-  import { EIconColor, EIconType } from "../utils/types";
+  import { EIconColor, EIconType } from "../utils/enums";
 
   export let size: "small" | "normal" | "big" = "normal";
   export let clickOutToClose = false;
