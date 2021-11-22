@@ -2,8 +2,9 @@
   import Icon from "./Icon.svelte";
   import { EIconColor, EIconType } from "../utils/enums";
 
-  export let size: "small" | "normal" | "big" = "normal";
+  export let size: "small" | "normal" | "large" = "normal";
   export let clickOutToClose = false;
+  export let showTitle = true;
   export let title = "Title";
   export let onClose: () => void;
   const clickInside = (e: Event) => {
@@ -19,16 +20,18 @@
     class="modal-{size} center bg-white border-gray-400 shadow"
     on:click={clickInside}
   >
-    <div class="border-b border-gray-200 p-4 flex flex-row justify-between">
-      <div class="text-lg text-black">{title}</div>
-      <Icon
-        type={EIconType.close}
-        color={EIconColor.gray}
-        size="small"
-        className="cursor-pointer"
-        onClick={onClose}
-      />
-    </div>
+    {#if showTitle}
+      <div class="border-b border-gray-200 p-4 flex flex-row justify-between">
+        <div class="text-lg text-black">{title}</div>
+        <Icon
+          type={EIconType.close}
+          color={EIconColor.gray}
+          size="small"
+          className="cursor-pointer"
+          onClick={onClose}
+        />
+      </div>
+    {/if}
     <slot />
   </div>
 </div>
@@ -43,6 +46,7 @@
     }
     .modal-large {
       width: 22rem;
+      min-height: 24rem;
     }
   }
 
@@ -54,7 +58,8 @@
       width: 30rem;
     }
     .modal-large {
-      width: 40rem;
+      width: 44rem;
+      min-height: 24rem;
     }
   }
 </style>

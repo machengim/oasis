@@ -39,7 +39,8 @@ export enum EIconType {
     play_speed = "play_speed",
     close_caption = "close_caption",
     play_next = "play_next",
-    list = "list"
+    list = "list",
+    search = "search"
 }
 
 export enum EIconColor {
