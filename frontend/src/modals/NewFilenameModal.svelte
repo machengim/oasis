@@ -73,7 +73,7 @@
     try {
       await api.post("/api/dir", payload, false);
       const newFile: IFile = {
-        dir: dirs,
+        dir: dirs.join("/") || "/",
         filename: newFilename,
         file_type: EFileType.Dir,
         size: 0,
@@ -101,7 +101,7 @@
 
     try {
       await api.put(endpoint, payload, false);
-      contextFile.dir = dirs;
+      contextFile.dir = dirs.join("/") || "/";
       const newFileType =
         contextFile.file_type === EFileType.Dir
           ? EFileType.Dir

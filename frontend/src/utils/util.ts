@@ -226,3 +226,19 @@ export function buildEncodeFilePath(dirs: Array<string>, filename: string) {
 export function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms))
 }
+
+export function accurateTimeOut(start: number, length: number, tolerance: number, callback: () => void) {
+  const timer = (t: number, callback: () => void) => {
+    setTimeout(() => {
+      const timeElapsed = new Date().getTime() - start;
+      if (length - timeElapsed < tolerance) {
+        callback();
+      } else {
+        let newTime = length - timeElapsed;
+        timer(newTime, callback);
+      }
+    }, t);
+  };
+
+  timer(length, callback);
+}

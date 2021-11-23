@@ -46,7 +46,7 @@
     }
     .modal-large {
       width: 22rem;
-      min-height: 24rem;
+      height: 24rem;
     }
   }
 
@@ -59,7 +59,7 @@
     }
     .modal-large {
       width: 44rem;
-      min-height: 24rem;
+      height: 36rem;
     }
   }
 </style>

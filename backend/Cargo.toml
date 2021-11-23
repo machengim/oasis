@@ -25,3 +25,4 @@ tokio = { version = "1.10.1", features = ["full"] }
 time = "0.2.11"
 urlencoding = "2.1.0"
 uuid = { version = "0.8", features = ["v4"] }
+walkdir = "2"

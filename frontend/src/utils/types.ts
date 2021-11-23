@@ -49,7 +49,7 @@ export interface IChangePasswordRequest {
 }
 
 export interface IFile {
-  dir?: Array<string>,
+  dir?: string,
   filename: string,
   file_type: enums.EFileType,
   size: number,

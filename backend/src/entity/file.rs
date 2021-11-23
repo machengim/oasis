@@ -5,6 +5,7 @@ use std::path::PathBuf;
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct File {
+    pub dir: Option<PathBuf>,
     pub filename: String,
     pub file_type: FileType,
     pub size: u64,
@@ -46,7 +47,7 @@ impl FileType {
 }
 
 impl File {
-    pub fn from_path(path: &PathBuf) -> AnyResult<Self> {
+    pub fn from_path(path: &PathBuf, need_dir: bool, storage: &str) -> AnyResult<Self> {
         let filename = match path.file_name() {
             Some(str) => str.to_string_lossy().to_string(),
             None => {
@@ -60,7 +61,15 @@ impl File {
             _ => 0,
         };
 
+        let dir = if need_dir {
+            let parent_dir = path.parent().unwrap().strip_prefix(storage)?;
+            Some(PathBuf::from(parent_dir))
+        } else {
+            None
+        };
+
         Ok(Self {
+            dir,
             filename,
             file_type,
             size,

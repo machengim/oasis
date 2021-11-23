@@ -25,7 +25,7 @@
       "/api/file/" + buildEncodeFilePath(dirs, contextFile.filename);
     try {
       await api.remove(endpoint, null, false);
-      contextFile.dir = dirs;
+      contextFile.dir = dirs.join("/") || "/";
       deleteFile(contextFile);
       setNotification("success", $t("message.success.delete_file"));
     } catch (e) {

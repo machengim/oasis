@@ -92,7 +92,7 @@ async function finishUpload(task: IUploadTask) {
     updateTask(task.file, EUploadStatus.success, task.progress);
 
     const newFile: IFile = {
-      dir: task.targetDir,
+      dir: task.targetDir.join("/") || "/",
       file_type: inferFileType(task.file.name),
       size: task.file.size,
       filename: task.file.name

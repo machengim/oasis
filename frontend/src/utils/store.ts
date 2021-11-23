@@ -2,7 +2,6 @@ import { get, Writable, writable } from 'svelte/store';
 import type { IFile, INotification, IUser, ISiteFull, IUploadTask } from './types';
 import type { ELoopMethod, EUploadStatus } from './enums';
 import * as constants from '../assets/constants.json';
-import { compareArray } from './util';
 
 export const siteStore: Writable<ISiteFull> = writable(null);
 
@@ -42,7 +41,7 @@ export function pushFile(file: IFile) {
   if (!file.dir) return;
 
   const currentDir = get(dirsStore);
-  if (compareArray(currentDir, file.dir)) {
+  if (currentDir.join("/") || "/" === file.dir) {
     const newFiles = get(filesStore);
     newFiles.push(file);
     filesStore.set(newFiles);
@@ -53,7 +52,7 @@ export function updateFile(oldFile: IFile, newFile: IFile) {
   if (!newFile.dir) return;
 
   const currentDir = get(dirsStore);
-  if (compareArray(currentDir, newFile.dir)) {
+  if (currentDir.join("/") || "/" === newFile.dir) {
     const files = get(filesStore);
     const index = files.findIndex(f => f.filename === oldFile.filename);
     if (index >= 0) {
@@ -67,7 +66,7 @@ export function deleteFile(file: IFile) {
   if (!file.dir) return;
 
   const currentDir = get(dirsStore);
-  if (compareArray(currentDir, file.dir)) {
+  if (currentDir.join("/") || "/" === file.dir) {
     const files = get(filesStore);
     const index = files.findIndex(f => f === file);
     if (index >= 0) {
@@ -124,3 +123,5 @@ export function terminateWorkers() {
 
   workerStore.set([]);
 }
+
+export const keywordsStore: Writable<Array<string>> = writable([]);

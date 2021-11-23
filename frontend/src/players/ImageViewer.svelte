@@ -3,7 +3,7 @@
   import { onMount, onDestroy } from "svelte";
   import { loopStore } from "../utils/store";
   import Icon from "../components/Icon.svelte";
-  import { checkMobile, checkSafari } from "../utils/util";
+  import { checkMobile, checkSafari, accurateTimeOut } from "../utils/util";
   import { EIconType, EIconColor, ELoopMethod } from "../utils/enums";
   import Spinner from "../components/Spinner.svelte";
   import * as api from "../utils/api";
@@ -77,23 +77,8 @@
 
   const startMenuTimer = () => {
     timeOutStart = new Date().getTime();
-    accurateTimeOut(2000, () => (showMenu = false));
-  };
-
-  const accurateTimeOut = (length: number, callback: () => void) => {
-    const timer = (t: number, callback: () => void) => {
-      menuTimeout = setTimeout(() => {
-        const timeElapsed = new Date().getTime() - timeOutStart;
-        if (length - timeElapsed < 200) {
-          callback();
-        } else {
-          let t = length - timeElapsed;
-          timer(t, callback);
-        }
-      }, t);
-    };
-
-    timer(length, callback);
+    const start = new Date().getTime();
+    accurateTimeOut(start, 2000, 200, () => (showMenu = false));
   };
 
   const reset = () => {

@@ -21,7 +21,6 @@
   import MediaPlayer from "../players/MediaPlayer.svelte";
   import {
     inferFileType,
-    compareArray,
     compareFile,
     buildEncodeFilePath,
   } from "../utils/util";
@@ -34,17 +33,19 @@
 
   const navigate = useNavigate();
   export let filename: string;
-  let dirs = $dirsStore;
+  let dirs: Array<string>;
   let filePath: string;
   let trackPath: string;
-  let siblings: Array<IFile>;
+  let siblings: Array<IFile> = [];
   let filesInStore: Array<IFile> = [];
   let isLoading = false;
   let fileType: EFileType;
   let loopIcons: Array<ILoopIcon> = [];
   let showFileLinkModal = false;
-  // Fix compareDir bug when at the root dir.
-  let rootFetched = false;
+
+  const unsubscribeDirs = dirsStore.subscribe((d) => {
+    dirs = d;
+  });
 
   const unsubscribeFiles = filesStore.subscribe((files) => {
     filesInStore = files;
@@ -56,7 +57,12 @@
 
   onDestroy(() => {
     unsubscribeFiles();
+    unsubscribeDirs();
   });
+
+  $: if (dirs) {
+    fetchDirContent(dirs);
+  }
 
   $: if (filename) {
     titleStore.set(filename);
@@ -68,18 +74,11 @@
     trackPath = buildTrackPath();
   }
 
-  $: if (fileType && filesInStore) {
-    if (dirs.length === 0 && $dirsStore.length === 0 && !rootFetched) {
-      fetchDirContent(dirs);
-      rootFetched = true;
-    } else if (compareArray(dirs, $dirsStore)) {
-      const order: IFileOrder = { key: "name", asc: true };
-      const siblingFiles = $filesStore.filter((f) => f.file_type === fileType);
-      siblingFiles.sort((a, b) => compareFile(a, b, order));
-      siblings = siblingFiles;
-    } else {
-      fetchDirContent(dirs);
-    }
+  $: if (filesInStore && filesInStore.length > 0) {
+    const order: IFileOrder = { key: "name", asc: true };
+    const siblingFiles = $filesStore.filter((f) => f.file_type === fileType);
+    siblingFiles.sort((a, b) => compareFile(a, b, order));
+    siblings = siblingFiles;
   }
 
   const initLoopIcons = () => {
@@ -98,6 +97,7 @@
   };
 
   const fetchDirContent = async (dirs: Array<string>) => {
+    if (!dirs) return;
     let endpoint = "/api/dir";
     if (dirs.length > 0) {
       endpoint += "?path=" + encodeURIComponent(dirs.join("/"));
@@ -106,7 +106,6 @@
     isLoading = true;
     try {
       let files: Array<IFile> = await api.get(endpoint);
-      dirsStore.set(dirs);
       filesStore.set(files);
     } catch (e) {
       console.error(e);
