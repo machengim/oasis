@@ -153,6 +153,13 @@
       "title": "删除",
       "text_before": "正在删除",
       "text_after": ". 此操作是永久的且不可撤销. 确定要继续?"
+    },
+    "search_file": {
+      "placeholder": "搜索..",
+      "recent": "最近搜索",
+      "clear_all": "清除全部",
+      "no_results": "没有结果",
+      "results": "条结果"
     }
   },
   "message": {
@@ -189,7 +196,8 @@
       "launch_fail": "站点启动失败",
       "create_dir": "新目录创建失败",
       "rename_file": "重命名失败",
-      "delete_file": "删除失败"
+      "delete_file": "删除失败",
+      "search_file": "搜索失败"
     }
   }
 }

@@ -4,6 +4,7 @@
 
   export let type: EIconType;
   export let color: EIconColor = EIconColor.gray;
+  export let hoverColor: EIconColor = null;
   export let size: "small" | "tiny" | "default" | "large" | "huge" = "default";
   export let className: string = "";
   export let onClick: (e) => void = null;
@@ -19,7 +20,7 @@
     iconHtml = getIcon();
   }
 
-  $: if (type && color) {
+  $: if (type && iconColor) {
     svgClass = buildStyle();
   }
 
@@ -66,6 +67,16 @@
       default:
         return color;
     }
+  };
+
+  const changeToHoverColor = () => {
+    if (hoverColor) {
+      iconColor = convertColor(hoverColor);
+    }
+  };
+
+  const resetColor = () => {
+    iconColor = convertColor(color);
   };
 
   const getIcon = () => {
@@ -138,7 +149,12 @@
   };
 </script>
 
-<span class={className} on:click={onClick}>
+<span
+  class={className}
+  on:click={onClick}
+  on:mouseover={changeToHoverColor}
+  on:mouseout={resetColor}
+>
   <svg
     xmlns="http://www.w3.org/2000/svg"
     class={svgClass}

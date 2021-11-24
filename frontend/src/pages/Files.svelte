@@ -7,6 +7,7 @@
     sectionStore,
     userStore,
   } from "../utils/store";
+import { compareArray } from "../utils/util";
   import DirList from "./DirList.svelte";
   import FileView from "./FileView.svelte";
 
@@ -57,7 +58,9 @@
       .map((s) => decodeURIComponent(s))
       .slice(1);
 
-    dirsStore.set(dirs);
+    if (!compareArray(dirs, $dirsStore)) {
+      dirsStore.set(dirs);
+    }
   };
 </script>
 

@@ -1,44 +1,67 @@
 <script lang="ts">
   import Modal from "../components/Modal.svelte";
+  import { t } from "svelte-i18n";
   import { useNavigate } from "svelte-navigator";
   import Icon from "../components/Icon.svelte";
   import { EIconColor, EIconType } from "../utils/enums";
   import type { IFile } from "../utils/types";
   import * as api from "../utils/api";
-  import { setNotification, keywordsStore } from "../utils/store";
+  import { setNotification } from "../utils/store";
   import Spinner from "../components/Spinner.svelte";
   import FileIcon from "../components/FileIcon.svelte";
   import { onDestroy, onMount } from "svelte";
 
   export let onClose: () => void;
   const navigate = useNavigate();
+  const localStorageKey = "oa_keywords";
+  const historySize = 10; // how many recent search keywords are saved
   let inputElement: HTMLInputElement;
   let keyword: string;
   let fetchTimeout: NodeJS.Timeout;
   let searchResults: Array<IFile> = [];
   let isLoading = false;
   let loaded = false;
-  let useHistoryKeyword = false;
+  let historyKeywords: Array<string> = [];
+  let useHistoryKeyword = false; // When using recent keyword, start fetching immediately
 
   onMount(() => {
     if (inputElement) {
       inputElement.focus();
     }
+    initHistoryKeywords();
   });
 
   onDestroy(() => {
-    if (fetchTimeout) {
-      clearTimeout(fetchTimeout);
-    }
+    clearFetchTimeout();
     keyword = null;
     searchResults = [];
   });
 
   $: if (keyword && keyword.trim().length > 0) {
+    searchKeywords();
+  } else {
+    clearFetchTimeout();
+    loaded = false;
+    searchResults = [];
+  }
+
+  const initHistoryKeywords = () => {
+    console.log("local key is ", localStorageKey);
+    const keywordsInLocalStorage = localStorage.getItem(localStorageKey);
+    console.log("get value: ", keywordsInLocalStorage);
+    if (keywordsInLocalStorage) {
+      historyKeywords = JSON.parse(keywordsInLocalStorage);
+    }
+  };
+
+  const clearFetchTimeout = () => {
     if (fetchTimeout) {
       clearTimeout(fetchTimeout);
     }
+  };
 
+  const searchKeywords = () => {
+    clearFetchTimeout();
     if (useHistoryKeyword) {
       fetchSearchResults();
     } else {
@@ -46,20 +69,13 @@
         fetchSearchResults();
       }, 1000);
     }
-  } else {
-    if (fetchSearchResults) {
-      clearTimeout(fetchTimeout);
-    }
-
-    loaded = false;
-    searchResults = [];
-  }
+  };
 
   const fetchSearchResults = async () => {
     if (keyword.trim().length === 0) return;
 
-    const currentKeyword = keyword;
     isLoading = true;
+    const currentKeyword = keyword;
     let keywords = keyword.trim().split(/\s+/).join("+").toLowerCase();
     try {
       const results: Array<IFile> = await api.get(
@@ -68,22 +84,51 @@
       );
       if (keyword === currentKeyword) {
         searchResults = results;
-        const historyKeywords = $keywordsStore;
-        const index = historyKeywords.findIndex((k) => k === currentKeyword);
-        if (index >= 0) {
-          historyKeywords.splice(index, 1);
-        }
-        const newKeywords = [currentKeyword].concat(historyKeywords);
-        keywordsStore.set(newKeywords);
+        saveKeywordToHistory(currentKeyword);
         loaded = true;
       }
     } catch (e) {
       console.error(e);
-      setNotification("error", "Search failed");
+      setNotification("error", $t("message.error.search_file"));
     } finally {
       isLoading = false;
       useHistoryKeyword = false;
     }
+  };
+
+  const saveKeywordToHistory = (currentKeyword: string) => {
+    const index = historyKeywords.findIndex((k) => k === currentKeyword.trim());
+    if (index >= 0) {
+      historyKeywords.splice(index, 1);
+    }
+    let newKeywords = [currentKeyword.trim()].concat(historyKeywords);
+    if (newKeywords.length > historySize) {
+      newKeywords = newKeywords.slice(0, historySize);
+    }
+    setLocalKeywords(newKeywords);
+    historyKeywords = newKeywords;
+  };
+
+  const removeKeywordFromHistory = (e: Event, targetKeyword: string) => {
+    e.stopPropagation();
+
+    const index = historyKeywords.findIndex((k) => k === targetKeyword.trim());
+
+    if (index >= 0) {
+      const newKeywords = historyKeywords;
+      newKeywords.splice(index, 1);
+      setLocalKeywords(newKeywords);
+      historyKeywords = newKeywords;
+    }
+  };
+
+  const clearAllKeywordsFromHistory = () => {
+    historyKeywords = [];
+    setLocalKeywords(historyKeywords);
+  };
+
+  const setLocalKeywords = (data: Array<string>) => {
+    localStorage.setItem(localStorageKey, JSON.stringify(data));
   };
 
   const selectFile = (file: IFile) => {
@@ -120,17 +165,21 @@
       class="w-full ml-2 border-none focus:outline-none"
       bind:value={keyword}
       bind:this={inputElement}
-      placeholder="Search.."
+      placeholder=".txt readme"
     />
     <div class="flex flex-row items-center">
       <Icon
         type={EIconType.close}
         color={EIconColor.gray}
+        hoverColor={EIconColor.black}
         size="small"
         className="cursor-pointer"
         onClick={() => (keyword = null)}
       />
-      <div class="border rounded ml-1 px-1 cursor-pointer" on:click={onClose}>
+      <div
+        class="border rounded ml-1 px-1 cursor-pointer hover:bg-blue-400 hover:text-white"
+        on:click={onClose}
+      >
         esc
       </div>
     </div>
@@ -139,22 +188,42 @@
   {#if isLoading}
     <Spinner />
   {:else if !loaded}
-    <div class="p-4 text-lg">
-      <div class="mb-2"><b>Recent search</b></div>
-      {#each $keywordsStore as keyword}
+    <div class="flex-grow overscroll-y-auto p-4 text-lg">
+      <div class="mb-2 flex flex-row justify-between items-center">
+        <div><b>{$t("modal.search_file.recent")}</b></div>
         <div
-          class="hover:bg-gray-200 cursor-pointer p-2 rounded"
+          class="rounded px-2 cursor-pointer hover:bg-blue-400 hover:text-white"
+          on:click={clearAllKeywordsFromHistory}
+        >
+          {$t("modal.search_file.clear_all")}
+        </div>
+      </div>
+      {#each historyKeywords as keyword}
+        <div
+          class="flex flex-row justify-between items-center hover:bg-gray-200 cursor-pointer p-2 rounded"
           on:click={() => chooseHistoryKeyword(keyword)}
         >
           {keyword}
+          <Icon
+            type={EIconType.close}
+            color={EIconColor.gray}
+            hoverColor={EIconColor.black}
+            size="small"
+            className="cursor-pointer"
+            onClick={(e) => removeKeywordFromHistory(e, keyword)}
+          />
         </div>
       {/each}
     </div>
   {:else if searchResults.length === 0}
-    <div class="p-4 text-lg">No results</div>
+    <div class="h-full p-4 text-lg">
+      <b>{$t("modal.search_file.no_results")}</b>
+    </div>
   {:else}
-    <div class="result-list overflow-y-auto">
-      <div class="p-4 text-lg">{searchResults.length} results found:</div>
+    <div class="flex-grow overflow-y-auto">
+      <div class="p-4 text-lg">
+        <b>{searchResults.length} {$t("modal.search_file.results")}</b>
+      </div>
       {#each searchResults as result}
         <div
           class="grid grid-cols-3 p-4 bg-white text-lg hover:bg-gray-200 cursor-pointer"
@@ -176,17 +245,3 @@
     </div>
   {/if}
 </Modal>
-
-<style>
-  @media only screen and (min-width: 320px) {
-    .result-list {
-      height: 20rem;
-    }
-  }
-
-  @media only screen and (min-width: 768px) {
-    .result-list {
-      height: 30rem;
-    }
-  }
-</style>

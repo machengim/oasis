@@ -123,5 +123,3 @@ export function terminateWorkers() {
 
   workerStore.set([]);
 }
-
-export const keywordsStore: Writable<Array<string>> = writable([]);

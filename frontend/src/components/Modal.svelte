@@ -13,11 +13,11 @@
 </script>
 
 <div
-  class="fixed top-0 left-0 z-40 w-screen h-screen flex flex-col bg-gray-400 bg-opacity-40"
+  class="fixed top-0 left-0 z-40 w-screen h-screen bg-gray-400 bg-opacity-40"
   on:click={clickOutToClose ? onClose : () => {}}
 >
   <div
-    class="modal-{size} center bg-white border-gray-400 shadow"
+    class="modal-{size} center flex flex-col bg-white border-gray-400 shadow"
     on:click={clickInside}
   >
     {#if showTitle}
@@ -39,27 +39,40 @@
 <style>
   @media only screen and (min-width: 320px) {
     .modal-small {
-      width: 12rem;
+      width: 60%;
     }
     .modal-normal {
-      width: 18rem;
+      width: 75%;
     }
     .modal-large {
-      width: 22rem;
-      height: 24rem;
+      width: 90%;
+      height: 60%;
     }
   }
 
   @media only screen and (min-width: 768px) {
     .modal-small {
-      width: 20rem;
+      width: 40%;
     }
     .modal-normal {
-      width: 30rem;
+      width: 55%;
     }
     .modal-large {
-      width: 44rem;
-      height: 36rem;
+      width: 70%;
+      height: 60%;
+    }
+  }
+
+  @media only screen and (min-width: 1280px) {
+    .modal-small {
+      width: 20%;
+    }
+    .modal-normal {
+      width: 40%;
+    }
+    .modal-large {
+      width: 60%;
+      height: 60%;
     }
   }
 </style>

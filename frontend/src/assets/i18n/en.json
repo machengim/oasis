@@ -154,6 +154,13 @@
       "title": "Delete ",
       "text_before": "You are deleting ",
       "text_after": ". This action is permanent and cannot undo. Are you sure you want to continue?"
+    },
+    "search_file": {
+      "placeholder": "Search..",
+      "recent": "Recent search",
+      "clear_all": "Clear all",
+      "no_results": "No results",
+      "results": "results"
     }
   },
   "message": {
@@ -190,7 +197,8 @@
       "launch_fail": "Launch failed",
       "create_dir": "New folder create failed",
       "rename_file": "Rename failed",
-      "delete_file": "Delete failed"
+      "delete_file": "Delete failed",
+      "search_file": "Search failed"
     }
   }
 }

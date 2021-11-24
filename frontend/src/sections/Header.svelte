@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
+  import { t } from "svelte-i18n";
   import { siteStore, sectionStore, getSitename } from "../utils/store";
   import AvatarMenu from "./AvatarMenu.svelte";
   import Icon from "../components/Icon.svelte";
@@ -128,7 +129,7 @@
         on:click={() => openModal("search")}
       >
         <Icon type={EIconType.search} size="tiny" color={EIconColor.gray} />
-        <span class="ml-2">Search..</span>
+        <span class="ml-2">{$t("modal.search_file.placeholder")}</span>
       </div>
       <div class="relative">
         <Icon
