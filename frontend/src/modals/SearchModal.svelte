@@ -188,7 +188,7 @@
   {#if isLoading}
     <Spinner />
   {:else if !loaded}
-    <div class="flex-grow overscroll-y-auto p-4 text-lg">
+    <div class="flex-grow overflow-y-auto p-4 text-lg">
       <div class="mb-2 flex flex-row justify-between items-center">
         <div><b>{$t("modal.search_file.recent")}</b></div>
         <div
