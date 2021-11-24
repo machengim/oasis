@@ -1,13 +1,13 @@
 {
-    "version": "0.2.1",
+    "version": "0.2.2",
     "descriptions": [
         {
             "lang": "en",
-            "detail": "Context Menu; File rename & delete; HTTPS"
+            "detail": "File search"
         },
         {
             "lang": "cn",
-            "detail": "右键菜单; 文件重命名, 删除; HTTPS"
+            "detail": "文件搜索"
         }
     ],
     "url": "https://github.com/machengim/oasis/releases"

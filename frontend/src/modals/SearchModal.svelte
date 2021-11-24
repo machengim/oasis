@@ -226,7 +226,7 @@
       </div>
       {#each searchResults as result}
         <div
-          class="grid grid-cols-3 p-4 bg-white text-lg hover:bg-gray-200 cursor-pointer"
+          class="grid grid-cols-3 p-2 lg:p-4 bg-white text-lg hover:bg-gray-200 cursor-pointer"
           on:click={() => selectFile(result)}
         >
           <div class="col-span-3 lg:col-span-1 px-2 flex flex-row items-center">
@@ -236,7 +236,7 @@
             </div>
           </div>
           <div
-            class="col-span-3 lg:col-span-2 px-4 lg:px-0 text-sm text-gray-400 break-all overflow-ellipsis my-auto"
+            class="col-span-3 lg:col-span-2 px-2 ml-1 lg:px-0 text-sm text-gray-400 break-all overflow-ellipsis my-auto"
           >
             {"/" + result.dir}
           </div>

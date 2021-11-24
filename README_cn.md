@@ -1,6 +1,6 @@
 ## OASIS
 
-[![Build](https://github.com/machengim/oasis/actions/workflows/build_release.yml/badge.svg)](https://github.com/machengim/oasis/actions/workflows/build_release.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/main/LICENSE-MIT) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)](https://github.com/machengim/oasis/releases) [![Docker](https://img.shields.io/badge/docker-v0.2.1-orange)](https://hub.docker.com/r/machengim/oasis)
+[![Build](https://github.com/machengim/oasis/actions/workflows/build_release.yml/badge.svg)](https://github.com/machengim/oasis/actions/workflows/build_release.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/main/LICENSE-MIT) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)](https://github.com/machengim/oasis/releases) [![Docker](https://img.shields.io/badge/docker-v0.2.2-orange)](https://hub.docker.com/r/machengim/oasis)
 
 [English README](https://github.com/machengim/oasis/blob/main/README.md)
 
@@ -43,7 +43,7 @@
 
 - [x] HTTPS
 - [ ] 访客模式
-- [ ] 搜索
+- [x] 搜索
 - [ ] 高级文件分享
 - [ ] 文本编辑器
 
@@ -60,7 +60,7 @@
 
 ### 构建
 
-- Node 14.17+
+- Node 14+
 - Rust 1.54+
 
 ```

@@ -31,7 +31,7 @@
   };
 </script>
 
-<Modal {onClose} title={$t("modal.shutdown.title")}>
+<Modal {onClose} size="small" title={$t("modal.shutdown.title")}>
   {#if isLoading}
     <Spinner />
   {:else}

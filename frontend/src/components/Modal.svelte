@@ -39,7 +39,7 @@
 <style>
   @media only screen and (min-width: 320px) {
     .modal-small {
-      width: 60%;
+      width: 65%;
     }
     .modal-normal {
       width: 75%;
@@ -55,7 +55,7 @@
       width: 40%;
     }
     .modal-normal {
-      width: 55%;
+      width: 50%;
     }
     .modal-large {
       width: 70%;
@@ -65,7 +65,7 @@
 
   @media only screen and (min-width: 1280px) {
     .modal-small {
-      width: 20%;
+      width: 30%;
     }
     .modal-normal {
       width: 40%;

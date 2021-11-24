@@ -43,7 +43,7 @@
   };
 </script>
 
-<Modal {onClose} title={$t("modal.about.title")}>
+<Modal {onClose} size="small" title={$t("modal.about.title")}>
   <div class="p-4 text-lg">
     <div>
       <span>{$t("modal.about.version")}: </span>

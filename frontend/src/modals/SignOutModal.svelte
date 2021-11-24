@@ -33,7 +33,7 @@
   };
 </script>
 
-<Modal {onClose} title={$t("modal.signout.title")}>
+<Modal {onClose} size="small" title={$t("modal.signout.title")}>
   {#if isLoading}
     <Spinner />
   {:else}

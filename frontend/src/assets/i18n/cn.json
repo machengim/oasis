@@ -132,13 +132,13 @@
     },
     "upload": {
       "title_cancel": "取消上传任务",
-      "cancel_uploads_warn": "有未完成的上传任务. 确定要取消它们吗?",
+      "cancel_uploads_warn": "有未完成的上传任务。确定要取消它们吗?",
       "cancel_upload_file": "确定要取消正在上传的文件:"
     },
     "create_folder": {
       "title": "创建目录",
       "text_before": "你正在",
-      "text_after": "下创建一个新目录. 请在下方输入新目录名:",
+      "text_after": "下创建一个新目录。请在下方输入新目录名:",
       "error_empty": "目录名不能为空",
       "error_used": "该名称已被使用",
       "error_long": "目录名太长",
@@ -152,7 +152,7 @@
     "delete_file": {
       "title": "删除",
       "text_before": "正在删除",
-      "text_after": ". 此操作是永久的且不可撤销. 确定要继续?"
+      "text_after": ". 此操作是永久的且不可撤销。确定要继续?"
     },
     "search_file": {
       "placeholder": "搜索..",
