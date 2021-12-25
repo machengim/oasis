@@ -130,7 +130,7 @@
               class="hover:bg-blue-400 hover:text-white cursor-pointer rounded px-1"
               on:click={sendGuestLoginRequest}
             >
-              Guest login
+              {$t("component.login.guest_login")}
             </div>
           </div>
         {/if}

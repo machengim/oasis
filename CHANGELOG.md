@@ -1,5 +1,10 @@
 ## Change Log
 
+
+### v0.2.3
++ Allow guest users login
++ Hide files from guest users
+
 ### v0.2.2
 
 + File search

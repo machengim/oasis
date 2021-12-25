@@ -37,10 +37,10 @@
         least_permission: visible ? 0 : 1,
       };
       updateFile(contextFile, newFile);
-      setNotification("success", "Visibility set successfully");
+      setNotification("success", $t("message.success.update_visibility"));
       onClose();
     } catch (e) {
-      setNotification("error", "Visibility set failed");
+      setNotification("error", $t("message.error.update_visibility"));
       console.error(e);
     } finally {
       isLoading = false;

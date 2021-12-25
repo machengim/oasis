@@ -93,7 +93,8 @@
       "login": "登录"
     },
     "login": {
-      "title": "用户登录"
+      "title": "用户登录",
+      "guest_login": "访客登录"
     },
     "upload_list": {
       "title": "上传列表"
@@ -141,7 +142,7 @@
     },
     "create_folder": {
       "title": "创建目录",
-      "text_before": "你正在",
+      "text_before": "将要",
       "text_after": "下创建一个新目录。请在下方输入新目录名:",
       "error_empty": "目录名不能为空",
       "error_used": "该名称已被使用",
@@ -150,12 +151,12 @@
     },
     "rename_file": {
       "title": "重命名",
-      "text_before": "正在重命名",
+      "text_before": "将要重命名",
       "text_after": "。请在下方输入新的名字: "
     },
     "delete_file": {
       "title": "删除",
-      "text_before": "正在删除",
+      "text_before": "将要删除",
       "text_after": "。此操作是永久的且不可撤销。确定要继续?"
     },
     "search_file": {
@@ -166,7 +167,7 @@
       "results": "条结果"
     },
     "visibility_set": {
-      "text_before": "正在",
+      "text_before": "将要",
       "text_after": "。确定要继续?",
       "hiding": "向访客隐藏",
       "showing": "向访客显示"
@@ -187,7 +188,8 @@
       "app_up_to_date": "您的软件是最新版本",
       "create_dir": "新目录创建成功",
       "rename_file": "重命名成功",
-      "delete_file": "删除成功"
+      "delete_file": "删除成功",
+      "update_visibility": "文件可见性更新成功"
     },
     "error": {
       "no_storage": "请选择存储位置",
@@ -207,7 +209,8 @@
       "create_dir": "新目录创建失败",
       "rename_file": "重命名失败",
       "delete_file": "删除失败",
-      "search_file": "搜索失败"
+      "search_file": "搜索失败",
+      "update_visibility": "文件可见性更新失败"
     }
   }
 }

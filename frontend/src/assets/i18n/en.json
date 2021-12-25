@@ -93,7 +93,8 @@
       "login": "Login"
     },
     "login": {
-      "title": "Login"
+      "title": "Login",
+      "guest_login": "Guest login"
     },
     "upload_list": {
       "title": "Upload List"
@@ -188,7 +189,8 @@
       "app_up_to_date": "Your app is up to date",
       "create_dir": "New folder created successfully",
       "rename_file": "Rename successfully",
-      "delete_file": "Delete successfully"
+      "delete_file": "Delete successfully",
+      "update_visibility": "File visibility updated successfully"
     },
     "error": {
       "no_storage": "Please choose a storage",
@@ -208,7 +210,8 @@
       "create_dir": "New folder create failed",
       "rename_file": "Rename failed",
       "delete_file": "Delete failed",
-      "search_file": "Search failed"
+      "search_file": "Search failed",
+      "update_visibility": "File visibility update failed"
     }
   }
 }
