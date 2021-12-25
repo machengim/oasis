@@ -77,6 +77,7 @@
         filename: newFilename,
         file_type: EFileType.Dir,
         size: 0,
+        least_permission: 0,
       };
       pushFile(newFile);
 
@@ -94,7 +95,7 @@
     isLoading = true;
 
     const endpoint =
-      "/api/file/" + buildEncodeFilePath(dirs, contextFile.filename);
+      "/api/file/" + buildEncodeFilePath(dirs, contextFile.filename) + "/name";
     const payload = {
       new_name: newFilename,
     };

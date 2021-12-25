@@ -54,6 +54,7 @@ export interface IFile {
   filename: string,
   file_type: enums.EFileType,
   size: number,
+  least_permission: number,
 }
 
 export interface IFileOrder {

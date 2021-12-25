@@ -7,13 +7,14 @@
     IUpdateAppNeedRespose,
     IUpdateAppInfo,
   } from "../utils/types";
-  import { setNotification, siteStore } from "../utils/store";
+  import { setNotification, siteStore, userStore } from "../utils/store";
   import * as api from "../utils/api";
   import { compareVersion } from "../utils/util";
   import * as constants from "../assets/constants.json";
 
   export let onClose: () => void;
   export let setUpdateInfo: (info: IUpdateAppInfo) => void;
+  const user = $userStore;
   let isLoading = false;
   let repo: ILink = constants.repo;
   let links: Array<ILink> = constants.links;
@@ -77,15 +78,17 @@
   </div>
 
   <div class="w-full p-4 flex flex-row justify-end">
-    <Button
-      onClick={checkUpdate}
-      color="blue"
-      value={isLoading
-        ? $t("button.check_updating")
-        : $t("button.check_update")}
-      className="mr-4"
-      disabled={isLoading}
-    />
+    {#if user.permission === 9}
+      <Button
+        onClick={checkUpdate}
+        color="blue"
+        value={isLoading
+          ? $t("button.check_updating")
+          : $t("button.check_update")}
+        className="mr-4"
+        disabled={isLoading}
+      />
+    {/if}
     <Button onClick={onClose} value={$t("button.close")} />
   </div>
 </Modal>

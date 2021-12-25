@@ -37,6 +37,17 @@ where
     Ok(stmt.fetch_optional(conn).await?)
 }
 
+pub async fn fetch_multiple<'r, T>(
+    query: Query<'r>,
+    conn: &mut PoolConnection<Sqlite>,
+) -> Result<Vec<T>, Error>
+where
+    T: Send + Unpin + for<'a> FromRow<'a, SqliteRow>,
+{
+    let stmt = prepare_sql(query.sql, &query.args);
+    Ok(stmt.fetch_all(conn).await?)
+}
+
 pub async fn execute<'r>(query: Query<'r>, tx: &mut Transaction<'_, Sqlite>) -> Result<i64, Error> {
     let mut row_id = 0;
     let stmt = prepare_exec_sql(query.sql, &query.args);

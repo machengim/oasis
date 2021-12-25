@@ -66,7 +66,9 @@
       "daily": "Daily",
       "weekly": "Weekly",
       "monthly": "Montly",
-      "never": "Never"
+      "never": "Never",
+      "guest": "Guest",
+      "allow": "allow"
     },
     "profile": {
       "title": "User profile"
@@ -99,7 +101,9 @@
     "context_menu": {
       "rename": "Rename",
       "delete": "Delete",
-      "close": "Close"
+      "close": "Close",
+      "show": "Show",
+      "hide": "Hide"
     }
   },
   "modal": {
@@ -161,6 +165,12 @@
       "clear_all": "Clear all",
       "no_results": "No results",
       "results": "results"
+    },
+    "visibility_set": {
+      "text_before": "You are ",
+      "text_after": ". Are you sure to contine?",
+      "hiding": "hiding from guest users ",
+      "showing": "showing to guest users "
     }
   },
   "message": {

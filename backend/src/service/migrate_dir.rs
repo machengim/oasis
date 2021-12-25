@@ -44,6 +44,8 @@ impl<'s> MigrationSource<'s> for MigrationDir<'s> {
                     migration_type,
                     Cow::Owned(sql),
                 ));
+
+                migrations.sort_by(|a, b| a.version.cmp(&b.version));
             }
 
             Ok(migrations)

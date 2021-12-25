@@ -40,7 +40,8 @@ export enum EIconType {
     close_caption = "close_caption",
     play_next = "play_next",
     list = "list",
-    search = "search"
+    search = "search",
+    eyeoff = "eyeoff"
 }
 
 export enum EIconColor {

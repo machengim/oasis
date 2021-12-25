@@ -2,7 +2,7 @@
   // Name it `FilesList` instead of `FileList` to avoid conflicts with the ts built-in type.
   import { t } from "svelte-i18n";
   import type { IFile, IFileOrder } from "../utils/types";
-  import { EIconType } from "../utils/enums";
+  import { EIconColor, EIconType } from "../utils/enums";
   import Icon from "../components/Icon.svelte";
   import FileIcon from "../components/FileIcon.svelte";
   import { formatSize } from "../utils/util";
@@ -47,7 +47,7 @@
       <Icon type={EIconType.down} size="tiny" className="ml-2" />
     {/if}
   </div>
-  <div class="px-2  flex flex-row items-center">
+  <div class="px-2 flex flex-row items-center">
     <span
       class="cursor-pointer hover:text-gray-400"
       on:click={() => changeOrder("size")}
@@ -78,8 +78,18 @@
     on:click={() => selectFile(file)}
   >
     <div class="col-span-3 px-2 flex flex-row items-center">
-      <FileIcon {file} />
-      <span class="ml-2 break-all">
+      <div class="relative pr-2">
+        <FileIcon {file} />
+        {#if file.least_permission > 0}
+          <Icon
+            type={EIconType.eyeoff}
+            color={EIconColor.black}
+            size="min"
+            className="absolute top-0 right-0"
+          />
+        {/if}
+      </div>
+      <span class="ml-1 break-all">
         {file.filename}
       </span>
     </div>

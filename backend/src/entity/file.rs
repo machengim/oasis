@@ -9,6 +9,7 @@ pub struct File {
     pub filename: String,
     pub file_type: FileType,
     pub size: u64,
+    pub least_permission: i8,
 }
 
 #[derive(Serialize, PartialEq)]
@@ -47,7 +48,12 @@ impl FileType {
 }
 
 impl File {
-    pub fn from_path(path: &PathBuf, need_dir: bool, storage: &str) -> AnyResult<Self> {
+    pub fn from_path(
+        path: &PathBuf,
+        need_dir: bool,
+        storage: &str,
+        least_permission: i8,
+    ) -> AnyResult<Self> {
         let filename = match path.file_name() {
             Some(str) => str.to_string_lossy().to_string(),
             None => {
@@ -73,6 +79,7 @@ impl File {
             filename,
             file_type,
             size,
+            least_permission,
         })
     }
 }

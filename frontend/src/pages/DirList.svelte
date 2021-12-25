@@ -26,6 +26,7 @@
   import PromptModal from "../modals/PromptModal.svelte";
   import NewFilenameModal from "../modals/NewFilenameModal.svelte";
   import DeleteFileModal from "../modals/DeleteFileModal.svelte";
+  import FileVisibilityModal from "../modals/FileVisibilityModal.svelte";
   import ContextMenu from "../sections/ContextMenu.svelte";
   import { onDestroy } from "svelte";
   import FilesList from "../sections/FilesList.svelte";
@@ -45,6 +46,7 @@
   let showNewMenu = false;
   let showNewFilenameModal = false;
   let showContextMenu = false;
+  let showFileVisibilityModal = false;
   let showDeleteFileModal = false;
   let contextPos: IMousePosition;
   let contextFile: IFile;
@@ -214,6 +216,11 @@
     contextFile = null;
   };
 
+  const closeFileVisibilityModal = () => {
+    showFileVisibilityModal = false;
+    contextFile = null;
+  };
+
   const toggleShowNewMenu = (e: Event) => {
     e.stopPropagation();
     showNewMenu = !showNewMenu;
@@ -225,7 +232,9 @@
     showContextMenu = true;
   };
 
-  const onContextAction = (action: "rename" | "delete" | "close") => {
+  const onContextAction = (
+    action: "rename" | "delete" | "close" | "visibility"
+  ) => {
     showContextMenu = false;
 
     switch (action) {
@@ -234,6 +243,9 @@
         break;
       case "delete":
         showDeleteFileModal = true;
+        break;
+      case "visibility":
+        showFileVisibilityModal = true;
         break;
       case "close":
         contextFile = null;
@@ -250,7 +262,7 @@
 </script>
 
 {#if showContextMenu}
-  <ContextMenu pos={contextPos} {onContextAction} />
+  <ContextMenu pos={contextPos} {onContextAction} {contextFile} />
 {/if}
 {#if showPromptModal}
   <PromptModal
@@ -272,6 +284,13 @@
 {/if}
 {#if showDeleteFileModal}
   <DeleteFileModal {dirs} {contextFile} onClose={closeDeleteFileModal} />
+{/if}
+{#if showFileVisibilityModal}
+  <FileVisibilityModal
+    {dirs}
+    {contextFile}
+    onClose={closeFileVisibilityModal}
+  />
 {/if}
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">

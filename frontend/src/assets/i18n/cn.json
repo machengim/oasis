@@ -66,7 +66,9 @@
       "daily": "每日",
       "weekly": "每周",
       "monthly": "每月",
-      "never": "从不"
+      "never": "从不",
+      "guest": "访客",
+      "allow": "允许"
     },
     "profile": {
       "title": "用户资料"
@@ -99,7 +101,9 @@
     "context_menu": {
       "rename": "重命名",
       "delete": "删除",
-      "close": "关闭"
+      "close": "关闭",
+      "show": "显示",
+      "hide": "隐藏"
     }
   },
   "modal": {
@@ -147,12 +151,12 @@
     "rename_file": {
       "title": "重命名",
       "text_before": "正在重命名",
-      "text_after": ". 请在下方输入新的名字: "
+      "text_after": "。请在下方输入新的名字: "
     },
     "delete_file": {
       "title": "删除",
       "text_before": "正在删除",
-      "text_after": ". 此操作是永久的且不可撤销。确定要继续?"
+      "text_after": "。此操作是永久的且不可撤销。确定要继续?"
     },
     "search_file": {
       "placeholder": "搜索..",
@@ -160,6 +164,12 @@
       "clear_all": "清除全部",
       "no_results": "没有结果",
       "results": "条结果"
+    },
+    "visibility_set": {
+      "text_before": "正在",
+      "text_after": "。确定要继续?",
+      "hiding": "向访客隐藏",
+      "showing": "向访客显示"
     }
   },
   "message": {

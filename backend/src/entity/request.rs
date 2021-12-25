@@ -77,3 +77,9 @@ pub struct CreateDirRequest {
 pub struct RenameFileRequest {
     pub new_name: String,
 }
+
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct SetFileVisibilityRequest {
+    pub visible: bool,
+}

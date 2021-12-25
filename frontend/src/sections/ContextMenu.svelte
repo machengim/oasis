@@ -2,10 +2,13 @@
   import { t } from "svelte-i18n";
   import { onMount } from "svelte";
   import { userStore } from "../utils/store";
-  import type { IMousePosition } from "../utils/types";
+  import type { IFile, IMousePosition } from "../utils/types";
 
-  export let onContextAction: (action: "rename" | "delete" | "close") => void;
+  export let onContextAction: (
+    action: "rename" | "delete" | "close" | "visibility"
+  ) => void;
   export let pos: IMousePosition;
+  export let contextFile: IFile;
   const user = $userStore;
   let menu: HTMLDivElement;
 
@@ -34,6 +37,14 @@
   >
     <div
       class="px-2 py-1 text-black hover:bg-gray-400 cursor-pointer"
+      on:click={() => onContextAction("visibility")}
+    >
+      {contextFile?.least_permission > 0
+        ? $t("component.context_menu.show")
+        : $t("component.context_menu.hide")}
+    </div>
+    <div
+      class="px-2 py-1 text-black hover:bg-gray-400 cursor-pointer"
       on:click={() => onContextAction("rename")}
     >
       {$t("component.context_menu.rename")}
@@ -44,6 +55,7 @@
     >
       {$t("component.context_menu.delete")}
     </div>
+
     <hr />
     <div
       class="px-2 py-1 text-black hover:bg-gray-400 cursor-pointer"

@@ -1,4 +1,5 @@
 use crate::entity::error::Error;
+use crate::entity::hidden::Hidden;
 use crate::entity::request::{SetupRequest, UpdateSiteRequest};
 use crate::entity::response::{AppNeedUpdateResponse, SiteBriefResponse, SiteFullResponse};
 use crate::entity::site::Site;
@@ -137,6 +138,13 @@ async fn update_site(
     let storage_str = storage.to_str().unwrap().to_owned();
     let mut conn = state.get_pool_conn().await?;
     let mut site = Site::read(&mut conn).await?.ok_or(500)?;
+    // If storage location changed, delete all records in HIDDEN table.
+    if site.storage != storage_str {
+        let mut tx = conn.begin().await?;
+        Hidden::delete_all_query(&mut tx).await?;
+        tx.commit().await?;
+    }
+
     site.name = req_body.sitename.to_owned();
     site.language = req_body.language.to_owned();
     site.update_freq = req_body.update_freq.to_owned();

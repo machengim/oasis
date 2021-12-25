@@ -216,10 +216,12 @@
 
       <!-- Allow guest setting -->
       <div class="w-full grid grid-cols-4 mb-4">
-        <div>Guest:</div>
+        <div>{$t("component.settings.guest")}:</div>
         <div class="col-span-3 pl-2">
           <input type="checkbox" id="allowGuest" bind:checked={allow_guest} />
-          <label for="allowGuest" class="ml-1">Allow</label>
+          <label for="allowGuest" class="ml-1"
+            >{$t("component.settings.allow")}</label
+          >
         </div>
       </div>
 

@@ -95,7 +95,8 @@ async function finishUpload(task: IUploadTask) {
       dir: task.targetDir.join("/") || "/",
       file_type: inferFileType(task.file.name),
       size: task.file.size,
-      filename: task.file.name
+      filename: task.file.name,
+      least_permission: 0
     };
 
     pushFile(newFile);

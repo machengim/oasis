@@ -28,13 +28,13 @@
       contextFile.dir = dirs.join("/") || "/";
       deleteFile(contextFile);
       setNotification("success", $t("message.success.delete_file"));
+      onClose();
     } catch (e) {
       setNotification("error", $t("message.error.delete_file"));
       console.error(e);
+    } finally {
+      isLoading = false;
     }
-
-    isLoading = false;
-    onClose();
   };
 </script>
 
