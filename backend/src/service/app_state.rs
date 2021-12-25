@@ -39,6 +39,10 @@ impl AppState {
         Ok(self.get_site()?.secret.to_owned())
     }
 
+    pub fn get_allow_guest(&self) -> AnyResult<i8> {
+        Ok(self.get_site()?.allow_guest)
+    }
+
     pub async fn get_pool_conn(&self) -> Result<PoolConnection<Sqlite>, sqlx::Error> {
         Ok(self.pool.acquire().await?)
     }

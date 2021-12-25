@@ -141,6 +141,7 @@ async fn update_site(
     site.language = req_body.language.to_owned();
     site.update_freq = req_body.update_freq.to_owned();
     site.storage = storage_str;
+    site.allow_guest = if req_body.allow_guest { 1 } else { 0 };
 
     let mut tx = conn.begin().await?;
     site.update(&mut tx).await?;

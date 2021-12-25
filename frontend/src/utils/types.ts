@@ -23,6 +23,7 @@ export interface IUpdateConfigRequest {
   language: string;
   storage: string;
   update_freq: string;
+  allow_guest: boolean;
 }
 
 export interface IUpdateAppNeedRespose {
@@ -78,6 +79,7 @@ export interface ISiteBrief {
   version: string,
   language: string,
   update_freq: string,
+  allow_guest: boolean,
 }
 
 export interface ISiteFull {
@@ -86,6 +88,7 @@ export interface ISiteFull {
   language: string,
   storage: string,
   update_freq: string,
+  allow_guest: boolean,
 }
 
 export interface ILink {

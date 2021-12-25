@@ -7,7 +7,7 @@
     sectionStore,
     userStore,
   } from "../utils/store";
-import { compareArray } from "../utils/util";
+  import { compareArray } from "../utils/util";
   import DirList from "./DirList.svelte";
   import FileView from "./FileView.svelte";
 

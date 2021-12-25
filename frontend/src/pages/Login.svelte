@@ -8,6 +8,7 @@
     sectionStore,
     userStore,
     resetTitle,
+    siteStore,
   } from "../utils/store";
   import { useNavigate } from "svelte-navigator";
   import { validateForm } from "../utils/util";
@@ -16,6 +17,7 @@
 
   const navigate = useNavigate();
   const focus = useFocus();
+  const allow_guest = $siteStore.allow_guest;
   let username = "";
   let password = "";
   let isLoading = false;
@@ -49,8 +51,25 @@
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.login_fail"));
+    } finally {
+      isLoading = false;
     }
-    isLoading = false;
+  };
+
+  const sendGuestLoginRequest = async () => {
+    isLoading = true;
+    try {
+      const guest: IUser = await api.get("/api/login/guest", "json");
+      userStore.set(guest);
+      console.log(guest);
+      setNotification("success", $t("message.success.login"));
+      navigate("/files");
+    } catch (e) {
+      console.error(e);
+      setNotification("error", $t("message.error.login_fail"));
+    } finally {
+      isLoading = false;
+    }
   };
 </script>
 
@@ -102,6 +121,19 @@
             type="submit"
           />
         </div>
+        {#if allow_guest}
+          <div
+            class="w-full flex flex-row justify-end"
+            style="margin-bottom: -1rem;"
+          >
+            <div
+              class="hover:bg-blue-400 hover:text-white cursor-pointer rounded px-1"
+              on:click={sendGuestLoginRequest}
+            >
+              Guest login
+            </div>
+          </div>
+        {/if}
       </div>
     </form>
   </div>

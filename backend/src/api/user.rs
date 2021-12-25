@@ -5,7 +5,7 @@ use crate::entity::user::User;
 use crate::service::app_state::AppState;
 use crate::service::auth::AuthUser;
 use crate::service::token::{AccessToken, RefreshToken, Token};
-use crate::util::constants::*;
+use crate::util::{self, constants::*};
 use anyhow::Result as AnyResult;
 use rocket::http::{Cookie, CookieJar};
 use rocket::serde::json::Json;
@@ -13,7 +13,13 @@ use rocket::{Route, State};
 use sqlx::Connection;
 
 pub fn route() -> Vec<Route> {
-    routes![login, signout, change_password, refresh_access_token]
+    routes![
+        login,
+        signout,
+        change_password,
+        refresh_access_token,
+        guest_login
+    ]
 }
 
 #[post("/login", data = "<req_body>")]
@@ -28,6 +34,32 @@ async fn login(
 
     let mut conn = state.get_pool_conn().await?;
     let user = User::login(&req_body.username, &req_body.password, &mut conn).await?;
+    let secret = state.get_secret()?;
+
+    let access_token = set_access_token(&user, &secret, jar)?;
+    set_refresh_token(&user, &secret, jar)?;
+
+    let login = LoginResponse {
+        username: user.username,
+        permission: user.permission,
+        expire: access_token.exp,
+    };
+
+    Ok(Json(login))
+}
+
+#[get("/login/guest")]
+async fn guest_login(
+    state: &State<AppState>,
+    jar: &CookieJar<'_>,
+) -> Result<Json<LoginResponse>, Error> {
+    let allow_guest = state.get_site()?.allow_guest;
+    if allow_guest <= 0 {
+        return Err(Error::BadRequest);
+    }
+
+    let current_timestamp = util::get_utc_seconds();
+    let user = User::guest(current_timestamp);
     let secret = state.get_secret()?;
 
     let access_token = set_access_token(&user, &secret, jar)?;
@@ -75,13 +107,19 @@ async fn refresh_access_token(
     jar: &CookieJar<'_>,
 ) -> Result<Json<LoginResponse>, Error> {
     let mut conn = state.get_pool_conn().await?;
-    let user_op = User::find_user_by_id(token.uid, &mut conn).await?;
+    let user: User;
 
-    if user_op.is_none() {
-        return Err(Error::BadRequest);
+    if state.get_allow_guest()? > 0 && token.uid == 0 {
+        user = User::guest(util::get_utc_seconds());
+    } else {
+        let user_op = User::find_user_by_id(token.uid, &mut conn).await?;
+
+        if user_op.is_none() {
+            return Err(Error::BadRequest);
+        }
+        user = user_op.unwrap();
     }
 
-    let user = user_op.unwrap();
     let secret = state.get_secret()?;
     let access_token = set_access_token(&user, &secret, jar)?;
     set_refresh_token(&user, &secret, jar)?;

@@ -29,6 +29,16 @@ impl User {
         }
     }
 
+    pub fn guest(created_at: i64) -> Self {
+        Self {
+            user_id: 0,
+            username: String::from("Guest"),
+            password: String::new(),
+            permission: 0,
+            created_at,
+        }
+    }
+
     pub async fn insert_query(&self, tx: &mut Transaction<'_, Sqlite>) -> AnyResult<i64> {
         let encrypt_password = hash(&self.password, DEFAULT_COST)?;
 

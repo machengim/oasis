@@ -9,7 +9,7 @@ use super::site::Site;
 pub enum FileResponse {
     Range(RangedFile),
     Binary(NamedFile),
-    Text(String)
+    Text(String),
 }
 
 #[derive(Serialize)]
@@ -34,6 +34,7 @@ pub struct SiteBriefResponse {
     pub version: String,
     pub language: String,
     pub update_freq: String,
+    pub allow_guest: bool,
 }
 
 #[derive(Serialize, Debug)]
@@ -44,6 +45,7 @@ pub struct SiteFullResponse {
     pub language: String,
     pub update_freq: String,
     pub storage: String,
+    pub allow_guest: bool,
 }
 
 impl From<Site> for SiteBriefResponse {
@@ -53,6 +55,7 @@ impl From<Site> for SiteBriefResponse {
             version: s.version,
             language: s.language,
             update_freq: s.update_freq,
+            allow_guest: s.allow_guest > 0,
         }
     }
 }
@@ -64,6 +67,7 @@ impl Default for SiteBriefResponse {
             version: VERSION.to_owned(),
             language: DEFAULT_LANGUAGE.to_owned(),
             update_freq: DEFAULT_UPDATE_FREQ.to_owned(),
+            allow_guest: false,
         }
     }
 }
@@ -76,6 +80,7 @@ impl From<Site> for SiteFullResponse {
             language: s.language,
             storage: s.storage,
             update_freq: s.update_freq,
+            allow_guest: s.allow_guest > 0,
         }
     }
 }
@@ -88,6 +93,7 @@ impl Default for SiteFullResponse {
             language: DEFAULT_LANGUAGE.to_owned(),
             storage: String::new(),
             update_freq: DEFAULT_UPDATE_FREQ.to_owned(),
+            allow_guest: false,
         }
     }
 }

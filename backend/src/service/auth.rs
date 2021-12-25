@@ -10,6 +10,7 @@ use rocket::{
 #[derive(Default)]
 pub struct AuthUser {
     pub uid: i64,
+    pub permission: i8,
 }
 
 #[derive(Default)]
@@ -26,10 +27,20 @@ impl<'r> FromRequest<'r> for AuthUser {
             if let Some(state) = req.rocket().state::<AppState>() {
                 if let Ok(secret) = state.get_secret() {
                     if let Ok(token) = AccessToken::decode(token_str.value(), &secret) {
-                        if token.uid > 0 && token.permission > 0 {
-                            return Outcome::Success(AuthUser { uid: token.uid });
-                        } else {
-                            return Outcome::Failure((Status::Unauthorized, Error::Unauthorized));
+                        if let Ok(allow_guest) = state.get_allow_guest() {
+                            if token.uid > (0 - allow_guest) as i64
+                                && token.permission > 0 - allow_guest
+                            {
+                                return Outcome::Success(AuthUser {
+                                    uid: token.uid,
+                                    permission: token.permission,
+                                });
+                            } else {
+                                return Outcome::Failure((
+                                    Status::Unauthorized,
+                                    Error::Unauthorized,
+                                ));
+                            }
                         }
                     }
                 }

@@ -24,6 +24,7 @@ pub struct UpdateSiteRequest {
     pub storage: String,
     pub language: String,
     pub update_freq: String,
+    pub allow_guest: bool,
 }
 
 #[derive(Deserialize, Debug)]

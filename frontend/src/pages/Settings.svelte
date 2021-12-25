@@ -13,6 +13,7 @@
     getSitename,
     getLang,
     resetTitle,
+    userStore,
   } from "../utils/store";
   import type { ISiteFull, IUpdateConfigRequest } from "../utils/types";
 
@@ -26,6 +27,7 @@
   let sitename = getSitename();
   let language: string;
   let update_freq: string;
+  let allow_guest = $siteStore.allow_guest;
 
   sectionStore.set("settings");
   resetTitle();
@@ -58,9 +60,9 @@
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.read_site_error"));
+    } finally {
+      isLoading = false;
     }
-
-    isLoading = false;
   };
 
   const onConfirm = async (e: Event) => {
@@ -93,11 +95,13 @@
   };
 
   const sendUpdateConfigRequest = async () => {
+    isLoading = true;
     const payload: IUpdateConfigRequest = {
       sitename,
       language,
       storage: encodeURIComponent(selectedDir),
       update_freq,
+      allow_guest,
     };
 
     const endpoint = "/api/sys/config";
@@ -106,6 +110,8 @@
       updateSiteStore();
     } catch (e) {
       throw e;
+    } finally {
+      isLoading = false;
     }
   };
 
@@ -127,6 +133,7 @@
     site.name = sitename;
     site.language = language;
     site.update_freq = update_freq;
+    site.allow_guest = allow_guest;
     siteStore.set(site);
   };
 
@@ -154,6 +161,8 @@
       <div class="text-xl font-bold mb-8 text-gray-700">
         {$t("component.settings.title")}
       </div>
+
+      <!-- Language setting -->
       <div class="w-full grid grid-cols-4 mb-4">
         <div>{$t("component.settings.language")}:</div>
         <div class="col-span-3">
@@ -168,6 +177,8 @@
           </select>
         </div>
       </div>
+
+      <!-- Site name setting -->
       <div class="w-full grid grid-cols-4 mb-4">
         <div>{$t("form.sitename")}:</div>
         <div class="col-span-3">
@@ -180,6 +191,8 @@
           />
         </div>
       </div>
+
+      <!-- Update frequency setting -->
       <div class="w-full grid grid-cols-4 mb-4">
         <div>{$t("component.settings.update")}:</div>
         <div class="col-span-3">
@@ -200,6 +213,17 @@
           </select>
         </div>
       </div>
+
+      <!-- Allow guest setting -->
+      <div class="w-full grid grid-cols-4 mb-4">
+        <div>Guest:</div>
+        <div class="col-span-3 pl-2">
+          <input type="checkbox" id="allowGuest" bind:checked={allow_guest} />
+          <label for="allowGuest" class="ml-1">Allow</label>
+        </div>
+      </div>
+
+      <!-- Storage setting -->
       <div class="w-full grid grid-cols-4 mb-8">
         <div>{$t("form.storage")}:</div>
         <div class="col-span-3 pl-2">

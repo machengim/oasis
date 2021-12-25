@@ -35,19 +35,21 @@
 >
   {#if user}
     <div class="px-4 my-1 font-bold">{user.username}</div>
-    <hr />
-    <div
-      class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
-      on:click={() => toPage("profile")}
-    >
-      {$t("component.avatar_menu.profile")}
-    </div>
-    <div
-      class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
-      on:click={() => toPage("settings")}
-    >
-      {$t("component.avatar_menu.settings")}
-    </div>
+    {#if user.permission > 0}
+      <hr />
+      <div
+        class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
+        on:click={() => toPage("profile")}
+      >
+        {$t("component.avatar_menu.profile")}
+      </div>
+      <div
+        class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
+        on:click={() => toPage("settings")}
+      >
+        {$t("component.avatar_menu.settings")}
+      </div>
+    {/if}
     <hr />
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
@@ -55,12 +57,14 @@
     >
       {$t("component.avatar_menu.about")}
     </div>
-    <div
-      class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
-      on:click={() => onOpenModal("shutdown")}
-    >
-      {$t("component.avatar_menu.shutdown")}
-    </div>
+    {#if user.permission > 0}
+      <div
+        class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
+        on:click={() => onOpenModal("shutdown")}
+      >
+        {$t("component.avatar_menu.shutdown")}
+      </div>
+    {/if}
     <div
       class="px-4 my-1 cursor-pointer hover:bg-blue-400 hover:text-white"
       on:click={() => onOpenModal("signout")}

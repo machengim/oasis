@@ -39,6 +39,8 @@ pub async fn init_app() -> AnyResult<()> {
 }
 
 pub async fn check_update(conn: &mut PoolConnection<Sqlite>) -> AnyResult<()> {
+    run_migration(conn).await?;
+
     let mut site = match Site::read(conn).await? {
         Some(s) => s,
         None => return Ok(()),
@@ -48,7 +50,6 @@ pub async fn check_update(conn: &mut PoolConnection<Sqlite>) -> AnyResult<()> {
     let version_app = constants::VERSION;
 
     if compare_version(version_app, &version_db) > 0 {
-        run_migration(conn).await?;
         site.version = version_app.to_owned();
         let mut tx = conn.begin().await?;
         site.update(&mut tx).await?;

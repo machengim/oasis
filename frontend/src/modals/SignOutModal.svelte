@@ -17,8 +17,10 @@
 
     try {
       const uploadingTasks = $uploadTaskStore;
-      await cancelUploads(uploadingTasks);
-      uploadTaskStore.set([]);
+      if (uploadingTasks.length > 0) {
+        await cancelUploads(uploadingTasks);
+        uploadTaskStore.set([]);
+      }
       await api.get("/api/user/signout", "raw");
       userStore.set(null);
       setNotification("success", $t("message.success.signout"));

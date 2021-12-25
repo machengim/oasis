@@ -54,7 +54,7 @@ async fn files_all(token: AccessToken, _dirs: PathBuf) -> Either<Option<NamedFil
 }
 
 async fn handle_files(token: AccessToken) -> Either<Option<NamedFile>, Redirect> {
-    if token.uid > 0 && token.permission > 0 {
+    if token.uid >= 0 && token.permission >= 0 {
         Either::Left(open_index_page().await)
     } else {
         Either::Right(Redirect::temporary(uri!("/login")))

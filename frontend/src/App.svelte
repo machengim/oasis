@@ -89,9 +89,9 @@
     } catch (e) {
       console.error(e);
       setNotification("error", $t("message.error.read_site_error"));
+    } finally {
+      isLoading = false;
     }
-
-    isLoading = false;
 
     // Check if need to refresh token every 2 mins
     // Condition is user in store and the token is almost expired (5 mins)

@@ -20,6 +20,7 @@ pub struct Site {
     pub update_freq: String,
     pub created_at: i64,
     pub updated_at: i64,
+    pub allow_guest: i8,
 }
 
 impl Site {
@@ -39,6 +40,7 @@ impl Site {
             update_freq,
             created_at,
             updated_at: created_at,
+            allow_guest: 0,
         }
     }
 
@@ -49,6 +51,7 @@ impl Site {
         Ok(fetch_single(query, conn).await?)
     }
 
+    // Allow guest is set to 0 when initilizing.
     pub async fn insert(&self, tx: &mut Transaction<'_, Sqlite>) -> anyhow::Result<i64> {
         let sql = "insert into SITE (name, version, storage, secret, created_at, language, update_freq, updated_at) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)";
         let query = Query::new(
@@ -71,7 +74,7 @@ impl Site {
     }
 
     pub async fn update(&self, tx: &mut Transaction<'_, Sqlite>) -> AnyResult<i64> {
-        let sql = "update SITE set name = ?1, version = ?2, storage = ?3, secret = ?4, created_at = ?5, language = ?6, update_freq = ?7, updated_at = ?8";
+        let sql = "update SITE set name = ?1, version = ?2, storage = ?3, secret = ?4, created_at = ?5, language = ?6, update_freq = ?7, updated_at = ?8, allow_guest = ?9";
         let query = Query::new(
             sql,
             args![
@@ -82,7 +85,8 @@ impl Site {
                 self.created_at,
                 &self.language,
                 &self.update_freq,
-                &self.updated_at
+                &self.updated_at,
+                &self.allow_guest
             ],
         );
 
