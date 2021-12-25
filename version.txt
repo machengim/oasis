@@ -1,13 +1,13 @@
 {
-    "version": "0.2.2",
+    "version": "0.2.3",
     "descriptions": [
         {
             "lang": "en",
-            "detail": "File search"
+            "detail": "Allow guest users; hide files/dirs from guest users."
         },
         {
             "lang": "cn",
-            "detail": "文件搜索"
+            "detail": "允许访客; 向访客隐藏文件/文件夹."
         }
     ],
     "url": "https://github.com/machengim/oasis/releases"

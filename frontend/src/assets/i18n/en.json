@@ -142,7 +142,7 @@
     },
     "create_folder": {
       "title": "Create folder",
-      "text_before": "You are creating a folder inside",
+      "text_before": "You are creating a folder inside ",
       "text_after": ". Please enter the new folder's name below:",
       "error_empty": "Folder name should not be empty",
       "error_used": "This name has been used",

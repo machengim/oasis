@@ -142,7 +142,7 @@
     },
     "create_folder": {
       "title": "创建目录",
-      "text_before": "将要",
+      "text_before": "将要在",
       "text_after": "下创建一个新目录。请在下方输入新目录名:",
       "error_empty": "目录名不能为空",
       "error_used": "该名称已被使用",
