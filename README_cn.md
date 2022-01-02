@@ -12,8 +12,8 @@
 
 1. 从 [release](https://github.com/machengim/oasis/releases) 页面下载
 2. 解压缩
-3. 如果运行在 Linux 或 MacOS 中, 授予 `oasis` 文件可执行权限 
-4. (可选) 在 `oasis.conf` 中设置服务器的IP和端口
+3. 如果运行在 Linux 或 MacOS 中, 授予 `oasis` 文件可执行权限
+4. (可选) 在 `oasis.conf` 中设置服务器的 IP 和端口
 5. 运行 `oasis` 或 `oasis.exe`
 6. 从浏览器访问服务器的 IP 地址
 
@@ -46,6 +46,7 @@
 - [x] 搜索
 - [ ] 高级文件分享
 - [ ] 文本编辑器
+- [ ] 日志
 
 ### 技术栈
 

@@ -144,7 +144,15 @@ async fn update_file_name(
         return Err(Error::BadRequest);
     }
 
-    fs::rename(current_file, target_file).await?;
+    fs::rename(current_file, &target_file).await?;
+
+    let target_relative_path = get_relative_path(state, &target_file)?;
+    let target_path_str = target_relative_path.to_str().unwrap();
+    let mut conn = state.get_pool_conn().await?;
+    let mut tx = conn.begin().await?;
+    Hidden::update_all_sub_path_query(&mut tx, path, target_path_str).await?;
+    tx.commit().await?;
+
     Ok(())
 }
 
@@ -182,6 +190,11 @@ async fn delete_file(state: &State<AppState>, path: &str, _user: AuthAdmin) -> R
     } else {
         fs::remove_dir_all(target_path).await?;
     }
+
+    let mut conn = state.get_pool_conn().await?;
+    let mut tx = conn.begin().await?;
+    Hidden::delete_all_sub_path_query(&mut tx, path).await?;
+    tx.commit().await?;
 
     Ok(())
 }
@@ -281,6 +294,13 @@ fn get_target_path(state: &State<AppState>, path: &str) -> AnyResult<PathBuf> {
     Ok(target_path)
 }
 
+fn get_relative_path(state: &State<AppState>, full_path: &PathBuf) -> AnyResult<PathBuf> {
+    let storage = state.get_site()?.storage.clone();
+    let relative_path = full_path.strip_prefix(storage)?;
+
+    Ok(relative_path.to_owned())
+}
+
 async fn search_dir_all(
     state: &State<AppState>,
     keywords: &Vec<&str>,
@@ -368,16 +388,3 @@ fn contains_all_keywords(path: &Path, keywords: &Vec<&str>) -> bool {
 
     return true;
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn test_walk_dir() {
-//         let keywords = vec!["Hello"];
-//         let storage = "/home/ma/Downloads";
-//         search_dir_all(&storage, &keywords, storage, 9).expect("Error walking dir");
-//         assert!(true);
-//     }
-// }

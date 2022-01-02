@@ -46,6 +46,7 @@ A self-hosted file server.
 - [x] Search
 - [ ] Advanced file sharing
 - [ ] Text editor
+- [ ] Logs
 
 ### Tech stack
 
