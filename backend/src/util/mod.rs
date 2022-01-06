@@ -39,6 +39,10 @@ pub fn get_temp_path() -> PathBuf {
     get_pwd().join("temp")
 }
 
+pub fn get_data_temp_path() -> PathBuf {
+    get_pwd().join("data").join("temp")
+}
+
 #[cfg(debug_assertions)]
 pub fn get_frontend_dir() -> PathBuf {
     let front_dir = constants::FRONTEND_DIR_DEBUG;

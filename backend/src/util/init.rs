@@ -89,7 +89,8 @@ pub async fn get_db_pool() -> Result<SqlitePool, sqlx::Error> {
 
 fn get_db_file_location() -> PathBuf {
     let pwd = super::get_pwd();
-    pwd.join("db").join("main.db")
+    // Change in v0.2.4, move db directory to data directory.
+    pwd.join("data").join("db").join("main.db")
 }
 
 fn compare_version(va: &str, vb: &str) -> i8 {

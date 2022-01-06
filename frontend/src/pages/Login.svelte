@@ -71,6 +71,10 @@
       isLoading = false;
     }
   };
+
+  const forgotPassword = () => {
+    navigate("/forgot-password");
+  };
 </script>
 
 {#if $isLoadingI18N}
@@ -79,7 +83,7 @@
   <div class="relative container-height w-full">
     <form on:submit={onConfirm} bind:this={form}>
       <div
-        class="w-80 center bg-gray-50 shadow rounded-lg flex flex-col items-center p-8"
+        class="w-80 center bg-gray-50 shadow rounded-lg flex flex-col items-center p-6"
       >
         <div class="text-xl font-bold mb-8 text-gray-700">
           {$t("component.login.title")}
@@ -121,19 +125,23 @@
             type="submit"
           />
         </div>
-        {#if allow_guest}
+
+        <div class="w-full flex flex-row justify-between items-center mt-4">
           <div
-            class="w-full flex flex-row justify-end"
-            style="margin-bottom: -1rem;"
+            class="hover:bg-blue-400 hover:text-white cursor-pointer rounded px-1"
+            on:click={forgotPassword}
           >
+            Forgot password?
+          </div>
+          {#if allow_guest}
             <div
               class="hover:bg-blue-400 hover:text-white cursor-pointer rounded px-1"
               on:click={sendGuestLoginRequest}
             >
               {$t("component.login.guest_login")}
             </div>
-          </div>
-        {/if}
+          {/if}
+        </div>
       </div>
     </form>
   </div>

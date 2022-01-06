@@ -9,7 +9,18 @@ use rocket::{Either, Route, Shutdown, State};
 use std::path::PathBuf;
 
 pub fn serve() -> Vec<Route> {
-    routes![index, index_html, shutdown, login, setup, files, files_all, settings, profile]
+    routes![
+        index,
+        index_html,
+        shutdown,
+        login,
+        setup,
+        files,
+        files_all,
+        settings,
+        profile,
+        forgot_password
+    ]
 }
 
 #[get("/")]
@@ -32,6 +43,11 @@ fn handle_index(first_run: bool) -> Redirect {
 
 #[get("/login")]
 async fn login() -> Option<NamedFile> {
+    open_index_page().await
+}
+
+#[get("/forgot-password")]
+async fn forgot_password() -> Option<NamedFile> {
     open_index_page().await
 }
 

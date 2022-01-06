@@ -29,6 +29,7 @@
   import { compareVersion, getLocale } from "./utils/util";
   import UpdateModal from "./modals/UpdateModal.svelte";
   import UploadList from "./sections/UploadList.svelte";
+  import ForgotPassword from "./pages/ForgotPassword.svelte";
 
   let language = "";
   let isLoading = true;
@@ -154,6 +155,7 @@
       <Route path="/files/*" component={Files} primary={false} />
       <Route path="/settings" component={Settings} />
       <Route path="/profile" component={Profile} />
+      <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/" component={Home} primary={false} />
     </Router>
   </main>

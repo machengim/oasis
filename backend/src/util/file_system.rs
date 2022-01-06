@@ -4,7 +4,7 @@ use encoding_rs::Encoding;
 use rocket::tokio::fs;
 use std::path::PathBuf;
 use sysinfo::{DiskExt, System, SystemExt};
-use tokio::io::AsyncReadExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 pub fn get_system_volumes() -> AnyResult<Vec<String>> {
     let mut sys = System::new_all();
@@ -72,6 +72,13 @@ fn detect_encoding(buffer: &[u8]) -> AnyResult<&'static Encoding> {
     }
 
     Ok(encoding)
+}
+
+pub async fn write_text_file(path: &PathBuf, content: &str) -> AnyResult<()> {
+    let mut file = fs::File::create(path).await?;
+    file.write_all(content.as_bytes()).await?;
+
+    Ok(())
 }
 
 #[cfg(test)]

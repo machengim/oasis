@@ -83,3 +83,10 @@ pub struct RenameFileRequest {
 pub struct SetFileVisibilityRequest {
     pub visible: bool,
 }
+
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct ForgotPasswordRequest {
+    pub url: String,
+    pub username: String,
+}

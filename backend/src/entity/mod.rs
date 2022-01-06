@@ -2,6 +2,7 @@ pub mod error;
 pub mod file;
 pub mod hidden;
 pub mod request;
+pub mod reset_password;
 pub mod response;
 pub mod site;
 pub mod upload_task;
