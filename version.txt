@@ -1,13 +1,13 @@
 {
-    "version": "0.2.3",
+    "version": "0.2.4",
     "descriptions": [
         {
             "lang": "en",
-            "detail": "Allow guest users; hide files/dirs from guest users."
+            "detail": "Reset password; Update hidden files when renaming or deleting files. This version contains breaking changes, please check CHANGELOG.md."
         },
         {
             "lang": "cn",
-            "detail": "允许访客; 向访客隐藏文件/文件夹."
+            "detail": "重置密码; 重命名/删除文件时更新隐藏文件。此版本包含重大变化, 请查看 CHANGELOG.md。"
         }
     ],
     "url": "https://github.com/machengim/oasis/releases"

@@ -1,6 +1,6 @@
 ## OASIS
 
-[![Build](https://github.com/machengim/oasis/actions/workflows/build_release.yml/badge.svg)](https://github.com/machengim/oasis/actions/workflows/build_release.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/main/LICENSE-MIT) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)](https://github.com/machengim/oasis/releases) [![Docker](https://img.shields.io/badge/docker-v0.2.3-orange)](https://hub.docker.com/r/machengim/oasis)
+[![Build](https://github.com/machengim/oasis/actions/workflows/build_release.yml/badge.svg)](https://github.com/machengim/oasis/actions/workflows/build_release.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/machengim/oasis/blob/main/LICENSE-MIT) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/machengim/oasis)](https://github.com/machengim/oasis/releases) [![Docker](https://img.shields.io/badge/docker-v0.2.4-orange)](https://hub.docker.com/r/machengim/oasis)
 
 [中文 README](https://github.com/machengim/oasis/blob/main/README_cn.md)
 
@@ -75,7 +75,7 @@ https://hub.docker.com/r/machengim/oasis
 
 ```
 docker run --name oasis -t -d \
--v <db>:/opt/oasis/db \
+-v <data>:/opt/oasis/data \
 -v <storage>:/home/storage \
 -p <port>:8000 machengim/oasis
 ```
