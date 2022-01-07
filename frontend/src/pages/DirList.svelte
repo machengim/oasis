@@ -296,7 +296,7 @@
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
     <div class="flex flex-row items-center justify-between">
       <BreadCrum {dirs} className="py-1" />
-      {#if user.permission > 0}
+      {#if user && user.permission > 0}
         <div class="relative flex flex-row justify-end">
           <Button
             onClick={toggleShowNewMenu}

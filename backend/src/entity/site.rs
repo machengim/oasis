@@ -25,7 +25,7 @@ pub struct Site {
 
 impl Site {
     pub fn new(name: &str, storage: &PathBuf, language: &str, created_at: i64) -> Self {
-        let secret = util::generate_secret_key();
+        let secret = util::generate_secret_key(32);
         let version = util::get_version_constant();
         let storage_str = storage.to_str().unwrap().to_owned();
         let update_freq = DEFAULT_UPDATE_FREQ.to_owned();

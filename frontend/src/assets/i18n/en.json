@@ -94,6 +94,7 @@
     },
     "login": {
       "title": "Login",
+      "forgot_password": "Forgot password?",
       "guest_login": "Guest login"
     },
     "upload_list": {
@@ -105,6 +106,19 @@
       "close": "Close",
       "show": "Show",
       "hide": "Hide"
+    },
+    "forgot_password": {
+      "title": "Forgot password",
+      "notice-p1": "Please check the following file in the Oasis application directory on the server:",
+      "notice-p2": "This file includes a link to reset your password which will expire in 6 hours."
+    },
+    "reset_password": {
+      "title": "Reset password",
+      "code": "Code",
+      "repeat": "Repeat",
+      "unmatch": "Passwords not match",
+      "notice-before": "Password has been reset. Please ",
+      "notice-after": " with your new password."
     }
   },
   "modal": {
@@ -190,7 +204,8 @@
       "create_dir": "New folder created successfully",
       "rename_file": "Rename successfully",
       "delete_file": "Delete successfully",
-      "update_visibility": "File visibility updated successfully"
+      "update_visibility": "File visibility updated successfully",
+      "reset_password": "Password reset successfully"
     },
     "error": {
       "no_storage": "Please choose a storage",
@@ -211,7 +226,9 @@
       "rename_file": "Rename failed",
       "delete_file": "Delete failed",
       "search_file": "Search failed",
-      "update_visibility": "File visibility update failed"
+      "update_visibility": "File visibility update failed",
+      "forgot_password": "Forget password request failed",
+      "reset_password": "Password reset failed"
     }
   }
 }

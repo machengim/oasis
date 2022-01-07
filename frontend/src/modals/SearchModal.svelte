@@ -46,9 +46,7 @@
   }
 
   const initHistoryKeywords = () => {
-    console.log("local key is ", localStorageKey);
     const keywordsInLocalStorage = localStorage.getItem(localStorageKey);
-    console.log("get value: ", keywordsInLocalStorage);
     if (keywordsInLocalStorage) {
       historyKeywords = JSON.parse(keywordsInLocalStorage);
     }

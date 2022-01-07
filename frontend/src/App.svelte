@@ -30,6 +30,7 @@
   import UpdateModal from "./modals/UpdateModal.svelte";
   import UploadList from "./sections/UploadList.svelte";
   import ForgotPassword from "./pages/ForgotPassword.svelte";
+  import ResetPassword from "./pages/ResetPassword.svelte";
 
   let language = "";
   let isLoading = true;
@@ -94,13 +95,13 @@
       isLoading = false;
     }
 
-    // Check if need to refresh token every 2 mins
+    // Check if need to refresh token every 3 mins
     // Condition is user in store and the token is almost expired (5 mins)
     setInterval(async () => {
       if (needRefreshToken()) {
         await api.refresh_token();
       }
-    }, 1000 * 120);
+    }, 1000 * 180);
   };
 
   const needRefreshToken = (): boolean => {
@@ -155,7 +156,16 @@
       <Route path="/files/*" component={Files} primary={false} />
       <Route path="/settings" component={Settings} />
       <Route path="/profile" component={Profile} />
-      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route
+        path="/forgot-password"
+        component={ForgotPassword}
+        primary={false}
+      />
+      <Route
+        path="/reset-password/*"
+        component={ResetPassword}
+        primary={false}
+      />
       <Route path="/" component={Home} primary={false} />
     </Router>
   </main>

@@ -1,5 +1,7 @@
 use crate::entity::error::Error;
-use crate::entity::request::{ChangePasswordRequest, ForgotPasswordRequest, LoginRequest};
+use crate::entity::request::{
+    ChangePasswordRequest, ForgotPasswordRequest, LoginRequest, ResetPasswordRequest,
+};
 use crate::entity::reset_password::ResetPassword;
 use crate::entity::response::LoginResponse;
 use crate::entity::user::User;
@@ -20,7 +22,8 @@ pub fn route() -> Vec<Route> {
         change_password,
         refresh_access_token,
         guest_login,
-        forgot_password
+        forgot_password,
+        reset_password
     ]
 }
 
@@ -158,6 +161,37 @@ async fn forgot_password(
     tx.commit().await?;
 
     Ok(reset_pw.reset_id)
+}
+
+#[post("/user/reset-password", data = "<req_body>")]
+async fn reset_password(
+    state: &State<AppState>,
+    req_body: Json<ResetPasswordRequest>,
+) -> Result<(), Error> {
+    let mut conn = state.get_pool_conn().await?;
+    let reset_pw = ResetPassword::from_reset_req(
+        &req_body.uuid,
+        &req_body.username,
+        &req_body.code,
+        &mut conn,
+    )
+    .await
+    .map_err(|_| Error::BadRequest)?;
+
+    let mut user = match User::find_user_by_name(&req_body.username, &mut conn).await? {
+        Some(user) => user,
+        None => return Err(Error::BadRequest),
+    };
+
+    user.password = req_body.password.clone();
+
+    reset_pw.remove_user_reset_password_files(&mut conn).await?;
+    let mut tx = conn.begin().await?;
+    user.update(&mut tx).await?;
+    ResetPassword::delete_query(&user.username, &mut tx).await?;
+    tx.commit().await?;
+
+    Ok(())
 }
 
 fn set_access_token(user: &User, secret: &str, jar: &CookieJar<'_>) -> AnyResult<AccessToken> {

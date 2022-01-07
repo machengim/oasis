@@ -61,7 +61,6 @@
     try {
       const guest: IUser = await api.get("/api/login/guest", "json");
       userStore.set(guest);
-      console.log(guest);
       setNotification("success", $t("message.success.login"));
       navigate("/files");
     } catch (e) {
@@ -131,7 +130,7 @@
             class="hover:bg-blue-400 hover:text-white cursor-pointer rounded px-1"
             on:click={forgotPassword}
           >
-            Forgot password?
+            {$t("component.login.forgot_password")}
           </div>
           {#if allow_guest}
             <div

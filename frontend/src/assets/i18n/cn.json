@@ -94,6 +94,7 @@
     },
     "login": {
       "title": "用户登录",
+      "forgot_password": "忘记密码?",
       "guest_login": "访客登录"
     },
     "upload_list": {
@@ -105,6 +106,19 @@
       "close": "关闭",
       "show": "显示",
       "hide": "隐藏"
+    },
+    "forgot_password": {
+      "title": "忘记密码",
+      "notice-p1": "请在服务器Oasis应用目录下查看文件:",
+      "notice-p2": "该文件包含一个6小时后过期的重置密码链接。"
+    },
+    "reset_password": {
+      "title": "重置密码",
+      "code": "验证码",
+      "repeat": "重复",
+      "unmatch": "密码不匹配",
+      "notice-before": "密码已重置, 请使用新密码重新",
+      "notice-after": "。"
     }
   },
   "modal": {
@@ -189,7 +203,8 @@
       "create_dir": "新目录创建成功",
       "rename_file": "重命名成功",
       "delete_file": "删除成功",
-      "update_visibility": "文件可见性更新成功"
+      "update_visibility": "文件可见性更新成功",
+      "reset_password": "重置密码成功"
     },
     "error": {
       "no_storage": "请选择存储位置",
@@ -210,7 +225,9 @@
       "rename_file": "重命名失败",
       "delete_file": "删除失败",
       "search_file": "搜索失败",
-      "update_visibility": "文件可见性更新失败"
+      "update_visibility": "文件可见性更新失败",
+      "forgot_password": "忘记密码请求失败",
+      "reset_password": "重置密码失败"
     }
   }
 }

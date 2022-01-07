@@ -19,7 +19,8 @@ pub fn serve() -> Vec<Route> {
         files_all,
         settings,
         profile,
-        forgot_password
+        forgot_password,
+        reset_password
     ]
 }
 
@@ -48,6 +49,11 @@ async fn login() -> Option<NamedFile> {
 
 #[get("/forgot-password")]
 async fn forgot_password() -> Option<NamedFile> {
+    open_index_page().await
+}
+
+#[get("/reset-password/<_uuid>")]
+async fn reset_password(_uuid: String) -> Option<NamedFile> {
     open_index_page().await
 }
 

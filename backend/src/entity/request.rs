@@ -90,3 +90,12 @@ pub struct ForgotPasswordRequest {
     pub url: String,
     pub username: String,
 }
+
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct ResetPasswordRequest {
+    pub uuid: String,
+    pub code: String,
+    pub username: String,
+    pub password: String,
+}

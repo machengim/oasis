@@ -1,7 +1,7 @@
-import type * as enums from './enums';
+import type * as enums from "./enums";
 
 export interface INotification {
-  type: 'success' | 'error';
+  type: "success" | "error";
   msg: string;
 }
 
@@ -46,28 +46,28 @@ export interface IUpdateDescription {
 export interface IChangePasswordRequest {
   username: string;
   old_password: string;
-  new_password: string
+  new_password: string;
 }
 
 export interface IFile {
-  dir?: string,
-  filename: string,
-  file_type: enums.EFileType,
-  size: number,
-  least_permission: number,
+  dir?: string;
+  filename: string;
+  file_type: enums.EFileType;
+  size: number;
+  least_permission: number;
 }
 
 export interface IFileOrder {
-  key: "name" | "type" | "size",
-  asc: boolean,
+  key: "name" | "type" | "size";
+  asc: boolean;
 }
 
 export interface IPartialBlob {
-  blob: Blob,
-  start: number,
-  end: number,
-  size: number,
-  type: string,
+  blob: Blob;
+  start: number;
+  end: number;
+  size: number;
+  type: string;
 }
 
 export interface ILoopIcon {
@@ -76,25 +76,25 @@ export interface ILoopIcon {
 }
 
 export interface ISiteBrief {
-  name: string,
-  version: string,
-  language: string,
-  update_freq: string,
-  allow_guest: boolean,
+  name: string;
+  version: string;
+  language: string;
+  update_freq: string;
+  allow_guest: boolean;
 }
 
 export interface ISiteFull {
-  name: string,
-  version: string,
-  language: string,
-  storage: string,
-  update_freq: string,
-  allow_guest: boolean,
+  name: string;
+  version: string;
+  language: string;
+  storage: string;
+  update_freq: string;
+  allow_guest: boolean;
 }
 
 export interface ILink {
-  name: string,
-  url: string,
+  name: string;
+  url: string;
 }
 
 export interface IUser {
@@ -116,10 +116,17 @@ export interface IUploadRequest {
   filename: string;
   size: number;
   target: string; // target directory to store the uploading file
-  hash: string;   // the md5 value of the file
+  hash: string; // the md5 value of the file
 }
 
 export interface IMousePosition {
   x: number;
   y: number;
+}
+
+export interface IResetPasswordRequest {
+  uuid: string;
+  code: string;
+  username: string;
+  password: string;
 }

@@ -9,12 +9,10 @@ use rand::{distributions::Alphanumeric, Rng};
 use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 
-pub fn generate_secret_key() -> String {
-    let secret_length = 32;
-
+pub fn generate_secret_key(length: usize) -> String {
     rand::thread_rng()
         .sample_iter(&Alphanumeric)
-        .take(secret_length)
+        .take(length)
         .map(char::from)
         .collect()
 }
