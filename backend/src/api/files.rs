@@ -2,7 +2,8 @@ use crate::entity::error::Error;
 use crate::entity::file::{File, FileType};
 use crate::entity::hidden::Hidden;
 use crate::entity::request::{
-    CreateDirRequest, GenerateLinkRequest, RenameFileRequest, SetFileVisibilityRequest,
+    CopyMoveFileRequest, CreateDirRequest, GenerateLinkRequest, RenameFileRequest,
+    SetFileVisibilityRequest,
 };
 use crate::entity::response::FileResponse;
 use crate::service::app_state::AppState;
@@ -11,6 +12,8 @@ use crate::service::range::{Range, RangedFile};
 use crate::service::track;
 use crate::util::{self, file_system};
 use anyhow::Result as AnyResult;
+use fs_extra::dir;
+use fs_extra::{copy_items_with_progress, TransitProcess};
 use rocket::fs::NamedFile;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
@@ -30,7 +33,8 @@ pub fn route() -> Vec<Route> {
         generate_share_link,
         get_share_link,
         search_files,
-        update_file_visibility
+        update_file_visibility,
+        copy_file
     ]
 }
 
@@ -281,6 +285,25 @@ async fn search_files(
     let results = search_dir_all(state, &keywords_splits, user.permission).await?;
 
     Ok(Json(results))
+}
+
+#[post("/file/copy", data = "<req_body>")]
+async fn copy_file(
+    state: &State<AppState>,
+    _admin: AuthAdmin,
+    req_body: Json<CopyMoveFileRequest>,
+) -> Result<(), Error> {
+    let source = get_target_path(state, &req_body.source)?;
+    let target = get_target_path(state, &req_body.target)?;
+
+    let options = dir::CopyOptions::new();
+    let handle = |_process_info: TransitProcess| dir::TransitProcessResult::ContinueOrAbort;
+    let from_paths = vec![source];
+    if let Err(e) = copy_items_with_progress(&from_paths, &target, &options, handle) {
+        println!("error : {}", e);
+    }
+
+    Ok(())
 }
 
 fn get_target_path(state: &State<AppState>, path: &str) -> AnyResult<PathBuf> {

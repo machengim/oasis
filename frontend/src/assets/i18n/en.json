@@ -53,7 +53,8 @@
     "dir_browser": {
       "title": "Directory Browser",
       "volumes": "Volumes",
-      "selected_dir": "Selected directory"
+      "selected_dir": "Selected directory",
+      "root_dir": "Root directory:"
     },
     "setup": {
       "title": "Site setup"
@@ -105,7 +106,8 @@
       "delete": "Delete",
       "close": "Close",
       "show": "Show",
-      "hide": "Hide"
+      "hide": "Hide",
+      "copy_to": "Copy to..."
     },
     "forgot_password": {
       "title": "Forgot password",
@@ -186,6 +188,15 @@
       "text_after": ". Are you sure to contine?",
       "hiding": "hiding from guest users ",
       "showing": "showing to guest users "
+    },
+    "copy_move": {
+      "copy": "Copy ",
+      "move": "Move ",
+      "copying": "copying ",
+      "moving": "moving ",
+      "text1": "You are ",
+      "text2": " to directory ",
+      "text3": ". Are you sure to continue?"
     }
   },
   "message": {
@@ -205,7 +216,8 @@
       "rename_file": "Rename successfully",
       "delete_file": "Delete successfully",
       "update_visibility": "File visibility updated successfully",
-      "reset_password": "Password reset successfully"
+      "reset_password": "Password reset successfully",
+      "copy_file": "Copy file successfully"
     },
     "error": {
       "no_storage": "Please choose a storage",
@@ -228,7 +240,8 @@
       "search_file": "Search failed",
       "update_visibility": "File visibility update failed",
       "forgot_password": "Forget password request failed",
-      "reset_password": "Password reset failed"
+      "reset_password": "Password reset failed",
+      "copy_file": "Copy file failed"
     }
   }
 }

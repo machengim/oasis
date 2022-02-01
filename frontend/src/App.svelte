@@ -17,6 +17,7 @@
     ISiteBrief,
     IUpdateAppNeedRespose,
     IUpdateAppInfo,
+    ISiteFull,
   } from "./utils/types";
   import Spinner from "./components/Spinner.svelte";
   import {
@@ -43,9 +44,9 @@
     }
   });
 
-  const unsubscribeUser = userStore.subscribe((user) => {
+  const unsubscribeUser = userStore.subscribe(async (user) => {
     if (user && user.permission === 9) {
-      checkUpdate();
+      await Promise.all([checkUpdate(), fetchSiteFullConfig()]);
     }
   });
 
@@ -70,6 +71,20 @@
   $: if (updateInfo) {
     processUpdateInfo();
   }
+
+  const fetchSiteFullConfig = async () => {
+    isLoading = true;
+    const endpoint = "/api/sys/config?mode=full";
+    try {
+      const site: ISiteFull = await api.get(endpoint, "json");
+      siteStore.set(site);
+    } catch (e) {
+      console.error(e);
+      setNotification("error", $t("message.error.read_site_error"));
+    } finally {
+      isLoading = false;
+    }
+  };
 
   const initApp = async () => {
     init({

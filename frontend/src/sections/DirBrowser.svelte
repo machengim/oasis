@@ -8,6 +8,7 @@
 
   export let onClose = () => {};
   export let onSelect = (v: string) => {};
+  export let root = "";
   let volumes: string[] = [];
   let path: string[] = null;
   let sub_dirs: string[] = [];
@@ -16,20 +17,22 @@
   let isLoading = false;
 
   onMount(() => {
-    fetchVolumes();
+    if (!root) {
+      fetchVolumes();
+    }
   });
 
   $: if (volumes.length > 0) {
     selectedVolume = volumes[0];
   }
 
-  $: if (selectedVolume) {
+  $: if (selectedVolume || root) {
     path = [];
   }
 
   $: if (path) {
     currentDir = buildFullPath();
-    fetchSubDirs();
+    fetchSubDirs(currentDir);
   }
 
   const fetchVolumes = async () => {
@@ -44,11 +47,11 @@
     isLoading = false;
   };
 
-  const fetchSubDirs = async () => {
+  const fetchSubDirs = async (dir: string) => {
     const currentPath = path;
     isLoading = true;
     try {
-      const endpoint = "/api/sys/dirs/" + encodeURIComponent(buildFullPath());
+      const endpoint = "/api/sys/dirs/" + encodeURIComponent(dir);
       // Tricky part is, on Windows, the result may be `C:Windows`
       // if the special character has been cleaned up in the volume name.
       const sub_dirs_res: Array<string> = await api.get(endpoint);
@@ -87,7 +90,7 @@
   // For Windows, it looks like `C:/Windows/System` or `C:\\Windows\\System.
   // And volume names may vary from `/` to `/run/media/user/Toshiba`.
   const buildFullPath = () => {
-    let fullPath = selectedVolume;
+    let fullPath = root || selectedVolume;
 
     for (let pathComponent of path) {
       const lastChar = fullPath.charAt(fullPath.length - 1);
@@ -130,18 +133,23 @@
     </div>
     <!-- Volume selector -->
     <div class="mb-4 flex flex-row items-center">
-      <span class="mr-4">{$t("component.dir_browser.volumes")}:</span>
-      <select
-        class="px-2 border bg-gray-50 max-w-10"
-        on:change={selectVolume}
-        on:blur
-      >
-        {#each volumes as volume}
-          <option value={volume}>
-            {volume}
-          </option>
-        {/each}
-      </select>
+      {#if root}
+        <span class="mr-4">{$t("component.dir_browser.root_dir")}</span>
+        <span class="text-gray-700 font-bold break-words mb-2">{root}</span>
+      {:else}
+        <span class="mr-4">{$t("component.dir_browser.volumes")}:</span>
+        <select
+          class="px-2 border bg-gray-50 max-w-10"
+          on:change={selectVolume}
+          on:blur
+        >
+          {#each volumes as volume}
+            <option value={volume}>
+              {volume}
+            </option>
+          {/each}
+        </select>
+      {/if}
     </div>
     <hr />
 

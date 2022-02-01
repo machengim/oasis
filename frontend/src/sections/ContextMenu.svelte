@@ -2,11 +2,13 @@
   import { t } from "svelte-i18n";
   import { onMount } from "svelte";
   import { userStore } from "../utils/store";
-  import type { IFile, IMousePosition } from "../utils/types";
+  import type {
+    ContextMenuAction,
+    IFile,
+    IMousePosition,
+  } from "../utils/types";
 
-  export let onContextAction: (
-    action: "rename" | "delete" | "close" | "visibility"
-  ) => void;
+  export let onContextAction: (action: ContextMenuAction) => void;
   export let pos: IMousePosition;
   export let contextFile: IFile;
   const user = $userStore;
@@ -48,6 +50,12 @@
       on:click={() => onContextAction("rename")}
     >
       {$t("component.context_menu.rename")}
+    </div>
+    <div
+      class="px-2 py-1 text-black hover:bg-gray-400 cursor-pointer"
+      on:click={() => onContextAction("copy")}
+    >
+      {$t("component.context_menu.copy_to")}
     </div>
     <div
       class="px-2 py-1 text-red-500 hover:bg-gray-400 cursor-pointer"

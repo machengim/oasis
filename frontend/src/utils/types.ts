@@ -130,3 +130,10 @@ export interface IResetPasswordRequest {
   username: string;
   password: string;
 }
+
+export type ContextMenuAction =
+  | "rename"
+  | "delete"
+  | "close"
+  | "visibility"
+  | "copy";

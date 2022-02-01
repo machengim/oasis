@@ -53,7 +53,8 @@
     "dir_browser": {
       "title": "目录浏览器",
       "volumes": "分区",
-      "selected_dir": "当前选择位置"
+      "selected_dir": "当前选择位置",
+      "root_dir": "根目录:"
     },
     "setup": {
       "title": "网站设置"
@@ -105,7 +106,8 @@
       "delete": "删除",
       "close": "关闭",
       "show": "显示",
-      "hide": "隐藏"
+      "hide": "隐藏",
+      "copy_to": "复制到..."
     },
     "forgot_password": {
       "title": "忘记密码",
@@ -185,6 +187,15 @@
       "text_after": "。确定要继续?",
       "hiding": "向访客隐藏",
       "showing": "向访客显示"
+    },
+    "copy_move": {
+      "copy": "复制",
+      "move": "移动",
+      "copying": "复制",
+      "moving": "移动",
+      "text1": "将要",
+      "text2": " 到文件夹",
+      "text3": "。确定要继续?"
     }
   },
   "message": {
@@ -204,7 +215,8 @@
       "rename_file": "重命名成功",
       "delete_file": "删除成功",
       "update_visibility": "文件可见性更新成功",
-      "reset_password": "重置密码成功"
+      "reset_password": "重置密码成功",
+      "copy_file": "文件复制成功"
     },
     "error": {
       "no_storage": "请选择存储位置",
@@ -227,7 +239,8 @@
       "search_file": "搜索失败",
       "update_visibility": "文件可见性更新失败",
       "forgot_password": "忘记密码请求失败",
-      "reset_password": "重置密码失败"
+      "reset_password": "重置密码失败",
+      "copy_file": "文件复制失败"
     }
   }
 }

@@ -10,8 +10,10 @@
     resetTitle,
     clickStore,
     userStore,
+    siteStore,
   } from "../utils/store";
   import type {
+    ContextMenuAction,
     IFile,
     IFileOrder,
     IMousePosition,
@@ -28,13 +30,17 @@
   import DeleteFileModal from "../modals/DeleteFileModal.svelte";
   import FileVisibilityModal from "../modals/FileVisibilityModal.svelte";
   import ContextMenu from "../sections/ContextMenu.svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import FilesList from "../sections/FilesList.svelte";
+  import DirBrowser from "../sections/DirBrowser.svelte";
+  import CopyFileModal from "../modals/CopyMoveFileModal.svelte";
+  import CopyMoveFileModal from "../modals/CopyMoveFileModal.svelte";
 
   const navigate = useNavigate();
   const user = $userStore;
   let dirs = $dirsStore;
   let files: Array<IFile> = $filesStore;
+  let storage = $siteStore.storage;
   let order: IFileOrder = { key: "name", asc: true };
   let isLoading = false;
   let fileSelector: HTMLInputElement;
@@ -48,8 +54,12 @@
   let showContextMenu = false;
   let showFileVisibilityModal = false;
   let showDeleteFileModal = false;
+  let showDirBrowser = false;
+  let showCopyFileModal = false;
   let contextPos: IMousePosition;
   let contextFile: IFile;
+  let targetDir: string;
+  let copyOrMove: "copy" | "move" = "copy";
 
   const unsubscribeDirs = dirsStore.subscribe((d) => (dirs = d));
 
@@ -67,10 +77,15 @@
     }
   });
 
+  const unsubscribeStorage = siteStore.subscribe(
+    (site) => (storage = site.storage)
+  );
+
   onDestroy(() => {
     unsubscribeDirs();
     unsubscribeFiles();
     unsubscribeClick();
+    unsubscribeStorage();
   });
 
   $: if (dirs.length >= 1) {
@@ -232,9 +247,7 @@
     showContextMenu = true;
   };
 
-  const onContextAction = (
-    action: "rename" | "delete" | "close" | "visibility"
-  ) => {
+  const onContextAction = (action: ContextMenuAction) => {
     showContextMenu = false;
 
     switch (action) {
@@ -250,6 +263,10 @@
       case "close":
         contextFile = null;
         break;
+      case "copy":
+        copyOrMove = "copy";
+        showDirBrowser = true;
+        break;
       default:
         break;
     }
@@ -263,6 +280,16 @@
 
 {#if showContextMenu}
   <ContextMenu pos={contextPos} {onContextAction} {contextFile} />
+{/if}
+{#if showDirBrowser && storage}
+  <DirBrowser
+    onClose={() => (showDirBrowser = false)}
+    onSelect={(v) => {
+      targetDir = v.replace(storage, "");
+      showCopyFileModal = true;
+    }}
+    root={storage}
+  />
 {/if}
 {#if showPromptModal}
   <PromptModal
@@ -292,6 +319,16 @@
     onClose={closeFileVisibilityModal}
   />
 {/if}
+{#if showCopyFileModal}
+  <CopyMoveFileModal
+    source={contextFile}
+    sourceDirs={dirs}
+    target={targetDir}
+    mode={copyOrMove}
+    onClose={() => (showCopyFileModal = false)}
+  />
+{/if}
+
 <div class="relative w-full h-full">
   <div class="w-11/12 lg:w-4/5 h-full mx-auto my-4 lg:mt-4 lg:mb-10">
     <div class="flex flex-row items-center justify-between">

@@ -1,6 +1,6 @@
-import { getLocaleFromNavigator } from 'svelte-i18n';
-import type { IFile, IFileOrder } from './types';
-import { EFileType } from './enums';
+import { getLocaleFromNavigator } from "svelte-i18n";
+import type { IFile, IFileOrder } from "./types";
+import { EFileType } from "./enums";
 
 export function upperFirstChar(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
@@ -28,13 +28,10 @@ export function formatSize(size: number) {
   do {
     size /= 1024;
     ++u;
-  } while (
-    Math.round(Math.abs(size) * r) / r >= 1024 &&
-    u < units.length - 1
-  );
+  } while (Math.round(Math.abs(size) * r) / r >= 1024 && u < units.length - 1);
 
   return size.toFixed(dp) + " " + units[u];
-};
+}
 
 export function validateForm(form: HTMLFormElement) {
   if (!form.checkValidity()) {
@@ -43,16 +40,19 @@ export function validateForm(form: HTMLFormElement) {
   }
 
   return true;
-};
+}
 
 export function captilizeFirst(input: string) {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
 export function compareArray<T>(arrayA: Array<T>, arrayB: Array<T>) {
-
-  return arrayA.length === arrayB.length &&
-    arrayA.every(function (value, index) { return value === arrayB[index] });
+  return (
+    arrayA.length === arrayB.length &&
+    arrayA.every(function (value, index) {
+      return value === arrayB[index];
+    })
+  );
 }
 
 function extractFileExt(filename: string) {
@@ -70,7 +70,7 @@ function extractFileExt(filename: string) {
   }
 
   return file_ext;
-};
+}
 
 export function inferFileType(filename: string) {
   const ext = extractFileExt(filename);
@@ -123,7 +123,7 @@ export function inferFileType(filename: string) {
 }
 
 export function compareDir(a: Array<string>, b: Array<string>) {
-  return encodeURIComponent(a.join('/')) === encodeURIComponent(b.join("/"));
+  return encodeURIComponent(a.join("/")) === encodeURIComponent(b.join("/"));
 }
 
 export function compareFile(a: IFile, b: IFile, order: IFileOrder) {
@@ -148,10 +148,12 @@ export function compareFile(a: IFile, b: IFile, order: IFileOrder) {
   }
 
   return result * ascFactor;
-};
+}
 
 export function checkMobile() {
-  return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
 }
 
 export function checkSafari() {
@@ -160,10 +162,10 @@ export function checkSafari() {
 
 export function readCookie(name: string) {
   const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
+  const ca = document.cookie.split(";");
   for (let i = 0; i < ca.length; i++) {
     let c = ca[i];
-    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+    while (c.charAt(0) == " ") c = c.substring(1, c.length);
     if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
   }
 
@@ -177,8 +179,8 @@ export function getLocale() {
 }
 
 export function compareVersion(v1: string, v2: string) {
-  const parts1 = v1.split(".").map(p => +p);
-  const parts2 = v2.split(".").map(p => +p);
+  const parts1 = v1.split(".").map((p) => +p);
+  const parts2 = v2.split(".").map((p) => +p);
 
   for (let i = 0; i < Math.min(parts1.length, parts2.length); i++) {
     if (parts1[i] > parts2[i]) {
@@ -218,16 +220,24 @@ export function srtToVtt(input: string): string {
 
 export function buildEncodeFilePath(dirs: Array<string>, filename: string) {
   const dir = dirs.join("/");
-  const path = dir ? dir + "/" + filename : filename;
+  let path = dir ? dir + "/" + filename : filename;
+  if (path.startsWith("/")) {
+    path = path.slice(1);
+  }
 
   return encodeURIComponent(path);
 }
 
 export function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms))
+  return new Promise((r) => setTimeout(r, ms));
 }
 
-export function accurateTimeOut(start: number, length: number, tolerance: number, callback: () => void) {
+export function accurateTimeOut(
+  start: number,
+  length: number,
+  tolerance: number,
+  callback: () => void
+) {
   const timer = (t: number, callback: () => void) => {
     setTimeout(() => {
       const timeElapsed = new Date().getTime() - start;
