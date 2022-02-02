@@ -80,7 +80,8 @@
       "size": "大小",
       "new": "+ 新建",
       "create_folder": "创建目录",
-      "upload_files": "上传文件"
+      "upload_files": "上传文件",
+      "drop_files": "将文件拖入此区域"
     },
     "file_view": {
       "filelist": "文件列表"

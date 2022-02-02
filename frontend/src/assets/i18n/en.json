@@ -80,7 +80,8 @@
       "size": "Size",
       "new": "+ New",
       "create_folder": "Create folder",
-      "upload_files": "Upload file(s)"
+      "upload_files": "Upload file(s)",
+      "drop_files": "Drop file(s) here"
     },
     "file_view": {
       "filelist": "File list"

@@ -252,3 +252,19 @@ export function accurateTimeOut(
 
   timer(length, callback);
 }
+
+export function isFile(input: File) {
+  return new Promise(function (resolve, reject) {
+    if (input.type !== "") {
+      return resolve(input);
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (reader.error && reader.error.name === "NotFoundError") {
+        return reject(reader.error.name);
+      }
+      resolve(input);
+    };
+    reader.readAsBinaryString(input);
+  });
+}

@@ -23,7 +23,7 @@
   import * as api from "../utils/api";
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
-  import { compareFile } from "../utils/util";
+  import { compareFile, isFile } from "../utils/util";
   import Button from "../components/Button.svelte";
   import PromptModal from "../modals/PromptModal.svelte";
   import NewFilenameModal from "../modals/NewFilenameModal.svelte";
@@ -176,7 +176,18 @@
     const target = e.target as HTMLInputElement;
     const filelist = target.files as FileList;
 
+    await uploadFiles(filelist);
+  };
+
+  const uploadFiles = async (filelist: FileList) => {
     for (const file of filelist) {
+      try {
+        await isFile(file);
+      } catch (e) {
+        console.log("Ignore folder upload: ", file.name);
+        continue;
+      }
+
       if (
         !resultForAll &&
         files.findIndex((f) => f.filename === file.name) >= 0
@@ -381,6 +392,7 @@
         {changeOrder}
         {backToParentDir}
         {openContextMenu}
+        {uploadFiles}
       />
     {/if}
   </div>

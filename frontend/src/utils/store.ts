@@ -1,7 +1,13 @@
-import { get, Writable, writable } from 'svelte/store';
-import type { IFile, INotification, IUser, ISiteFull, IUploadTask } from './types';
-import type { ELoopMethod, EUploadStatus } from './enums';
-import * as constants from '../assets/constants.json';
+import { get, Writable, writable } from "svelte/store";
+import type {
+  IFile,
+  INotification,
+  IUser,
+  ISiteFull,
+  IUploadTask,
+} from "./types";
+import type { ELoopMethod, EUploadStatus } from "./enums";
+import * as constants from "../assets/constants.json";
 
 export const siteStore: Writable<ISiteFull> = writable(null);
 
@@ -24,7 +30,7 @@ export function getUsername() {
 
 export const notificationStore: Writable<INotification> = writable(null);
 
-export function setNotification(type: 'success' | 'error', msg: string) {
+export function setNotification(type: "success" | "error", msg: string) {
   const newNotification: INotification = { type, msg };
   notificationStore.set(newNotification);
 }
@@ -43,7 +49,12 @@ export function pushFile(file: IFile) {
   const currentDir = get(dirsStore);
   if (currentDir.join("/") || "/" === file.dir) {
     const newFiles = get(filesStore);
-    newFiles.push(file);
+    const index = newFiles.findIndex((f) => f.filename === file.filename);
+    if (index >= 0) {
+      newFiles[index] = file;
+    } else {
+      newFiles.push(file);
+    }
     filesStore.set(newFiles);
   }
 }
@@ -54,7 +65,7 @@ export function updateFile(oldFile: IFile, newFile: IFile) {
   const currentDir = get(dirsStore);
   if (currentDir.join("/") || "/" === newFile.dir) {
     const files = get(filesStore);
-    const index = files.findIndex(f => f.filename === oldFile.filename);
+    const index = files.findIndex((f) => f.filename === oldFile.filename);
     if (index >= 0) {
       files[index] = newFile;
       filesStore.set(files);
@@ -68,7 +79,7 @@ export function deleteFile(file: IFile) {
   const currentDir = get(dirsStore);
   if (currentDir.join("/") || "/" === file.dir) {
     const files = get(filesStore);
-    const index = files.findIndex(f => f === file);
+    const index = files.findIndex((f) => f === file);
     if (index >= 0) {
       files.splice(index, 1);
       filesStore.set(files);
@@ -91,9 +102,13 @@ export function resetTitle() {
 
 export const uploadTaskStore: Writable<Array<IUploadTask>> = writable([]);
 
-export function updateTask(file: File, status: EUploadStatus, progress: number) {
+export function updateTask(
+  file: File,
+  status: EUploadStatus,
+  progress: number
+) {
   const tasks = get(uploadTaskStore);
-  const index = tasks.findIndex(t => t.file === file);
+  const index = tasks.findIndex((t) => t.file === file);
   if (index >= 0) {
     tasks[index].status = status;
     tasks[index].progress = progress;
@@ -111,7 +126,7 @@ export function pushWorker(worker: Worker) {
 
 export function removeWorker(worker: Worker) {
   const workers = get(workerStore);
-  const newWorkers = workers.filter(w => w !== worker);
+  const newWorkers = workers.filter((w) => w !== worker);
   workerStore.set(newWorkers);
 }
 
