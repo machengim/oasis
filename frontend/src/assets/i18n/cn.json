@@ -107,7 +107,8 @@
       "close": "关闭",
       "show": "显示",
       "hide": "隐藏",
-      "copy_to": "复制到..."
+      "copy_to": "复制到...",
+      "move_to": "移动到..."
     },
     "forgot_password": {
       "title": "忘记密码",
@@ -216,7 +217,8 @@
       "delete_file": "删除成功",
       "update_visibility": "文件可见性更新成功",
       "reset_password": "重置密码成功",
-      "copy_file": "文件复制成功"
+      "copy_file": "文件复制成功",
+      "move_file": "文件移动成功"
     },
     "error": {
       "no_storage": "请选择存储位置",
@@ -240,7 +242,8 @@
       "update_visibility": "文件可见性更新失败",
       "forgot_password": "忘记密码请求失败",
       "reset_password": "重置密码失败",
-      "copy_file": "文件复制失败"
+      "copy_file": "文件复制失败",
+      "move_file": "文件移动失败"
     }
   }
 }

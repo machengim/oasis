@@ -34,7 +34,8 @@ pub fn route() -> Vec<Route> {
         get_share_link,
         search_files,
         update_file_visibility,
-        copy_file
+        copy_file,
+        move_file
     ]
 }
 
@@ -299,9 +300,25 @@ async fn copy_file(
     let options = dir::CopyOptions::new();
     let handle = |_process_info: TransitProcess| dir::TransitProcessResult::ContinueOrAbort;
     let from_paths = vec![source];
-    if let Err(e) = copy_items_with_progress(&from_paths, &target, &options, handle) {
-        println!("error : {}", e);
-    }
+    copy_items_with_progress(&from_paths, &target, &options, handle).map_err(|_e| 500)?;
+
+    Ok(())
+}
+
+#[post("/file/move", data = "<req_body>")]
+async fn move_file(
+    state: &State<AppState>,
+    admin: AuthAdmin,
+    req_body: Json<CopyMoveFileRequest>,
+) -> Result<(), Error> {
+    copy_file(state, admin.clone(), Json(req_body.clone())).await?;
+
+    let mut conn = state.get_pool_conn().await?;
+    let mut tx = conn.begin().await?;
+    Hidden::delete_all_sub_path_query(&mut tx, &req_body.source).await?;
+    tx.commit().await?;
+
+    delete_file(state, &req_body.source, admin).await?;
 
     Ok(())
 }

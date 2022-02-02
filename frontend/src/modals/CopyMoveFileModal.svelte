@@ -6,7 +6,7 @@
   import type { IFile } from "../utils/types";
   import { buildEncodeFilePath } from "../utils/util";
   import * as api from "../utils/api";
-  import { setNotification } from "../utils/store";
+  import { deleteFile, setNotification } from "../utils/store";
 
   export let onClose: () => void;
   export let source: IFile;
@@ -14,6 +14,11 @@
   export let sourceDirs: string[];
   export let mode: "copy" | "move";
   let isLoading = false;
+
+  const getNotification = (result: "success" | "error") => {
+    const value = `message.${result}.${mode}_file`;
+    return $t(value);
+  };
 
   const onConfirm = async () => {
     isLoading = true;
@@ -23,12 +28,16 @@
     };
 
     try {
-      await api.post("/api/file/copy", payload, false);
-      setNotification("success", $t("message.success.copy_file"));
+      await api.post(`/api/file/${mode}`, payload, false);
+      if (mode === "move") {
+        source.dir = sourceDirs.join("/") || "/";
+        deleteFile(source);
+      }
+      setNotification("success", getNotification("success"));
       onClose();
     } catch (e) {
-      setNotification("error", $t("message.error.copy_file"));
       console.error(e);
+      setNotification("error", getNotification("error"));
     } finally {
       isLoading = false;
     }

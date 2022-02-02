@@ -7,13 +7,13 @@ use rocket::{
     Request,
 };
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct AuthUser {
     pub uid: i64,
     pub permission: i8,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct AuthAdmin {
     pub uid: i64,
 }

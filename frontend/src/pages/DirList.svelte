@@ -267,7 +267,9 @@
         copyOrMove = "copy";
         showDirBrowser = true;
         break;
-      default:
+      case "move":
+        copyOrMove = "move";
+        showDirBrowser = true;
         break;
     }
   };

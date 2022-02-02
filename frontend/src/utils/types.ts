@@ -136,4 +136,5 @@ export type ContextMenuAction =
   | "delete"
   | "close"
   | "visibility"
-  | "copy";
+  | "copy"
+  | "move";

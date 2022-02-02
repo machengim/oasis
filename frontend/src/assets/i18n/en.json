@@ -107,7 +107,8 @@
       "close": "Close",
       "show": "Show",
       "hide": "Hide",
-      "copy_to": "Copy to..."
+      "copy_to": "Copy to...",
+      "move_to": "Move to..."
     },
     "forgot_password": {
       "title": "Forgot password",
@@ -217,7 +218,8 @@
       "delete_file": "Delete successfully",
       "update_visibility": "File visibility updated successfully",
       "reset_password": "Password reset successfully",
-      "copy_file": "Copy file successfully"
+      "copy_file": "Copy file successfully",
+      "move_file": "Move file successfully"
     },
     "error": {
       "no_storage": "Please choose a storage",
@@ -241,7 +243,8 @@
       "update_visibility": "File visibility update failed",
       "forgot_password": "Forget password request failed",
       "reset_password": "Password reset failed",
-      "copy_file": "Copy file failed"
+      "copy_file": "Copy file failed",
+      "move_file": "Move file failed"
     }
   }
 }
