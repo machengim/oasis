@@ -1,13 +1,13 @@
 {
-    "version": "0.2.5",
+    "version": "0.2.4",
     "descriptions": [
         {
             "lang": "en",
-            "detail": "File copy and move; drag and drop upload"
+            "detail": "Reset password, Update hidden files when renaming or deleting"
         },
         {
             "lang": "cn",
-            "detail": "文件复制和移动, 拖拽上传"
+            "detail": "Reset password, Update hidden files when renaming or deleting"
         }
     ],
     "url": "https://github.com/machengim/oasis/releases"
