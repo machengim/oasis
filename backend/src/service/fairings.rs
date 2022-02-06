@@ -43,5 +43,5 @@ fn req_static<'r>(req_path: &Path) -> bool {
         }
     }
 
-    req_path.starts_with("/api/file/")
+    req_path.starts_with("/api/file/") && !req_path.starts_with("/api/file/copy-move-status")
 }

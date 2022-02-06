@@ -1,5 +1,11 @@
 ## Change Log
 
+### v0.2.5
+
+- File copy
+- File move
+- Drag and drop upload
+
 ### v0.2.4
 
 - Reset password
