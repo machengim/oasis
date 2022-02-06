@@ -99,10 +99,3 @@ pub struct ResetPasswordRequest {
     pub username: String,
     pub password: String,
 }
-
-#[derive(Deserialize, Clone)]
-#[serde(crate = "rocket::serde")]
-pub struct CopyMoveFileRequest {
-    pub source: String,
-    pub target: String,
-}

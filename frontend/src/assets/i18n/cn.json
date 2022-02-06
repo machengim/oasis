@@ -191,13 +191,19 @@
       "showing": "向访客显示"
     },
     "copy_move": {
-      "copy": "复制",
-      "move": "移动",
-      "copying": "复制",
-      "moving": "移动",
+      "copy": "复制 ",
+      "move": "移动 ",
+      "copying": "复制 ",
+      "moving": "移动 ",
       "text1": "将要",
       "text2": " 到文件夹",
-      "text3": "。确定要继续?"
+      "text3": "是否覆盖目标文件夹下的同名文件?",
+      "to": "到 ",
+      "progress": "进度: ",
+      "done_text": "任务完成。你可以关闭此窗口。",
+      "failed_text": "任务失败。请重试。",
+      "yes": "是",
+      "no": "否"
     }
   },
   "message": {

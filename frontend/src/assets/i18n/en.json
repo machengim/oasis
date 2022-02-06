@@ -198,7 +198,13 @@
       "moving": "moving ",
       "text1": "You are ",
       "text2": " to directory ",
-      "text3": ". Are you sure to continue?"
+      "text3": "Overwrite files with the same name in the target directory?",
+      "to": " to ",
+      "progress": "Progress: ",
+      "done_text": "Task done. You can close this window now.",
+      "failed_text": "Task failed. Please try again.",
+      "yes": "Yes",
+      "no": "No"
     }
   },
   "message": {

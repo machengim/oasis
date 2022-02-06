@@ -5,12 +5,18 @@ mod entity;
 mod service;
 mod util;
 use crate::util::local_ip::ServerConfig;
-use entity::site::Site;
+use entity::{copy_move_task::CopyMoveTask, site::Site};
+use lazy_static::lazy_static;
 use rocket::fs::FileServer;
 use service::app_state::AppState;
 use service::fairings::StaticFileCache;
-use std::{thread, time};
+use std::sync::Mutex;
+use std::{sync::Arc, thread, time};
 use util::{init, local_ip, rocket_env::RocketEnv};
+
+lazy_static! {
+    static ref COPY_MOVE_TASK: Arc<Mutex<Option<CopyMoveTask>>> = Arc::new(Mutex::new(None));
+}
 
 #[tokio::main]
 async fn main() {

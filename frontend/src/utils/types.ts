@@ -131,6 +131,15 @@ export interface IResetPasswordRequest {
   password: string;
 }
 
+export interface ICopyMoveTask {
+  uuid: string;
+  status: enums.ECopyMoveTaskStatus;
+  source: string;
+  target: string;
+  progress: number;
+  is_copy: boolean;
+}
+
 export type ContextMenuAction =
   | "rename"
   | "delete"

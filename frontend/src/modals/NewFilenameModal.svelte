@@ -132,7 +132,7 @@
     </p>
     <input
       type="text"
-      class="mt-2 w-48 lg:w-64 border rounded focus:outline-none px-2"
+      class="mt-2 w-64 lg:w-64 border rounded focus:outline-none px-2"
       bind:value={newFilename}
     />
     <p class="text-sm text-red-500 {error ? 'visible' : 'invisible'}">

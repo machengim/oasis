@@ -1,9 +1,9 @@
+use crate::entity::copy_move_task::{CopyMoveFileRequest, CopyMoveTask};
 use crate::entity::error::Error;
 use crate::entity::file::{File, FileType};
 use crate::entity::hidden::Hidden;
 use crate::entity::request::{
-    CopyMoveFileRequest, CreateDirRequest, GenerateLinkRequest, RenameFileRequest,
-    SetFileVisibilityRequest,
+    CreateDirRequest, GenerateLinkRequest, RenameFileRequest, SetFileVisibilityRequest,
 };
 use crate::entity::response::FileResponse;
 use crate::service::app_state::AppState;
@@ -12,8 +12,6 @@ use crate::service::range::{Range, RangedFile};
 use crate::service::track;
 use crate::util::{self, file_system};
 use anyhow::Result as AnyResult;
-use fs_extra::dir;
-use fs_extra::{copy_items_with_progress, TransitProcess};
 use rocket::fs::NamedFile;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
@@ -34,8 +32,8 @@ pub fn route() -> Vec<Route> {
         get_share_link,
         search_files,
         update_file_visibility,
-        copy_file,
-        move_file
+        copy_move_file,
+        get_copy_move_status
     ]
 }
 
@@ -288,39 +286,47 @@ async fn search_files(
     Ok(Json(results))
 }
 
-#[post("/file/copy", data = "<req_body>")]
-async fn copy_file(
-    state: &State<AppState>,
-    _admin: AuthAdmin,
-    req_body: Json<CopyMoveFileRequest>,
-) -> Result<(), Error> {
-    let source = get_target_path(state, &req_body.source)?;
-    let target = get_target_path(state, &req_body.target)?;
-
-    let options = dir::CopyOptions::new();
-    let handle = |_process_info: TransitProcess| dir::TransitProcessResult::ContinueOrAbort;
-    let from_paths = vec![source];
-    copy_items_with_progress(&from_paths, &target, &options, handle).map_err(|_e| 500)?;
-
-    Ok(())
-}
-
-#[post("/file/move", data = "<req_body>")]
-async fn move_file(
+#[post("/file/copy-move", data = "<req_body>")]
+async fn copy_move_file(
     state: &State<AppState>,
     admin: AuthAdmin,
     req_body: Json<CopyMoveFileRequest>,
-) -> Result<(), Error> {
-    copy_file(state, admin.clone(), Json(req_body.clone())).await?;
+) -> Result<String, Error> {
+    if !CopyMoveTask::allow_new_task() {
+        eprintln!("Copy or move task is already running.");
+        return Err(Error::BadRequest);
+    }
 
-    let mut conn = state.get_pool_conn().await?;
-    let mut tx = conn.begin().await?;
-    Hidden::delete_all_sub_path_query(&mut tx, &req_body.source).await?;
-    tx.commit().await?;
+    let source = get_target_path(state, &req_body.source)?;
+    let target = get_target_path(state, &req_body.target)?;
+    let task = CopyMoveTask::new(
+        source,
+        target,
+        admin.uid,
+        req_body.is_copy,
+        req_body.overwrite,
+    );
+    task.set_static_value();
+    task.run();
 
-    delete_file(state, &req_body.source, admin).await?;
+    Ok(task.uuid.clone())
+}
 
-    Ok(())
+#[get("/file/copy-move-status/<uuid>")]
+async fn get_copy_move_status(uuid: String, admin: AuthAdmin) -> Result<Json<CopyMoveTask>, Error> {
+    let task = CopyMoveTask::get_static_value();
+    if task.is_none() || task.as_ref().unwrap().uuid != uuid {
+        return Err(Error::NotFound);
+    }
+
+    if task.as_ref().unwrap().user_id != admin.uid {
+        return Err(Error::BadRequest);
+    }
+
+    let mut task_res = task.unwrap();
+    task_res.user_id = 0;
+
+    Ok(Json(task_res))
 }
 
 fn get_target_path(state: &State<AppState>, path: &str) -> AnyResult<PathBuf> {

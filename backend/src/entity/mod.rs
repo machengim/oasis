@@ -1,3 +1,4 @@
+pub mod copy_move_task;
 pub mod error;
 pub mod file;
 pub mod hidden;
