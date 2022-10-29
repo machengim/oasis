@@ -92,7 +92,8 @@ export async function refresh_token() {
   try {
     const response = await fetch("/api/user/refresh");
     const user: IUser = await response.json();
-    userStore.set(user);
+    
+    return user;
   } catch (e) {
     userStore.set(null);
   }

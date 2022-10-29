@@ -28,6 +28,13 @@ export function getUsername() {
   return (user && user.username) || "";
 }
 
+export function setUserExpire(newExpire: number) {
+  let user = get(userStore);
+  if (user) {
+    user.expire = newExpire;
+  }
+}
+
 export const notificationStore: Writable<INotification> = writable(null);
 
 export function setNotification(type: "success" | "error", msg: string) {

@@ -26,6 +26,7 @@
     userStore,
     titleStore,
     clickStore,
+    setUserExpire,
   } from "./utils/store";
   import { compareVersion, getLocale } from "./utils/util";
   import UpdateModal from "./modals/UpdateModal.svelte";
@@ -97,11 +98,11 @@
         "/api/sys/config?mode=brief"
       );
       const tokenReq = api.refresh_token();
-      const values: [ISiteBrief, void] = await Promise.all([siteReq, tokenReq]);
-      const site = values[0];
+      const [site, user] = await Promise.all([siteReq, tokenReq]);
       if (site) {
         siteStore.set({ ...site, storage: "" });
         titleStore.set(site.name);
+        userStore.set(user);
       }
     } catch (e) {
       console.error(e);
@@ -114,7 +115,14 @@
     // Condition is user in store and the token is almost expired (5 mins)
     setInterval(async () => {
       if (needRefreshToken()) {
-        await api.refresh_token();
+        const user = await api.refresh_token();
+        if (
+          user.username === $userStore.username &&
+          user.permission === $userStore.permission &&
+          user.expire > $userStore.expire
+        ) {
+          setUserExpire(user.expire);
+        }
       }
     }, 1000 * 180);
   };
