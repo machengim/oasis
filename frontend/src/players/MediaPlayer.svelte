@@ -64,7 +64,9 @@
     const mediaType = getMediaType();
     const mediaControls = [
       "play-large",
+      "rewind",
       "play",
+      "fast-forward",
       "progress",
       "current-time",
       "duration",
@@ -131,6 +133,7 @@
       <video
         controls
         playsinline
+        style="--plyr-captions-background: rgba(0, 0, 0, 0)"
         bind:this={splayer}
         on:canplay={onSvideoCanplay}
         on:ended={onSvideoEnd}
@@ -140,6 +143,7 @@
     {:else}
       <video
         class="player"
+        style="--plyr-captions-background: rgba(0, 0, 0, 0)"
         crossorigin="anonymous"
         playsinline
         controls
