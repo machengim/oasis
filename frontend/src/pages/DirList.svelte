@@ -23,7 +23,7 @@
   import * as api from "../utils/api";
   import Spinner from "../components/Spinner.svelte";
   import BreadCrum from "../components/BreadCrum.svelte";
-  import { compareFile, isFile } from "../utils/util";
+  import { buildEncodeFilePath, compareFile, isFile } from "../utils/util";
   import Button from "../components/Button.svelte";
   import PromptModal from "../modals/PromptModal.svelte";
   import NewFilenameModal from "../modals/NewFilenameModal.svelte";
@@ -33,7 +33,6 @@
   import { onDestroy, onMount } from "svelte";
   import FilesList from "../sections/FilesList.svelte";
   import DirBrowser from "../sections/DirBrowser.svelte";
-  import CopyFileModal from "../modals/CopyMoveFileModal.svelte";
   import CopyMoveFileModal from "../modals/CopyMoveFileModal.svelte";
 
   const navigate = useNavigate();
@@ -258,6 +257,19 @@
     showContextMenu = true;
   };
 
+  const onDownload = (contextFile: IFile) => {
+    if (contextFile.file_type === "Dir") {
+      // TODO: download dir
+    } else {
+      const filePath =
+        "/api/file/" + buildEncodeFilePath(dirs, contextFile.filename);
+      const link = document.createElement("a");
+      link.download = contextFile.filename;
+      link.href = filePath;
+      link.click();
+    }
+  };
+
   const onContextAction = (action: ContextMenuAction) => {
     showContextMenu = false;
 
@@ -281,6 +293,9 @@
       case "move":
         copyOrMove = "move";
         showDirBrowser = true;
+        break;
+      case "download":
+        onDownload(contextFile);
         break;
     }
   };

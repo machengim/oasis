@@ -109,7 +109,8 @@
       "show": "显示",
       "hide": "隐藏",
       "copy_to": "复制到...",
-      "move_to": "移动到..."
+      "move_to": "移动到...",
+      "download": "下载"
     },
     "forgot_password": {
       "title": "忘记密码",

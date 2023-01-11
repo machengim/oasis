@@ -51,7 +51,12 @@
     >
       {$t("component.context_menu.rename")}
     </div>
-
+    <div
+      class="px-2 py-1 text-black hover:bg-gray-400 cursor-pointer"
+      on:click={() => onContextAction("download")}
+    >
+      {$t("component.context_menu.download")}
+    </div>
     <div
       class="px-2 py-1 text-black hover:bg-gray-400 cursor-pointer"
       on:click={() => onContextAction("copy")}
