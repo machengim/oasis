@@ -62,19 +62,31 @@
 
   const initPlayer = () => {
     const mediaType = getMediaType();
-    const mediaControls = [
-      "play-large",
-      "rewind",
-      "play",
-      "fast-forward",
-      "progress",
-      "current-time",
-      "duration",
-      "mute",
-      "volume",
-      "captions",
-      "settings",
-    ];
+    const mediaControls = checkMobile()
+      ? [
+          "play-large",
+          "rewind",
+          "play",
+          "fast-forward",
+          "progress",
+          "current-time",
+          "duration",
+          "captions",
+          "settings",
+        ]
+      : [
+          "play-large",
+          "rewind",
+          "play",
+          "fast-forward",
+          "progress",
+          "current-time",
+          "duration",
+          "mute",
+          "volume",
+          "captions",
+          "settings",
+        ];
 
     if (mediaType === "video") {
       mediaControls.push("fullscreen");
