@@ -10,11 +10,15 @@ use crate::service::app_state::AppState;
 use crate::service::auth::{AuthAdmin, AuthUser};
 use crate::service::range::{Range, RangedFile};
 use crate::service::track;
+use crate::util::constants::ZIP_BUFFER_SIZE;
 use crate::util::{self, file_system};
 use anyhow::Result as AnyResult;
+use async_zip::{write::ZipFileWriter, Compression, ZipEntryBuilder};
 use rocket::fs::NamedFile;
+use rocket::response::stream::ByteStream;
 use rocket::serde::json::Json;
 use rocket::tokio::fs;
+use rocket::tokio::io::{self, AsyncReadExt, AsyncWrite};
 use rocket::{Route, State};
 use sqlx::Acquire;
 use std::path::{Path, PathBuf};
@@ -33,7 +37,8 @@ pub fn route() -> Vec<Route> {
         search_files,
         update_file_visibility,
         copy_move_file,
-        get_copy_move_status
+        get_copy_move_status,
+        download_dir
     ]
 }
 
@@ -72,6 +77,33 @@ async fn dir_content(
     }
 
     Ok(Json(content))
+}
+
+#[get("/download/dir?<path>")]
+async fn download_dir(
+    path: &str,
+    _user: AuthAdmin,
+    state: &State<AppState>,
+) -> ByteStream![Vec<u8>] {
+    let (mut writer, mut reader) = tokio::io::duplex(ZIP_BUFFER_SIZE);
+    let target_path = get_target_path(state, path).unwrap();
+    rocket::tokio::spawn(async move {
+        if let Err(e) = zip_dir(&mut writer, &target_path).await {
+            println!("Error ziping dir: {}", e);
+        }
+    });
+
+    ByteStream! {
+        loop {
+            let mut buf = vec![0; ZIP_BUFFER_SIZE];
+            let r = reader.read(&mut buf).await.unwrap();
+            if r == 0 {
+                break;
+            }
+            buf.truncate(r);
+            yield buf;
+        }
+    }
 }
 
 #[post("/dir", data = "<req_body>")]
@@ -433,4 +465,39 @@ fn contains_all_keywords(path: &Path, keywords: &Vec<&str>) -> bool {
     }
 
     return true;
+}
+
+async fn zip_dir<W: AsyncWrite + Unpin>(
+    writer: &mut W,
+    path: &PathBuf,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut writer = ZipFileWriter::new(writer);
+    let mut it = WalkDir::new(path).into_iter();
+    while let Some(Ok(entry)) = it.next() {
+        if !entry.file_type().is_file() {
+            continue;
+        }
+
+        if entry.path().symlink_metadata().is_err() {
+            continue;
+        }
+
+        let parent_dir = match path.parent() {
+            Some(p) => p,
+            None => path,
+        };
+        let filename = match entry.path().strip_prefix(&parent_dir) {
+            Ok(v) => v.to_str().unwrap(),
+            Err(_) => continue,
+        };
+        let entry_op =
+            ZipEntryBuilder::new(filename.to_owned(), Compression::Stored).unix_permissions(0o644);
+        let mut file = tokio::fs::File::open(entry.path()).await?;
+        let mut file_writer = writer.write_entry_stream(entry_op).await?;
+        io::copy(&mut file, &mut file_writer).await?;
+        file_writer.close().await?;
+    }
+
+    writer.close().await?;
+    Ok(())
 }

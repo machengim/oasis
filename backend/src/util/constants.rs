@@ -22,3 +22,4 @@ pub const APP_VERSION_URL_DEBUG: &'static str =
 #[allow(dead_code)]
 pub const CACHE_FILE_EXTS: [&'static str; 3] = ["html", "js", "css"];
 pub const DEFAULT_IP: IpAddr = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
+pub const ZIP_BUFFER_SIZE: usize = 65536;

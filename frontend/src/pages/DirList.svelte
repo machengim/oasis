@@ -258,16 +258,17 @@
   };
 
   const onDownload = (contextFile: IFile) => {
-    if (contextFile.file_type === "Dir") {
-      // TODO: download dir
-    } else {
-      const filePath =
-        "/api/file/" + buildEncodeFilePath(dirs, contextFile.filename);
-      const link = document.createElement("a");
-      link.download = contextFile.filename;
-      link.href = filePath;
-      link.click();
-    }
+    const isDir = contextFile.file_type === "Dir";
+    const filePath = buildEncodeFilePath(dirs, contextFile.filename);
+    const apiPath = isDir
+      ? "/api/download/dir?path=" + filePath
+      : "/api/file/" + filePath;
+    const link = document.createElement("a");
+    link.download = isDir
+      ? contextFile.filename + ".zip"
+      : contextFile.filename;
+    link.href = apiPath;
+    link.click();
   };
 
   const onContextAction = (action: ContextMenuAction) => {
