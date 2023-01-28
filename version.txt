@@ -1,13 +1,13 @@
 {
-    "version": "0.2.5",
+    "version": "0.2.6",
     "descriptions": [
         {
             "lang": "en",
-            "detail": "File copy and move; drag and drop upload"
+            "detail": "Folder download"
         },
         {
             "lang": "cn",
-            "detail": "文件复制和移动; 拖拽上传"
+            "detail": "文件夹下载"
         }
     ],
     "url": "https://github.com/machengim/oasis/releases"

@@ -3,7 +3,7 @@ use std::net::{IpAddr, Ipv4Addr};
 pub const DEFAULT_APP_NAME: &'static str = "Oasis";
 pub const DEFAULT_UPDATE_FREQ: &'static str = "monthly";
 pub const DEFAULT_LANGUAGE: &'static str = "en";
-pub const VERSION: &'static str = "0.2.5";
+pub const VERSION: &'static str = "0.2.6";
 #[allow(dead_code)]
 pub const FRONTEND_DIR_DEBUG: &'static str = "../frontend/public/";
 #[allow(dead_code)]

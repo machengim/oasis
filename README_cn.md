@@ -17,47 +17,16 @@
 5. 运行 `oasis` 或 `oasis.exe`
 6. 从浏览器访问服务器的 IP 地址
 
-### 功能
+### Docker
 
-- 用户验证
-- 文件预览
-- 文件下载
-- 文件上传
-- 播放列表
-- 移动端适配
-- 外部链接
-- 第三方媒体播放器支持(通过外部链接)
-- 多平台支持 (Linux, MacOS, Windows, Docker)
-- I18n (英语, 中文)
+https://hub.docker.com/r/machengim/oasis
 
-### 文件格式支持
-
-- 文本
-- 图片 (浏览器支持)
-- 音频 (浏览器支持)
-- 视频 (浏览器支持)
-- 字幕 (`srt` / `vtt` 格式, 支持 Chrome, Firefox 和 Edge 浏览器)
-- PDF (由 pdf.js 支持)
-
-### 规划
-
-- [x] HTTPS
-- [x] 访客模式
-- [x] 搜索
-- [ ] 高级文件分享
-- [ ] 文本编辑器
-- [ ] 日志
-
-### 技术栈
-
-- [Svelte](https://svelte.dev)
-- [Rocket](https://rocket.rs)
-- [Tailwind](https://tailwindcss.com)
-
-### 致谢
-
-- [Pdf.js](https://mozilla.github.io/pdf.js)
-- [Plyr](https://plyr.io)
+```
+docker run --name oasis -t -d \
+-v <data>:/opt/oasis/data \
+-v <storage>:/home/storage \
+-p <port>:8000 machengim/oasis
+```
 
 ### 构建
 
@@ -69,13 +38,30 @@ cd path/to/oasis
 node build.js
 ```
 
-### Docker
+### 功能
 
-https://hub.docker.com/r/machengim/oasis
+- 用户验证
+- 文件预览/下载/上传/搜索
+- 媒体文件播放列表
+- 文件外部链接
+- I18n (英语, 中文)
 
-```
-docker run --name oasis -t -d \
--v <data>:/opt/oasis/data \
--v <storage>:/home/storage \
--p <port>:8000 machengim/oasis
-```
+### 文件格式支持
+
+- 文本
+- 图片 (浏览器支持)
+- 音频 (浏览器支持)
+- 视频 (浏览器支持)
+- 字幕 (`srt` / `vtt` 格式, 支持 Chrome, Firefox 和 Edge 浏览器)
+- PDF (由 pdf.js 支持)
+
+### 技术栈
+
+- [Svelte](https://svelte.dev)
+- [Rocket](https://rocket.rs)
+- [Tailwind](https://tailwindcss.com)
+
+### 致谢
+
+- [Pdf.js](https://mozilla.github.io/pdf.js)
+- [Plyr](https://plyr.io)

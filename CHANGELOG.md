@@ -1,5 +1,9 @@
 ## Change Log
 
+### v0.2.6
+
+- Folder download
+
 ### v0.2.5
 
 - File copy
